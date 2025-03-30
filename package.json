@@ -1,0 +1,65 @@
+{
+  "name": "nomadhood",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "generate": "bun prisma generate",
+    "prisma-studio": "bun prisma studio",
+    "db-reset": "bun prisma migrate reset",
+    "migrate-dev": "bun prisma migrate dev",
+    "migrate": "bun prisma migrate deploy",
+    "dev": "bun run migrate-dev && bun run db-seed && bun next dev",
+    "build": "bun next build",
+    "start": "bun next start",
+    "lint": "bun eslint --cache src",
+    "lint-fix": "bun eslint --cache src --fix",
+    "test-unit": "bun vitest",
+    "test-e2e": "bun playwright test",
+    "test-start": "bun run test-unit && bun run test-e2e",
+    "postinstall": "bun run generate"
+  },
+  "prisma": {},
+  "prettier": {
+    "printWidth": 80,
+    "trailingComma": "all",
+    "singleQuote": true
+  },
+  "dependencies": {
+    "@prisma/client": "^5.12.1",
+    "@tanstack/react-query": "^5.67.1",
+    "@trpc/client": "^11.0.1",
+    "@trpc/next": "^11.0.1",
+    "@trpc/react-query": "^11.0.1",
+    "@trpc/server": "^11.0.1",
+    "clsx": "^2.0.0",
+    "next": "^15.1.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "superjson": "^1.12.4",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.1",
+    "@types/bun": "latest",
+    "@types/node": "^22.13.5",
+    "@types/react": "^19.0.0",
+    "autoprefixer": "^10.4.7",
+    "dotenv": "^16.0.1",
+    "eslint": "^9.21.0",
+    "eslint-config-next": "^15.1.7",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "postcss": "^8.4.39",
+    "prettier": "^3.3.3",
+    "prisma": "^5.12.1",
+    "tailwindcss": "^3.4.6",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.24.1",
+    "vite": "^6.1.1",
+    "vitest": "^3.0.6"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
