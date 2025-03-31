@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="PostgreSQL" uuid="01a09ee9-8159-4492-8de6-05b58f8e3e44">
+    <data-source source="LOCAL" name="nomadhood_local@localhost" uuid="ea36ba0c-1201-4dab-b06a-88e54c6483b0">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
+      <schema-control>AUTOMATIC</schema-control>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>postgresql://neondb_owner:npg_H6yWrACl1vhR@ep-jolly-butterfly-a5a36sdt-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/nomadhood_local</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
-    <data-source source="LOCAL" name="PostgreSQL [2]" uuid="4bac8ebd-a86f-4f86-8573-8f09bb3b9db0">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>postgresql://neondb_owner:npg_H6yWrACl1vhR@ep-jolly-butterfly-a5a36sdt-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
+      <time-zone>America/Los_Angeles</time-zone>
     </data-source>
   </component>
 </project>
