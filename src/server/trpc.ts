@@ -9,7 +9,7 @@
  */
 
 import { initTRPC, TRPCError } from '@trpc/server';
-import { transformer } from '~/utils/transformer';
+import { transformer } from '@/utils/transformer';
 import type { Context } from './context';
 
 const t = initTRPC.context<Context>().create({
@@ -42,7 +42,6 @@ export const isAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-
 /**
  * Admin middleware
  * Checks if `ctx.user` exists and is an admin
@@ -56,8 +55,6 @@ const isAdmin = t.middleware(({ ctx, next }) => {
   return next({ ctx });
 });
 
-
-
 /**
  * Create a router
  * @see https://trpc.io/docs/v11/router
@@ -70,13 +67,11 @@ export const router = t.router;
  **/
 export const publicProcedure = t.procedure;
 
-
 /**
  * Admin procedure
  * Requires valid `ctx.user` and `ctx.user.isAdmin`
  */
 export const adminProcedure = t.procedure.use(isAuthed).use(isAdmin); // 👈 this line right here
-
 
 /**
  * Protected procedure

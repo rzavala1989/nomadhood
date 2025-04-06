@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     /* Base Options: */
+    "baseUrl": ".",
     "skipLibCheck": true,
     "target": "es2022",
     "allowJs": true,
@@ -23,7 +24,7 @@
 
     /* Path aliases */
     "paths": {
-      "~/*": ["./src/*"]
+      "@/*": ["src/*"]
     },
 
     "types": ["vitest/globals"]

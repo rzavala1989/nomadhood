@@ -3,15 +3,14 @@
  */
 import { createCallerFactory, publicProcedure, router } from '../trpc';
 import { userRouter } from './user';
-import { neighborhoodsRouter} from "~/server/routers/neighborhoods";
-import {favoritesRouter} from "~/server/routers/favoritesRouter.ts";
+import { neighborhoodsRouter } from '@/server/routers/neighborhoods';
+import { favoritesRouter } from '@/server/routers/favoritesRouter.ts';
 
 export const appRouter = router({
   healthcheck: publicProcedure.query(() => 'yay!'),
   user: userRouter,
   neighborhoods: neighborhoodsRouter,
-    favorites: favoritesRouter,
-
+  favorites: favoritesRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);
