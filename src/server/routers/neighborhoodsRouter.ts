@@ -2,7 +2,6 @@ import { z } from 'zod';
 import {
   router,
   publicProcedure,
-  protectedProcedure,
   adminProcedure,
 } from '@/server/trpc';
 import { prisma } from '@/server/prisma';

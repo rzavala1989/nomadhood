@@ -6,6 +6,7 @@ import { SessionProvider } from 'next-auth/react';
 import { DefaultLayout } from '@/components/DefaultLayout';
 import { trpc } from '@/utils/trpc';
 import '@/styles/globals.css';
+import { Session } from 'next-auth';
 
 export type NextPageWithLayout<
   TProps = Record<string, unknown>,
@@ -16,8 +17,9 @@ export type NextPageWithLayout<
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   pageProps: AppProps['pageProps'] & {
-    session?: any; // or use Session from next-auth if you're fancy
+    session?: Session;
   };
 };
 

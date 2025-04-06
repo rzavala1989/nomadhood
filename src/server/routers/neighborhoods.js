@@ -19,7 +19,7 @@ export const neighborhoodsRouter = router({
         description: z.string().optional(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       return prisma.neighborhood.create({
         data: {
           ...input,
