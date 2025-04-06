@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17.4
+    restart: always
+    environment:
+      POSTGRES_USER: ricardozavala
+      POSTGRES_PASSWORD: CozyTortoise89!
+      POSTGRES_DB: nomadhood_local
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+
+    depends_on:
+      - db
+    command: ["bun", "run", "dev"]
+
+volumes:
+  pgdata:

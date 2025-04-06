@@ -17,7 +17,6 @@
     "test-unit": "bun vitest",
     "test-e2e": "bun playwright test",
     "test-start": "bun run test-unit && bun run test-e2e",
-    "postinstall": "bun run generate"
   },
   "prisma": {},
   "prettier": {
