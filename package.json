@@ -66,7 +66,7 @@
     "resend": "^4.2.0",
     "shadcn": "^2.4.0-canary.17",
     "sonner": "^2.0.3",
-    "superjson": "^1.12.4",
+    "superjson": "^2.2.2",
     "tailwind-merge": "^3.1.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
