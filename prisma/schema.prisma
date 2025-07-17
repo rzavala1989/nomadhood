@@ -10,40 +10,57 @@ datasource db {
 
 model User {
   id            String    @id @default(uuid())
-  email         String    @unique
-  name          String?
-  image         String?
+  email         String    @unique @db.VarChar(255)
+  name          String?   @db.VarChar(100)
+  image         String?   @db.VarChar(500)
   isAdmin       Boolean   @default(false)
   emailVerified DateTime? // Added for magic link email verification
   createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   accounts  Account[]
   sessions  Session[]
   reviews   Review[]
   favorites Favorite[]
+
+  @@index([email])
+  @@index([isAdmin])
 }
 
 model Neighborhood {
   id          String     @id @default(uuid())
-  name        String
-  city        String
-  state       String
-  zip         String
-  description String?
+  name        String     @db.VarChar(100)
+  city        String     @db.VarChar(50)
+  state       String     @db.Char(2)
+  zip         String     @db.VarChar(10)
+  description String?    @db.Text
+  latitude    Float?
+  longitude   Float?
   createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   reviews     Review[]
   favorites   Favorite[]
+
+  @@index([city, state])
+  @@index([zip])
+  @@index([latitude, longitude])
 }
 
 model Review {
   id             String       @id @default(uuid())
-  rating         Int
-  comment        String?
+  rating         Int          @db.SmallInt
+  comment        String?      @db.Text
   createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
   userId         String
   neighborhoodId String
-  user           User         @relation(fields: [userId], references: [id])
-  neighborhood   Neighborhood @relation(fields: [neighborhoodId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  neighborhood   Neighborhood @relation(fields: [neighborhoodId], references: [id], onDelete: Cascade)
+
+  @@index([neighborhoodId])
+  @@index([userId])
+  @@index([rating])
+  @@unique([userId, neighborhoodId])
 }
 
 model Favorite {
