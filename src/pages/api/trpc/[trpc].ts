@@ -14,10 +14,23 @@ export default trpcNext.createNextApiHandler({
   /**
    * @see https://trpc.io/docs/v11/error-handling
    */
-  onError({ error }) {
+  onError({ error, path, input, ctx, type, req }) {
+    console.error(`❌ tRPC Error on \`${path ?? '<no-path>'}\`:`, {
+      error: {
+        message: error.message,
+        code: error.code,
+        cause: error.cause,
+      },
+      type,
+      input,
+      userId: ctx?.user?.id,
+      userAgent: req?.headers?.['user-agent'],
+    });
+
+    // In production, you might want to send to error reporting service
     if (error.code === 'INTERNAL_SERVER_ERROR') {
-      // send to bug reporting
-      console.error('Something went wrong', error);
+      // Example: Sentry, LogRocket, etc.
+      // errorReporter.captureException(error);
     }
   },
   /**
