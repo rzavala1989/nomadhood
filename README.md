@@ -34,34 +34,45 @@ session.user = {
 
 ```bash
 src/
-├── app/                # Next.js app directory
+├── components/         # Reusable UI components
+│   ├── ui/            # shadcn/ui components
+│   ├── auth/          # Authentication components
+│   └── landing/       # Landing page components
+├── hooks/             # Custom React hooks
+├── lib/               # Utility libraries
+├── pages/             # Next.js pages (Pages Router)
 │   ├── api/           # API routes
-│   ├── components/     # Reusable components
-|   ├── hooks/          # Custom hooks
-│   ├── lib/           # Utility functions
-│   ├── middleware/     # Middleware functions
-│   ├── pages/          # Page components
-│   ├── server/         # Server-side code
-│   ├── styles/         # Global styles
-│   ├── types/          # Type definitions
-│   ├── utils/          # Utility functions
-
+│   ├── auth/          # Authentication pages
+│   └── _app.tsx       # App wrapper
+├── server/            # Server-side code
+│   ├── routers/       # tRPC routers
+│   ├── context.ts     # tRPC context
+│   ├── env.ts         # Environment validation
+│   ├── prisma.ts      # Database client
+│   └── trpc.ts        # tRPC setup
+├── styles/            # Global styles
+├── types/             # TypeScript type definitions
+└── utils/             # Utility functions
 ```
-TODO / In Progress
-🗺️ Add Mapbox GL for geospatial UX
+## 🚀 Features
 
-🏘️ CRUD for neighborhoods
+### ✅ Implemented
+- **Authentication**: GitHub OAuth + Magic Link email authentication
+- **User Management**: Profile management with admin role system
+- **Neighborhoods**: CRUD operations with search, filtering, and pagination
+- **Reviews**: Complete review system with ratings and statistics
+- **Favorites**: Save and manage favorite neighborhoods
+- **Dashboard**: Interactive analytics dashboard with charts
+- **Database**: Optimized schema with proper indexes and constraints
 
-📝 Reviews system
+### 🚧 In Progress
+- **Admin Dashboard**: Management interface for neighborhoods and reviews
+- **Enhanced UI**: Neighborhood browsing and detail pages
+- **Testing**: Comprehensive unit and E2E test coverage
 
-❤️ Favorites
-
-🛡️ Role-based admin dashboard
-
-📈 Analytics (per neighborhood + user)
-
-🪪 Profile pages
-
-🌍 Search and filters
-
-🧪 Unit & E2E testing with Vitest + Playwright
+### 📋 Planned Features
+- **🗺️ Mapbox Integration**: Interactive maps with geospatial data
+- **📈 Advanced Analytics**: Per-neighborhood and user analytics
+- **🪪 Profile Pages**: Public user profiles and activity feeds
+- **🔍 Advanced Search**: Location-based search with filters
+- **📱 Mobile Optimization**: Progressive Web App features
