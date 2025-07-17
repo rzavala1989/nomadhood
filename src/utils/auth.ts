@@ -4,6 +4,7 @@ import { NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import EmailProvider from 'next-auth/providers/email';
 import { Resend } from 'resend';
+import { env } from '@/server/env';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -189,7 +190,7 @@ export const authOptions: NextAuthOptions = {
       if (token?.sub) {
         session.user.id = token.sub;
       }
-      session.user.isAdmin = session.user.email === 'zavala.ricardo.m@gmail.com';
+      session.user.isAdmin = env.ADMIN_EMAIL ? session.user.email === env.ADMIN_EMAIL : false;
       return session;
     },
   },

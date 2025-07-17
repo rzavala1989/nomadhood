@@ -5,9 +5,9 @@ services:
     image: postgres:17.4
     restart: always
     environment:
-      POSTGRES_USER: ricardozavala
-      POSTGRES_PASSWORD: CozyTortoise89!
-      POSTGRES_DB: nomadhood_local
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-nomadhood_local}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
