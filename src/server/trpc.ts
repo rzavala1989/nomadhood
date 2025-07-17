@@ -9,6 +9,7 @@
  */
 
 import { initTRPC, TRPCError } from '@trpc/server';
+import { ZodError } from 'zod';
 import { transformer } from '@/utils/transformer';
 import type { Context } from './context';
 
@@ -21,8 +22,14 @@ const t = initTRPC.context<Context>().create({
   /**
    * @see https://trpc.io/docs/v11/error-formatting
    */
-  errorFormatter({ shape }) {
-    return shape;
+  errorFormatter({ shape, error }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
+      },
+    };
   },
 });
 

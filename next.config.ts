@@ -19,6 +19,6 @@ export default {
   eslint: { ignoreDuringBuilds: !!process.env.CI },
   /** We run typechecking as a separate task in CI */
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: !!process.env.CI,
   },
 } satisfies NextConfig;

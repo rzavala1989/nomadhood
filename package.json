@@ -11,6 +11,7 @@
     "dev": "bun run migrate-dev && bun next dev",
     "build": "bun next build",
     "start": "bun next start",
+    "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "lint": "bun eslint --cache src",
     "lint-fix": "bun eslint --cache src --fix",
@@ -19,11 +20,6 @@
     "test-start": "bun run test-unit && bun run test-e2e"
   },
   "prisma": {},
-  "prettier": {
-    "printWidth": 80,
-    "trailingComma": "all",
-    "singleQuote": true
-  },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
