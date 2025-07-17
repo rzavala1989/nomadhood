@@ -22,35 +22,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v2
+      - uses: oven-sh/setup-bun@v1
         with:
-          version: 8.5.1
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22.x
-          cache: 'pnpm' # You can active this cache when your repo has a lockfile
+          bun-version: latest
 
       - name: Install deps (with cache)
-        run: pnpm install
+        run: bun install --frozen-lockfile
 
       - name: Install playwright
-        run: pnpm exec playwright install chromium
+        run: bun playwright install chromium
 
       - name: Next.js cache
         uses: actions/cache@v3
         with:
           path: ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-nextjs
+          key: ${{ runner.os }}-${{ hashFiles('**/bun.lockb') }}-nextjs
 
       - name: Setup Prisma
-        run: pnpm prebuild
+        run: bun run generate
 
-      - run: pnpm build
-      - run: pnpm test-e2e
+      - run: bun run build
+      - run: bun run test-e2e
 
       - name: Check types
-        run: pnpm tsc
+        run: bun run type-check
 
       - name: Upload test results
         if: ${{ always() }}
@@ -81,26 +76,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v2
+      - uses: oven-sh/setup-bun@v1
         with:
-          version: 8.5.1
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22.x
-          cache: 'pnpm' # You can active this cache when your repo has a lockfile
+          bun-version: latest
 
       - name: Install deps (with cache)
-        run: pnpm install
+        run: bun install --frozen-lockfile
 
       - name: Next.js cache
         uses: actions/cache@v3
         with:
           path: ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-nextjs
+          key: ${{ runner.os }}-${{ hashFiles('**/bun.lockb') }}-nextjs
 
       - name: Setup Prisma
-        run: pnpm prebuild
+        run: bun run generate
 
-      - run: pnpm test-unit
-      - run: pnpm tsc
+      - run: bun run test-unit
+      - run: bun run type-check
