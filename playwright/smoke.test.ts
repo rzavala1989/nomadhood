@@ -1,22 +1,19 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.setTimeout(35e3);
 
 test('go to /', async ({ page }) => {
   await page.goto('/');
 
-  await page.waitForSelector(`text=Starter`);
+  await page.waitForSelector(`text=Welcome to Nomadhood`);
 });
 
-test('add a post', async ({ page }) => {
-  const nonce = `${Math.random()}`;
-
+test('navigate to sign in', async ({ page }) => {
   await page.goto('/');
-  await page.fill(`[name=title]`, nonce);
-  await page.fill(`[name=text]`, nonce);
-  await page.click(`form [type=submit]`);
-  await page.waitForLoadState('networkidle');
-  await page.reload();
 
-  await page.waitForSelector(`text="${nonce}"`);
+  await page.click('text=Sign In');
+  await page.waitForLoadState('networkidle');
+
+  // Should be on auth page or redirected to provider
+  expect(page.url()).toContain('/auth');
 });
