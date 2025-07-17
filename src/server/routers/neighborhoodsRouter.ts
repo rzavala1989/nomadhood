@@ -7,6 +7,20 @@ import {
 } from '@/server/trpc';
 import { prisma } from '@/server/prisma';
 
+const createNeighborhoodSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
+  city: z.string().min(1, 'City is required').max(50, 'City name too long'),
+  state: z.string().length(2, 'State must be 2 characters').toUpperCase(),
+  zip: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code format'),
+  description: z.string().max(1000, 'Description too long').optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+});
+
+const updateNeighborhoodSchema = createNeighborhoodSchema.partial().extend({
+  id: z.string().uuid(),
+});
+
 export const neighborhoodsRouter = router({
   list: publicProcedure
     .input(
@@ -107,15 +121,7 @@ export const neighborhoodsRouter = router({
     }),
 
   create: adminProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        city: z.string(),
-        state: z.string(),
-        zip: z.string(),
-        description: z.string().optional(),
-      }),
-    )
+    .input(createNeighborhoodSchema)
     .mutation(({ input }) =>
       prisma.neighborhood.create({
         data: input,
@@ -123,22 +129,14 @@ export const neighborhoodsRouter = router({
     ),
 
   update: adminProcedure
-    .input(
-      z.object({
-        id: z.string().uuid(),
-        name: z.string(),
-        city: z.string(),
-        state: z.string(),
-        zip: z.string(),
-        description: z.string().optional(),
-      }),
-    )
-    .mutation(({ input }) =>
-      prisma.neighborhood.update({
-        where: { id: input.id },
-        data: input,
-      }),
-    ),
+    .input(updateNeighborhoodSchema)
+    .mutation(({ input }) => {
+      const { id, ...updateData } = input;
+      return prisma.neighborhood.update({
+        where: { id },
+        data: updateData,
+      });
+    }),
 
   delete: adminProcedure
     .input(z.object({ id: z.string().uuid() }))
