@@ -14,7 +14,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
 
   // Auth
-  NEXTAUTH_SECRET: z.string().min(32, 'NEXTAUTH_SECRET must be at least 32 characters'),
+  AUTH_SECRET: z.string().min(32, 'AUTH_SECRET must be at least 32 characters'),
   NEXTAUTH_URL: z.string().url().optional(),
 
   // OAuth Providers

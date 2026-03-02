@@ -32,8 +32,8 @@ export const neighborhoodsRouter = router({
         search: z.string().optional(),
       }).optional()
     )
-    .query(async ({ input = {} }) => {
-      const { limit, offset, city, state, search } = input;
+    .query(async ({ input }) => {
+      const { limit = 20, offset = 0, city, state, search } = input ?? {};
 
       const where = {
         ...(city && { city: { contains: city, mode: 'insensitive' as const } }),
