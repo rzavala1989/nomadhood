@@ -13,7 +13,7 @@ export function SignInForm() {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        signIn('email', {
+        signIn('resend', {
           email,
           callbackUrl: '/dashboard',
           redirect: false,

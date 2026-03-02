@@ -1,13 +1,28 @@
 import type * as trpcNext from '@trpc/server/adapters/next';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/utils/auth';
+import { prisma } from '@/server/prisma';
 
 export async function createContext(opts: trpcNext.CreateNextContextOptions) {
-  const session = await getServerSession(opts.req, opts.res, authOptions);
+  // Auth.js v5 session-token cookie (http: 'authjs.session-token', https: '__Secure-authjs.session-token')
+  const sessionToken =
+    opts.req.cookies['authjs.session-token'] ??
+    opts.req.cookies['__Secure-authjs.session-token'];
+
+  if (!sessionToken) {
+    return { user: null, isAdmin: false };
+  }
+
+  const dbSession = await prisma.session.findUnique({
+    where: { sessionToken },
+    include: { user: true },
+  });
+
+  if (!dbSession || dbSession.expires < new Date()) {
+    return { user: null, isAdmin: false };
+  }
 
   return {
-    user: session?.user ?? null,
-    isAdmin: session?.user?.isAdmin ?? false,
+    user: dbSession.user,
+    isAdmin: dbSession.user.isAdmin,
   };
 }
 

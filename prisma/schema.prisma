@@ -1,6 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"] // if using Bun with Prisma latest
+  provider = "prisma-client-js"
 }
 
 datasource db {
