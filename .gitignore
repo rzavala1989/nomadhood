@@ -42,3 +42,6 @@ yarn-error.log*
 
 # testing
 playwright/test-results
+
+# Census shapefiles
+partnership_shapefiles_*/
