@@ -11,6 +11,7 @@ import { StarRating } from '@/components/star-rating';
 import { ReviewForm } from '@/components/review-form';
 import { RatingDistributionChart } from '@/components/rating-distribution-chart';
 import { NeighborhoodMap } from '@/components/neighborhood-map-wrapper';
+import { NeighborhoodCard } from '@/components/neighborhood-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -249,7 +250,34 @@ export default function NeighborhoodDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Similar Neighborhoods */}
+        <SimilarNeighborhoods neighborhoodId={neighborhood.id} state={neighborhood.state} />
       </div>
     </DashboardLayout>
+  );
+}
+
+function SimilarNeighborhoods({ neighborhoodId, state }: { neighborhoodId: string; state: string }) {
+  const { data: similar } = trpc.neighborhoods.getSimilar.useQuery(
+    { id: neighborhoodId, limit: 4 },
+    { enabled: !!neighborhoodId },
+  );
+
+  if (!similar || similar.length === 0) return null;
+
+  return (
+    <div className="animate-fade-up" style={{ animationDelay: '360ms' }}>
+      <p className="text-label text-[--text-ghost] mb-[var(--space-4)]">
+        SIMILAR IN {state}
+      </p>
+      <div className="grid grid-cols-1 gap-px md:grid-cols-2">
+        {similar.map((n, i) => (
+          <div key={n.id} className="animate-fade-up" style={{ animationDelay: `${400 + i * 60}ms` }}>
+            <NeighborhoodCard neighborhood={n} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

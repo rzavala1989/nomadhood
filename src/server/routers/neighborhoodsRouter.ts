@@ -162,4 +162,31 @@ export const neighborhoodsRouter = router({
         where: { id: input.id },
       }),
     ),
+
+  getSimilar: publicProcedure
+    .input(z.object({ id: z.string().uuid(), limit: z.number().min(1).max(10).default(4) }))
+    .query(async ({ input }) => {
+      const neighborhood = await prisma.neighborhood.findUnique({
+        where: { id: input.id },
+        select: { city: true, state: true },
+      });
+
+      if (!neighborhood) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Neighborhood not found' });
+      }
+
+      return prisma.neighborhood.findMany({
+        where: {
+          id: { not: input.id },
+          OR: [
+            { city: neighborhood.city, state: neighborhood.state },
+            { state: neighborhood.state },
+          ],
+        },
+        take: input.limit,
+        include: {
+          _count: { select: { reviews: true, favorites: true } },
+        },
+      });
+    }),
 });

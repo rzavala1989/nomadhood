@@ -6,6 +6,8 @@ import { ThemeProvider } from 'next-themes';
 
 import { DefaultLayout } from '@/components/DefaultLayout';
 import { AmbientOverlay } from '@/components/ambient-overlay';
+import { ComparisonProvider } from '@/contexts/comparison-context';
+import { ComparisonBar } from '@/components/comparison-bar';
 import { Toaster } from '@/components/ui/sonner';
 import { trpc } from '@/utils/trpc';
 import '@/styles/globals.css';
@@ -33,7 +35,10 @@ const MyApp = (({ Component, pageProps }: AppPropsWithLayout) => {
   return (
     <SessionProvider session={pageProps.session}>
       <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
-        {getLayout(<Component {...pageProps} />)}
+        <ComparisonProvider>
+          {getLayout(<Component {...pageProps} />)}
+          <ComparisonBar />
+        </ComparisonProvider>
         <AmbientOverlay />
         <Toaster position="bottom-right" />
       </ThemeProvider>

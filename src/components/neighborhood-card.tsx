@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { StarIcon } from 'lucide-react';
+import { StarIcon, GitCompareArrowsIcon } from 'lucide-react';
 
 import { FavoriteButton } from '@/components/favorite-button';
+import { useComparison } from '@/contexts/comparison-context';
 
 type NeighborhoodCardProps = {
   id: string;
@@ -20,6 +21,9 @@ export function NeighborhoodCard({
 }: {
   neighborhood: NeighborhoodCardProps;
 }) {
+  const { add, remove, has, isFull } = useComparison();
+  const isComparing = has(neighborhood.id);
+
   return (
     <Link href={`/neighborhoods/${neighborhood.id}`} className="block">
       <div className="surface-1 surface-hover p-[var(--space-5)]">
@@ -32,7 +36,29 @@ export function NeighborhoodCard({
               {neighborhood.city}, {neighborhood.state}
             </p>
           </div>
-          <FavoriteButton neighborhoodId={neighborhood.id} />
+          <div className="flex items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isComparing) {
+                  remove(neighborhood.id);
+                } else if (!isFull) {
+                  add({ id: neighborhood.id, name: neighborhood.name });
+                }
+              }}
+              disabled={!isComparing && isFull}
+              className={`p-1 transition-all hover:scale-110 ${
+                isComparing
+                  ? 'text-[--text-primary]'
+                  : 'text-black/[0.12] disabled:opacity-30'
+              }`}
+              title={isComparing ? 'Remove from comparison' : 'Add to comparison'}
+            >
+              <GitCompareArrowsIcon className="h-3.5 w-3.5" />
+            </button>
+            <FavoriteButton neighborhoodId={neighborhood.id} />
+          </div>
         </div>
 
         {neighborhood.description && (
