@@ -1,78 +1,51 @@
-# 🏡 Nomadhood
+# Nomadhood
 
-**Nomadhood** is a fullstack TypeScript web application designed to help users explore, review, and save their favorite neighborhoods. It's built with bleeding-edge tools for speed, flexibility, and DX excellence.
+Neighborhood discovery and review platform for digital nomads. Search, compare, and review neighborhoods with interactive maps, composite scoring, and community reviews.
 
----
-
-## 🚀 Tech Stack
-
-| Layer       | Tech                                                                 |
-|-------------|----------------------------------------------------------------------|
-| Frontend    | React (Next.js 15), TypeScript, TailwindCSS, shadcn/ui               |
-| Backend     | tRPC, Prisma ORM, PostgreSQL (local)                                 |
-| Auth        | NextAuth.js with GitHub provider + session customization             |
-| Database    | PostgreSQL (managed via Prisma, local development via pgAdmin)       |
-| Dev Tools   | Bun, ESLint, Prettier, Vitest, Playwright                            |
-| Infra       | Vercel (frontend), Fly.io (optional backend), GitHub Actions (CI/CD) |
-
----
-
-## 🔒 Authentication
-
-Powered by [NextAuth.js](https://next-auth.js.org/), users authenticate via GitHub (with optional role-based access control for admin routes).
-
-Session includes:
-```ts
-session.user = {
-  id: string;
-  email: string;
-  isAdmin?: boolean;
-}
-```
-
-## Directory Structure
+## Quickstart
 
 ```bash
-src/
-├── components/         # Reusable UI components
-│   ├── ui/            # shadcn/ui components
-│   ├── auth/          # Authentication components
-│   └── landing/       # Landing page components
-├── hooks/             # Custom React hooks
-├── lib/               # Utility libraries
-├── pages/             # Next.js pages (Pages Router)
-│   ├── api/           # API routes
-│   ├── auth/          # Authentication pages
-│   └── _app.tsx       # App wrapper
-├── server/            # Server-side code
-│   ├── routers/       # tRPC routers
-│   ├── context.ts     # tRPC context
-│   ├── env.ts         # Environment validation
-│   ├── prisma.ts      # Database client
-│   └── trpc.ts        # tRPC setup
-├── styles/            # Global styles
-├── types/             # TypeScript type definitions
-└── utils/             # Utility functions
+git clone <repo-url> && cd nomadhood
+cp .env.example .env           # fill in your credentials
+bun install
+bun run migrate-dev            # run migrations and generate client
+bun dev                        # http://localhost:3000
 ```
-## 🚀 Features
 
-### ✅ Implemented
-- **Authentication**: GitHub OAuth + Magic Link email authentication
-- **User Management**: Profile management with admin role system
-- **Neighborhoods**: CRUD operations with search, filtering, and pagination
-- **Reviews**: Complete review system with ratings and statistics
-- **Favorites**: Save and manage favorite neighborhoods
-- **Dashboard**: Interactive analytics dashboard with charts
-- **Database**: Optimized schema with proper indexes and constraints
+Requires Node 18+, Bun, and a PostgreSQL database (Neon free tier works).
 
-### 🚧 In Progress
-- **Admin Dashboard**: Management interface for neighborhoods and reviews
-- **Enhanced UI**: Neighborhood browsing and detail pages
-- **Testing**: Comprehensive unit and E2E test coverage
+## Stack
 
-### 📋 Planned Features
-- **🗺️ Mapbox Integration**: Interactive maps with geospatial data
-- **📈 Advanced Analytics**: Per-neighborhood and user analytics
-- **🪪 Profile Pages**: Public user profiles and activity feeds
-- **🔍 Advanced Search**: Location-based search with filters
-- **📱 Mobile Optimization**: Progressive Web App features
+Next.js 15 (Pages Router) / React 19 / tRPC v11 / Prisma v6 / Auth.js v5 / PostgreSQL / Tailwind and shadcn/ui
+
+## Documentation
+
+| Document | What it covers |
+|----------|---------------|
+| [Architecture](docs/architecture.md) | Tech stack, directory structure, tRPC router map, data flow |
+| [Database](docs/database.md) | Prisma schema, models, relationships, migrations, seeding |
+| [Authentication](docs/authentication.md) | GitHub OAuth, sessions, admin roles, cookie handling |
+| [Features](docs/features.md) | All implemented features with descriptions |
+| [Development](docs/development.md) | Setup, env vars, scripts, testing, tooling |
+
+## Project Structure
+
+```
+src/
+  pages/           Next.js pages (Pages Router)
+  components/      React components
+  server/          tRPC routers, Prisma client, auth context
+  styles/          Global CSS and design tokens
+  utils/           tRPC client, helpers
+  contexts/        React context providers
+  hooks/           Custom React hooks
+  types/           TypeScript type extensions
+prisma/
+  schema.prisma    Database schema
+  seed.ts          Sample data seeder
+docs/              Detailed documentation
+```
+
+## License
+
+Private.

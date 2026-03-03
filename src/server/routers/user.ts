@@ -7,8 +7,8 @@ export const userRouter = router({
   /**
    * Get current user (based on session/context)
    */
-  me: protectedProcedure.query(({ ctx }) => {
-    return ctx.user;
+  me: publicProcedure.query(({ ctx }) => {
+    return ctx.user ?? null;
   }),
 
   /**

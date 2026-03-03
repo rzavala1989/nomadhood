@@ -63,26 +63,51 @@ export const neighborhoodsRouter = router({
         most_favorites: { favorites: { _count: 'desc' as const } },
       };
 
-      const [neighborhoods, total] = await Promise.all([
+      const [neighborhoods, total, maxReviewResult, maxFavoriteResult] = await Promise.all([
         prisma.neighborhood.findMany({
           where,
           orderBy: orderByMap[sortBy],
           take: limit,
           skip: offset,
           include: {
-            _count: {
-              select: {
-                reviews: true,
-                favorites: true,
-              },
-            },
+            _count: { select: { reviews: true, favorites: true } },
+            reviews: { select: { rating: true } },
           },
         }),
         prisma.neighborhood.count({ where }),
+        prisma.review.groupBy({
+          by: ['neighborhoodId'],
+          _count: { id: true },
+          orderBy: { _count: { id: 'desc' } },
+          take: 1,
+        }),
+        prisma.favorite.groupBy({
+          by: ['neighborhoodId'],
+          _count: { id: true },
+          orderBy: { _count: { id: 'desc' } },
+          take: 1,
+        }),
       ]);
 
+      const maxReviews = maxReviewResult[0]?._count.id ?? 1;
+      const maxFavorites = maxFavoriteResult[0]?._count.id ?? 1;
+
+      const neighborhoodsWithScore = neighborhoods.map((n) => {
+        const avgRating =
+          n.reviews.length > 0
+            ? n.reviews.reduce((s, r) => s + r.rating, 0) / n.reviews.length
+            : 0;
+        const nomadScore = Math.round(
+          (avgRating / 5) * 50 +
+            (n._count.reviews / maxReviews) * 30 +
+            (n._count.favorites / maxFavorites) * 20,
+        );
+        const { reviews: _reviews, ...rest } = n;
+        return { ...rest, avgRating, nomadScore };
+      });
+
       return {
-        neighborhoods,
+        neighborhoods: neighborhoodsWithScore,
         pagination: {
           total,
           limit,
@@ -95,29 +120,43 @@ export const neighborhoodsRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.string().uuid() }))
     .query(async ({ input }) => {
-      const neighborhood = await prisma.neighborhood.findUnique({
-        where: { id: input.id },
-        include: {
-          reviews: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  image: true,
+      const [neighborhood, maxReviewResult, maxFavoriteResult] = await Promise.all([
+        prisma.neighborhood.findUnique({
+          where: { id: input.id },
+          include: {
+            reviews: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    image: true,
+                  },
                 },
               },
+              orderBy: { createdAt: 'desc' },
             },
-            orderBy: { createdAt: 'desc' },
-          },
-          _count: {
-            select: {
-              reviews: true,
-              favorites: true,
+            _count: {
+              select: {
+                reviews: true,
+                favorites: true,
+              },
             },
           },
-        },
-      });
+        }),
+        prisma.review.groupBy({
+          by: ['neighborhoodId'],
+          _count: { id: true },
+          orderBy: { _count: { id: 'desc' } },
+          take: 1,
+        }),
+        prisma.favorite.groupBy({
+          by: ['neighborhoodId'],
+          _count: { id: true },
+          orderBy: { _count: { id: 'desc' } },
+          take: 1,
+        }),
+      ]);
 
       if (!neighborhood) {
         throw new TRPCError({
@@ -126,14 +165,23 @@ export const neighborhoodsRouter = router({
         });
       }
 
-      // Calculate average rating
-      const avgRating = neighborhood.reviews.length > 0
-        ? neighborhood.reviews.reduce((sum, review) => sum + review.rating, 0) / neighborhood.reviews.length
-        : null;
+      const avgRating =
+        neighborhood.reviews.length > 0
+          ? neighborhood.reviews.reduce((sum, r) => sum + r.rating, 0) / neighborhood.reviews.length
+          : null;
+
+      const maxReviews = maxReviewResult[0]?._count.id ?? 1;
+      const maxFavorites = maxFavoriteResult[0]?._count.id ?? 1;
+      const nomadScore = Math.round(
+        ((avgRating ?? 0) / 5) * 50 +
+          (neighborhood._count.reviews / maxReviews) * 30 +
+          (neighborhood._count.favorites / maxFavorites) * 20,
+      );
 
       return {
         ...neighborhood,
         avgRating,
+        nomadScore,
       };
     }),
 

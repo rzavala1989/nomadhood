@@ -45,8 +45,6 @@ export default function NeighborhoodsPage() {
     offset,
   });
 
-  const { data: scores } = trpc.neighborhoods.getWithScores.useQuery();
-
   const resetOffset = () => setOffset(0);
 
   return (
@@ -196,7 +194,7 @@ export default function NeighborhoodsPage() {
                         onMouseEnter={() => setSelectedMapId(n.id)}
                         onMouseLeave={() => setSelectedMapId(null)}
                       >
-                        <NeighborhoodCard neighborhood={n} nomadScore={scores?.[n.id]} />
+                        <NeighborhoodCard neighborhood={n} nomadScore={n.nomadScore} />
                       </div>
                     ))}
                   </div>

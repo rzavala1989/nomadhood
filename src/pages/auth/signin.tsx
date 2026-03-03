@@ -7,7 +7,7 @@ export default function SignIn() {
         <div className="text-center space-y-[var(--space-2)]">
           <h1 className="text-title">Sign In</h1>
           <p className="text-body text-[--text-secondary]">
-            Continue with your GitHub account.
+            New here? Your account is created automatically on first sign in.
           </p>
         </div>
 
