@@ -8,7 +8,6 @@ import Map, {
   type MapRef,
 } from 'react-map-gl/maplibre';
 import maplibregl from 'maplibre-gl';
-import { MapPinIcon } from 'lucide-react';
 import Link from 'next/link';
 import type { Geometry } from 'geojson';
 
@@ -62,14 +61,14 @@ export default function NeighborhoodMap({
     const lngs = markers.map((n) => n.longitude!);
     const lats = markers.map((n) => n.latitude!);
     return new maplibregl.LngLatBounds(
-      [Math.min(...lngs) - 0.5, Math.min(...lats) - 0.5],
-      [Math.max(...lngs) + 0.5, Math.max(...lats) + 0.5],
+      [Math.min(...lngs) - 1, Math.min(...lats) - 1],
+      [Math.max(...lngs) + 1, Math.max(...lats) + 1],
     );
   }, [markers]);
 
   const onMapLoad = useCallback(() => {
     if (bounds && mapRef.current) {
-      mapRef.current.fitBounds(bounds, { padding: 60, maxZoom: 12 });
+      mapRef.current.fitBounds(bounds, { padding: 40, maxZoom: 14 });
     }
   }, [bounds]);
 
@@ -119,36 +118,60 @@ export default function NeighborhoodMap({
           </Source>
         )}
 
-        {markers.map((n) => (
-          <Marker
-            key={n.id}
-            longitude={n.longitude!}
-            latitude={n.latitude!}
-            anchor="center"
-            onClick={(e) => {
-              e.originalEvent.stopPropagation();
-              setPopupId(n.id);
-              onSelect?.(n.id);
-            }}
-          >
-            <div
-              className={`flex h-6 w-6 items-center justify-center transition-all ${
-                selectedId === n.id || popupId === n.id
-                  ? 'scale-125 bg-[--bg-inverse]'
-                  : 'bg-[--bg-inverse]/80 hover:scale-110'
-              }`}
+        {markers.map((n) => {
+          const isActive = selectedId === n.id || popupId === n.id;
+          return (
+            <Marker
+              key={n.id}
+              longitude={n.longitude!}
+              latitude={n.latitude!}
+              anchor="center"
+              onClick={(e) => {
+                e.originalEvent.stopPropagation();
+                setPopupId(n.id);
+                onSelect?.(n.id);
+              }}
             >
-              <MapPinIcon className="h-3 w-3 text-[--text-inverse]" />
-            </div>
-          </Marker>
-        ))}
+              <div
+                className="group cursor-pointer"
+                style={{ transition: 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+              >
+                {/* Outer pulse ring on active */}
+                <div
+                  className={`absolute inset-0 rounded-full transition-opacity duration-300 ${
+                    isActive ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    marginLeft: -4,
+                    marginTop: -4,
+                    background: 'rgba(255, 255, 255, 0.12)',
+                  }}
+                />
+                {/* Dot */}
+                <div
+                  className="rounded-full transition-all duration-200 ease-out group-hover:scale-150"
+                  style={{
+                    width: isActive ? 10 : 7,
+                    height: isActive ? 10 : 7,
+                    background: isActive ? '#ffffff' : 'rgba(0, 0, 0, 0.7)',
+                    boxShadow: isActive
+                      ? '0 0 0 3px rgba(255,255,255,0.25), 0 0 8px rgba(255,255,255,0.15)'
+                      : '0 0 0 2px rgba(255,255,255,0.9), 0 1px 3px rgba(0,0,0,0.3)',
+                  }}
+                />
+              </div>
+            </Marker>
+          );
+        })}
 
         {popupNeighborhood && (
           <Popup
             longitude={popupNeighborhood.longitude!}
             latitude={popupNeighborhood.latitude!}
             anchor="bottom"
-            offset={16}
+            offset={10}
             closeOnClick={false}
             onClose={() => {
               setPopupId(null);
