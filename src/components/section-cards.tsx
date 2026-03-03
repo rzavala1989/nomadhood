@@ -1,75 +1,32 @@
-import { BuildingIcon, HeartIcon, StarIcon, UsersIcon } from 'lucide-react';
-
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { trpc } from '@/utils/trpc';
 
 export function SectionCards() {
   const { data: stats } = trpc.getDashboardStats.useQuery();
 
+  const cards = [
+    { label: 'Neighborhoods', value: stats?.neighborhoodCount, desc: 'Total listed' },
+    { label: 'Users', value: stats?.userCount, desc: 'Registered' },
+    { label: 'Reviews', value: stats?.reviewCount, desc: 'Submitted' },
+    { label: 'Favorites', value: stats?.favoriteCount, desc: 'Saved' },
+  ];
+
   return (
-    <div className="*:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4 grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card lg:px-6">
-      <Card className="@container/card">
-        <CardHeader className="relative">
-          <CardDescription>Neighborhoods</CardDescription>
-          <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-            {stats?.neighborhoodCount ?? '—'}
-          </CardTitle>
-          <div className="absolute right-4 top-4 text-muted-foreground">
-            <BuildingIcon className="size-5" />
-          </div>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-sm">
-          <div className="text-muted-foreground">Total neighborhoods listed</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader className="relative">
-          <CardDescription>Users</CardDescription>
-          <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-            {stats?.userCount ?? '—'}
-          </CardTitle>
-          <div className="absolute right-4 top-4 text-muted-foreground">
-            <UsersIcon className="size-5" />
-          </div>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-sm">
-          <div className="text-muted-foreground">Registered accounts</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader className="relative">
-          <CardDescription>Reviews</CardDescription>
-          <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-            {stats?.reviewCount ?? '—'}
-          </CardTitle>
-          <div className="absolute right-4 top-4 text-muted-foreground">
-            <StarIcon className="size-5" />
-          </div>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-sm">
-          <div className="text-muted-foreground">Neighborhood reviews submitted</div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader className="relative">
-          <CardDescription>Favorites</CardDescription>
-          <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-            {stats?.favoriteCount ?? '—'}
-          </CardTitle>
-          <div className="absolute right-4 top-4 text-muted-foreground">
-            <HeartIcon className="size-5" />
-          </div>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1 text-sm">
-          <div className="text-muted-foreground">Neighborhoods saved by users</div>
-        </CardFooter>
-      </Card>
+    <div className="grid grid-cols-1 gap-px px-[var(--space-6)] @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+      {cards.map((card, i) => (
+        <div
+          key={card.label}
+          className="surface-1 p-[var(--space-5)] animate-fade-up"
+          style={{ animationDelay: `${i * 60}ms` }}
+        >
+          <p className="text-label text-[--text-ghost]">{card.label}</p>
+          <p className="mt-[var(--space-2)] text-[28px] font-light text-[--text-primary] tabular-nums">
+            {card.value ?? '\u2014'}
+          </p>
+          <p className="mt-[var(--space-1)] text-micro text-[--text-tertiary]">
+            {card.desc}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }

@@ -1,0 +1,55 @@
+import { HeartIcon } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+
+import { cn } from '@/lib/utils';
+import { trpc } from '@/utils/trpc';
+
+export function FavoriteButton({
+  neighborhoodId,
+  className,
+}: {
+  neighborhoodId: string;
+  className?: string;
+}) {
+  const { data: session } = useSession();
+  const utils = trpc.useUtils();
+
+  const { data } = trpc.favorites.isFavorite.useQuery(
+    { neighborhoodId },
+    { enabled: !!session },
+  );
+
+  const toggle = trpc.favorites.toggle.useMutation({
+    onSuccess: () => {
+      utils.favorites.isFavorite.invalidate({ neighborhoodId });
+      utils.favorites.getMine.invalidate();
+      utils.getDashboardStats.invalidate();
+    },
+  });
+
+  if (!session) return null;
+
+  const isFavorite = data?.isFavorite ?? false;
+
+  return (
+    <button
+      className={cn(
+        'p-1 transition-all hover:scale-110',
+        className,
+      )}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggle.mutate({ neighborhoodId });
+      }}
+      disabled={toggle.isPending}
+    >
+      <HeartIcon
+        className={cn(
+          'h-4 w-4 transition-all duration-300',
+          isFavorite ? 'fill-black/70 text-black/70' : 'text-black/[0.12]',
+        )}
+      />
+    </button>
+  );
+}
