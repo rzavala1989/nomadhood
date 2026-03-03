@@ -5,54 +5,64 @@ import Link from 'next/link';
 const IndexPage: NextPageWithLayout = () => {
   const { data: me, isLoading } = trpc.user.me.useQuery();
 
-  if (isLoading) return <p className="text-white">Loading...</p>;
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-6 w-32 bg-[--bg-surface-2] animate-skeleton" />
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-md space-y-6 text-center">
-        <h1 className="text-4xl font-bold">🏡 Welcome to Nomadhood</h1>
-        <p className="text-gray-400">
-          A fullstack playground for exploring, favoriting, and reviewing neighborhoods.
+    <main className="flex min-h-screen flex-col items-center justify-center px-[var(--space-6)]">
+      <div className="w-full max-w-md space-y-[var(--space-8)] text-center">
+        <h1 className="text-title">
+          Nomad<em>hood</em>
+        </h1>
+        <p className="text-body text-[--text-secondary]">
+          Explore, review, and save neighborhoods worldwide.
         </p>
 
         {me ? (
-          <>
-            <p className="text-lg text-white">
-              Hello, <span className="font-semibold">{me.name || me.email}</span>
+          <div className="space-y-[var(--space-4)]">
+            <p className="text-caption text-[--text-secondary]">
+              Hello, <span className="text-[--text-primary]">{me.name || me.email}</span>
             </p>
-            <Link
-              href="/profile"
-              className="inline-block px-6 py-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition"
-            >
-              Go to Profile
-            </Link>
-            <Link
-              href="/dashboard"
-              className="inline-block px-6 py-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition"
-            >
-              Go to Dashboard →
-            </Link>
-          </>
+            <div className="flex flex-col items-center gap-px sm:flex-row sm:justify-center">
+              <Link
+                href="/dashboard"
+                className="bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-4)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] transition-all hover:bg-[#1A1A18]/90"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/profile"
+                className="surface-1 px-[var(--space-4)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] text-[--text-tertiary] transition-all hover:bg-[--bg-surface-2] hover:text-[--text-secondary]"
+              >
+                Profile
+              </Link>
+            </div>
+          </div>
         ) : (
-          <>
-            <p className="text-lg text-white">
-              You’re not signed in yet.
+          <div className="space-y-[var(--space-4)]">
+            <p className="text-caption text-[--text-tertiary]">
+              Sign in to get started.
             </p>
-            <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <div className="flex flex-col items-center gap-px sm:flex-row sm:justify-center">
               <Link
                 href="/auth/signin"
-                className="inline-block px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-500 transition"
+                className="bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-4)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] transition-all hover:bg-[#1A1A18]/90"
               >
                 Sign In
               </Link>
               <Link
                 href="/auth/signup"
-                className="inline-block px-6 py-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition"
+                className="surface-1 px-[var(--space-4)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] text-[--text-tertiary] transition-all hover:bg-[--bg-surface-2] hover:text-[--text-secondary]"
               >
-                Create an Account
+                Create Account
               </Link>
             </div>
-          </>
+          </div>
         )}
       </div>
     </main>

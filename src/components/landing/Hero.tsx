@@ -2,12 +2,12 @@ import { Button } from '@/components/ui/button';
 
 export function Hero() {
   return (
-    <section className="text-center py-20">
-      <h1 className="text-5xl font-bold mb-6">
-        Welcome to the Future of Fullstack
+    <section className="text-center py-[var(--space-16)]">
+      <h1 className="text-title mb-[var(--space-4)]">
+        Welcome to <em>Nomadhood</em>
       </h1>
-      <p className="text-gray-400 mb-8">
-        Built with tRPC, Prisma, Next.js, Shadcn UI, and Bun.
+      <p className="text-body text-[--text-secondary] mb-[var(--space-8)]">
+        Explore, review, and save neighborhoods worldwide.
       </p>
       <Button asChild>
         <a href="/auth/signin">Get Started</a>

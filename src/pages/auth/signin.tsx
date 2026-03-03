@@ -4,21 +4,22 @@ import Link from 'next/link';
 
 export default function SignIn() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4">
-      <div className="w-full max-w-md space-y-6">
-        <h1 className="text-3xl font-bold text-center text-white">Sign In</h1>
-
-        <p className="text-center text-gray-400">
-          Welcome back. Enter your credentials to continue.
-        </p>
+    <div className="flex min-h-screen items-center justify-center px-[var(--space-6)]">
+      <div className="w-full max-w-md space-y-[var(--space-8)]">
+        <div className="text-center space-y-[var(--space-2)]">
+          <h1 className="text-title">Sign In</h1>
+          <p className="text-body text-[--text-secondary]">
+            Welcome back. Enter your credentials to continue.
+          </p>
+        </div>
 
         <SignInForm />
 
-        <p className="text-center text-gray-400">
-          Don’t have an account?{' '}
+        <p className="text-center text-caption text-[--text-tertiary]">
+          Don&apos;t have an account?{' '}
           <Link
             href="/auth/signup"
-            className="text-blue-500 hover:text-blue-400 font-medium"
+            className="text-[--text-primary] hover:text-[--text-secondary] transition-colors"
           >
             Sign Up
           </Link>
