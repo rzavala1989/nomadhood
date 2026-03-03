@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -55,6 +56,10 @@ export function ReviewForm({
       reset();
       setRating(0);
       onSuccess?.();
+      toast.success('Review submitted');
+    },
+    onError: () => {
+      toast.error('Failed to submit review');
     },
   });
 
@@ -63,6 +68,10 @@ export function ReviewForm({
       utils.reviews.getUserReview.invalidate({ neighborhoodId });
       utils.neighborhoods.getById.invalidate({ id: neighborhoodId });
       onSuccess?.();
+      toast.success('Review updated');
+    },
+    onError: () => {
+      toast.error('Failed to update review');
     },
   });
 

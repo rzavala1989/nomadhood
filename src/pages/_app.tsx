@@ -6,6 +6,7 @@ import { ThemeProvider } from 'next-themes';
 
 import { DefaultLayout } from '@/components/DefaultLayout';
 import { AmbientOverlay } from '@/components/ambient-overlay';
+import { Toaster } from '@/components/ui/sonner';
 import { trpc } from '@/utils/trpc';
 import '@/styles/globals.css';
 import { Session } from 'next-auth';
@@ -34,6 +35,7 @@ const MyApp = (({ Component, pageProps }: AppPropsWithLayout) => {
       <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
         {getLayout(<Component {...pageProps} />)}
         <AmbientOverlay />
+        <Toaster position="bottom-right" />
       </ThemeProvider>
     </SessionProvider>
   );

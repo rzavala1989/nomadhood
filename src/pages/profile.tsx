@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 import { MapPinIcon, HeartIcon, ArrowRightIcon } from 'lucide-react';
 
 import { DashboardLayout } from '@/components/dashboard-layout';
@@ -28,6 +29,10 @@ export default function ProfilePage() {
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: () => {
       utils.user.me.invalidate();
+      toast.success('Profile updated');
+    },
+    onError: () => {
+      toast.error('Failed to update profile');
     },
   });
 
@@ -106,9 +111,6 @@ export default function ProfilePage() {
                 >
                   {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
                 </Button>
-                {updateProfile.isSuccess && (
-                  <p className="text-caption text-[--text-secondary]">Updated.</p>
-                )}
               </div>
             </div>
 

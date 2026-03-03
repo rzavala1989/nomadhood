@@ -2,12 +2,15 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 import { PencilIcon, Trash2Icon } from 'lucide-react';
 
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { FavoriteButton } from '@/components/favorite-button';
 import { StarRating } from '@/components/star-rating';
 import { ReviewForm } from '@/components/review-form';
+import { RatingDistributionChart } from '@/components/rating-distribution-chart';
+import { NeighborhoodMap } from '@/components/neighborhood-map-wrapper';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -37,6 +40,10 @@ export default function NeighborhoodDetailPage() {
       utils.reviews.getUserReview.invalidate({ neighborhoodId: id });
       utils.neighborhoods.getById.invalidate({ id });
       utils.getDashboardStats.invalidate();
+      toast.success('Review deleted');
+    },
+    onError: () => {
+      toast.error('Failed to delete review');
     },
   });
 
@@ -97,9 +104,18 @@ export default function NeighborhoodDetailPage() {
           <FavoriteButton neighborhoodId={neighborhood.id} className="mt-2" />
         </div>
 
+        {/* Map */}
+        {neighborhood.latitude != null && neighborhood.longitude != null && (
+          <div className="h-[240px] animate-fade-up" style={{ animationDelay: '60ms' }}>
+            <NeighborhoodMap
+              neighborhoods={[neighborhood]}
+            />
+          </div>
+        )}
+
         {/* About */}
         {neighborhood.description && (
-          <div className="surface-1 p-[var(--space-5)] animate-fade-up" style={{ animationDelay: '60ms' }}>
+          <div className="surface-1 p-[var(--space-5)] animate-fade-up" style={{ animationDelay: '90ms' }}>
             <p className="text-label text-[--text-ghost] mb-[var(--space-3)]">ABOUT</p>
             <p className="text-body text-[--text-secondary]">{neighborhood.description}</p>
           </div>
@@ -119,6 +135,11 @@ export default function NeighborhoodDetailPage() {
               {neighborhood._count.favorites}
             </p>
           </div>
+        </div>
+
+        {/* Rating Distribution */}
+        <div className="animate-fade-up" style={{ animationDelay: '150ms' }}>
+          <RatingDistributionChart neighborhoodId={neighborhood.id} />
         </div>
 
         {/* Divider */}

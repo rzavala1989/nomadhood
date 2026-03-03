@@ -1,5 +1,6 @@
 import { HeartIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
 
 import { cn } from '@/lib/utils';
 import { trpc } from '@/utils/trpc';
@@ -20,10 +21,14 @@ export function FavoriteButton({
   );
 
   const toggle = trpc.favorites.toggle.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       utils.favorites.isFavorite.invalidate({ neighborhoodId });
       utils.favorites.getMine.invalidate();
       utils.getDashboardStats.invalidate();
+      toast.success(data.added ? 'Saved to favorites' : 'Removed from favorites');
+    },
+    onError: () => {
+      toast.error('Failed to update favorite');
     },
   });
 

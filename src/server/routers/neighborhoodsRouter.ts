@@ -30,10 +30,18 @@ export const neighborhoodsRouter = router({
         city: z.string().optional(),
         state: z.string().optional(),
         search: z.string().optional(),
+        sortBy: z.enum([
+          'newest',
+          'oldest',
+          'name_asc',
+          'name_desc',
+          'most_reviews',
+          'most_favorites',
+        ]).default('newest'),
       }).optional()
     )
     .query(async ({ input }) => {
-      const { limit = 20, offset = 0, city, state, search } = input ?? {};
+      const { limit = 20, offset = 0, city, state, search, sortBy = 'newest' } = input ?? {};
 
       const where = {
         ...(city && { city: { contains: city, mode: 'insensitive' as const } }),
@@ -46,10 +54,19 @@ export const neighborhoodsRouter = router({
         }),
       };
 
+      const orderByMap: Record<string, object> = {
+        newest: { createdAt: 'desc' as const },
+        oldest: { createdAt: 'asc' as const },
+        name_asc: { name: 'asc' as const },
+        name_desc: { name: 'desc' as const },
+        most_reviews: { reviews: { _count: 'desc' as const } },
+        most_favorites: { favorites: { _count: 'desc' as const } },
+      };
+
       const [neighborhoods, total] = await Promise.all([
         prisma.neighborhood.findMany({
           where,
-          orderBy: { createdAt: 'desc' },
+          orderBy: orderByMap[sortBy],
           take: limit,
           skip: offset,
           include: {
