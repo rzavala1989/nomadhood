@@ -18,15 +18,24 @@ type NeighborhoodCardProps = {
 
 export function NeighborhoodCard({
   neighborhood,
+  nomadScore,
 }: {
   neighborhood: NeighborhoodCardProps;
+  nomadScore?: number;
 }) {
   const { add, remove, has, isFull } = useComparison();
   const isComparing = has(neighborhood.id);
 
   return (
     <Link href={`/neighborhoods/${neighborhood.id}`} className="block">
-      <div className="surface-1 surface-hover p-[var(--space-5)]">
+      <div className="surface-1 surface-hover p-[var(--space-5)] relative">
+        {/* Nomad Score badge */}
+        {nomadScore != null && nomadScore > 0 && (
+          <div className="absolute top-[var(--space-3)] right-[var(--space-3)] bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-2)] py-[2px] text-[9px] tracking-[0.1em] tabular-nums">
+            {nomadScore}
+          </div>
+        )}
+
         <div className="flex items-start justify-between">
           <div>
             <p className="text-heading font-light text-[--text-primary]">

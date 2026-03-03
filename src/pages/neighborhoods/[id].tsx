@@ -32,6 +32,8 @@ export default function NeighborhoodDetailPage() {
   const { data: neighborhood, isLoading } =
     trpc.neighborhoods.getById.useQuery({ id }, { enabled: !!id });
 
+  const { data: scores } = trpc.neighborhoods.getWithScores.useQuery();
+
   const { data: userReview } = trpc.reviews.getUserReview.useQuery(
     { neighborhoodId: id },
     { enabled: !!id && !!session },
@@ -85,7 +87,14 @@ export default function NeighborhoodDetailPage() {
         {/* Header */}
         <div className="flex items-start justify-between animate-fade-up">
           <div>
-            <h2 className="text-title">{neighborhood.name}</h2>
+            <div className="flex items-center gap-[var(--space-3)]">
+              <h2 className="text-title">{neighborhood.name}</h2>
+              {scores?.[neighborhood.id] != null && scores[neighborhood.id] > 0 && (
+                <div className="bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-2)] py-[2px] text-[9px] tracking-[0.1em] tabular-nums self-start mt-[var(--space-1)]">
+                  NOMAD {scores[neighborhood.id]}
+                </div>
+              )}
+            </div>
             <div className="mt-[var(--space-3)] flex items-center gap-[var(--space-4)]">
               <span className="text-caption text-[--text-tertiary]">
                 {neighborhood.city}, {neighborhood.state} {neighborhood.zip}

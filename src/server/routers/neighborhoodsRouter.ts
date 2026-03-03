@@ -163,6 +163,43 @@ export const neighborhoodsRouter = router({
       }),
     ),
 
+  getWithScores: publicProcedure
+    .query(async () => {
+      const neighborhoods = await prisma.neighborhood.findMany({
+        include: {
+          _count: { select: { reviews: true, favorites: true } },
+          reviews: { select: { rating: true } },
+        },
+      });
+
+      const withStats = neighborhoods.map((n) => ({
+        id: n.id,
+        name: n.name,
+        city: n.city,
+        state: n.state,
+        avgRating:
+          n.reviews.length > 0
+            ? n.reviews.reduce((s, r) => s + r.rating, 0) / n.reviews.length
+            : 0,
+        reviewCount: n._count.reviews,
+        favoriteCount: n._count.favorites,
+      }));
+
+      const maxReviews = Math.max(...withStats.map((n) => n.reviewCount), 1);
+      const maxFavorites = Math.max(...withStats.map((n) => n.favoriteCount), 1);
+
+      const scores: Record<string, number> = {};
+      for (const n of withStats) {
+        scores[n.id] = Math.round(
+          (n.avgRating / 5) * 50 +
+          (n.reviewCount / maxReviews) * 30 +
+          (n.favoriteCount / maxFavorites) * 20,
+        );
+      }
+
+      return scores;
+    }),
+
   getSimilar: publicProcedure
     .input(z.object({ id: z.string().uuid(), limit: z.number().min(1).max(10).default(4) }))
     .query(async ({ input }) => {
