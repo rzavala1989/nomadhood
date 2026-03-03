@@ -5,6 +5,7 @@ import {
   MapPinIcon,
   MapIcon,
   UserIcon,
+  ShieldIcon,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
@@ -19,6 +20,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { trpc } from '@/utils/trpc';
 
 const navItems = [
   {
@@ -43,14 +45,27 @@ const navItems = [
   },
 ];
 
+const adminItem = {
+  title: 'Admin',
+  url: '/admin/users',
+  icon: ShieldIcon,
+};
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
+  const { data: adminCheck } = trpc.user.isAdmin.useQuery(undefined, {
+    enabled: !!session,
+  });
 
   const user = {
     name: session?.user?.name ?? 'User',
     email: session?.user?.email ?? '',
     avatar: session?.user?.image ?? '',
   };
+
+  const items = adminCheck?.isAdmin
+    ? [...navItems, adminItem]
+    : navItems;
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -72,7 +87,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navItems} />
+        <NavMain items={items} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

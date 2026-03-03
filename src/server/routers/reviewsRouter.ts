@@ -279,4 +279,34 @@ export const reviewsRouter = router({
         ratingDistribution,
       };
     }),
+
+  /**
+   * Admin: Get all reviews with pagination
+   */
+  adminGetAll: adminProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(50),
+        offset: z.number().min(0).default(0),
+      }).optional(),
+    )
+    .query(async ({ input }) => {
+      const { limit = 50, offset = 0 } = input ?? {};
+      const [reviews, total] = await Promise.all([
+        prisma.review.findMany({
+          take: limit,
+          skip: offset,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            user: { select: { id: true, name: true, email: true } },
+            neighborhood: { select: { id: true, name: true } },
+          },
+        }),
+        prisma.review.count(),
+      ]);
+      return {
+        reviews,
+        pagination: { total, limit, offset, hasMore: offset + limit < total },
+      };
+    }),
 });

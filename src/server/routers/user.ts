@@ -80,6 +80,18 @@ export const userRouter = router({
     ),
 
   /**
+   * Admin-only: Demote a user from admin
+   */
+  demote: adminProcedure
+    .input(z.object({ userId: z.string().uuid() }))
+    .mutation(({ input }) =>
+      prisma.user.update({
+        where: { id: input.userId },
+        data: { isAdmin: false },
+      }),
+    ),
+
+  /**
    * Admin-only: Delete user
    */
   delete: adminProcedure
