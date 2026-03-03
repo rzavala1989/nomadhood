@@ -103,17 +103,17 @@ export default function NeighborhoodMap({
               id="boundary-fill"
               type="fill"
               paint={{
-                'fill-color': '#ffffff',
-                'fill-opacity': 0.03,
+                'fill-color': '#050505',
+                'fill-opacity': 0.06,
               }}
             />
             <Layer
               id="boundary-line"
               type="line"
               paint={{
-                'line-color': '#ffffff',
-                'line-opacity': 0.12,
-                'line-width': 1,
+                'line-color': '#050505',
+                'line-opacity': 0.4,
+                'line-width': 1.5,
               }}
             />
           </Source>
