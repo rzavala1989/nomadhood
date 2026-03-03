@@ -36,6 +36,7 @@ model Neighborhood {
   description String?    @db.Text
   latitude    Float?
   longitude   Float?
+  boundary    Json?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   reviews     Review[]

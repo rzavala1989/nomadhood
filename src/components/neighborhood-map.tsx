@@ -3,11 +3,14 @@ import Map, {
   Marker,
   Popup,
   NavigationControl,
+  Source,
+  Layer,
   type MapRef,
 } from 'react-map-gl/maplibre';
 import maplibregl from 'maplibre-gl';
 import { MapPinIcon } from 'lucide-react';
 import Link from 'next/link';
+import type { Geometry } from 'geojson';
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -18,6 +21,7 @@ type Neighborhood = {
   state: string;
   latitude: number | null;
   longitude: number | null;
+  boundary?: unknown;
   _count: { reviews: number; favorites: number };
 };
 
@@ -35,6 +39,21 @@ export default function NeighborhoodMap({
 
   const markers = useMemo(
     () => neighborhoods.filter((n) => n.latitude != null && n.longitude != null),
+    [neighborhoods],
+  );
+
+  const boundaryCollection = useMemo(
+    () => ({
+      type: 'FeatureCollection' as const,
+      features: neighborhoods
+        .filter((n) => n.boundary)
+        .map((n) => ({
+          type: 'Feature' as const,
+          id: n.id,
+          properties: { id: n.id, name: n.name },
+          geometry: n.boundary as Geometry,
+        })),
+    }),
     [neighborhoods],
   );
 
@@ -77,6 +96,28 @@ export default function NeighborhoodMap({
         attributionControl={false}
       >
         <NavigationControl position="top-right" showCompass={false} />
+
+        {boundaryCollection.features.length > 0 && (
+          <Source id="boundaries" type="geojson" data={boundaryCollection}>
+            <Layer
+              id="boundary-fill"
+              type="fill"
+              paint={{
+                'fill-color': '#ffffff',
+                'fill-opacity': 0.03,
+              }}
+            />
+            <Layer
+              id="boundary-line"
+              type="line"
+              paint={{
+                'line-color': '#ffffff',
+                'line-opacity': 0.12,
+                'line-width': 1,
+              }}
+            />
+          </Source>
+        )}
 
         {markers.map((n) => (
           <Marker
