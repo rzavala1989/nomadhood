@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { router, protectedProcedure, adminProcedure } from '../trpc';
+import { TRPCError } from '@trpc/server';
+import { router, publicProcedure, protectedProcedure, adminProcedure } from '../trpc';
 import { prisma } from '../prisma';
 
 export const userRouter = router({
@@ -43,6 +44,44 @@ export const userRouter = router({
         },
       }),
     ),
+
+  /**
+   * Get public user profile with reviews and favorites
+   */
+  getPublicProfile: publicProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ input }) => {
+      const user = await prisma.user.findUnique({
+        where: { id: input.id },
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          createdAt: true,
+          reviews: {
+            include: {
+              neighborhood: {
+                select: { id: true, name: true, city: true, state: true },
+              },
+            },
+            orderBy: { createdAt: 'desc' },
+          },
+          favorites: {
+            include: {
+              neighborhood: {
+                select: { id: true, name: true, city: true, state: true },
+              },
+            },
+            orderBy: { createdAt: 'desc' },
+          },
+          _count: { select: { reviews: true, favorites: true } },
+        },
+      });
+      if (!user) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
+      }
+      return user;
+    }),
 
   /**
    * Admin check (for conditional rendering or logic)

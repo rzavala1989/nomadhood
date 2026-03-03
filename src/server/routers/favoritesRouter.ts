@@ -41,6 +41,7 @@ export const favoritesRouter = router({
     prisma.favorite.findMany({
       where: { userId: ctx.user.id },
       include: { neighborhood: true },
+      orderBy: { position: 'asc' },
     }),
   ),
 
@@ -57,5 +58,18 @@ export const favoritesRouter = router({
       });
 
       return { isFavorite: !!favorite };
+    }),
+
+  reorder: protectedProcedure
+    .input(z.object({ orderedIds: z.array(z.string().uuid()) }))
+    .mutation(async ({ ctx, input }) => {
+      const updates = input.orderedIds.map((id, index) =>
+        prisma.favorite.updateMany({
+          where: { id, userId: ctx.user.id },
+          data: { position: index },
+        }),
+      );
+      await prisma.$transaction(updates);
+      return { success: true };
     }),
 });

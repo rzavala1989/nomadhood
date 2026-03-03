@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -231,9 +232,12 @@ export default function NeighborhoodDetailPage() {
                   </Avatar>
                   <div className="flex-1 space-y-[var(--space-1)]">
                     <div className="flex items-center justify-between">
-                      <span className="text-caption text-[--text-secondary]">
+                      <Link
+                        href={`/users/${review.user.id}`}
+                        className="text-caption text-[--text-secondary] hover:text-[--text-primary] transition-colors"
+                      >
                         {review.user.name ?? 'Anonymous'}
-                      </span>
+                      </Link>
                       <span className="text-micro text-[--text-ghost]">
                         {formatDate(review.createdAt)}
                       </span>

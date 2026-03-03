@@ -64,6 +64,7 @@ model Review {
 
 model Favorite {
   id             String       @id @default(uuid())
+  position       Int          @default(0)
   createdAt      DateTime     @default(now())
   userId         String
   neighborhoodId String
