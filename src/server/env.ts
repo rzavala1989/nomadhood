@@ -20,6 +20,8 @@ const envSchema = z.object({
   // OAuth Providers
   GITHUB_CLIENT_ID: z.string().min(1, 'GITHUB_CLIENT_ID is required'),
   GITHUB_CLIENT_SECRET: z.string().min(1, 'GITHUB_CLIENT_SECRET is required'),
+  GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+  GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
 
   // Admin Configuration
   ADMIN_EMAIL: z.string().email('ADMIN_EMAIL must be a valid email').optional(),

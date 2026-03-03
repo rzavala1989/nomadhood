@@ -7,32 +7,42 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import Link from 'next/link';
 
-type CredentialFields = {
+type SignUpFields = {
+  name: string;
   email: string;
   password: string;
+  confirmPassword: string;
 };
 
-export function SignInForm() {
+export function SignUpForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<CredentialFields>();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<SignUpFields>();
+  const password = watch('password');
 
-  async function onSubmit(data: CredentialFields) {
+  async function onSubmit(data: SignUpFields) {
     setError(null);
     setLoading(true);
-    const result = await signIn('credentials', {
+
+    const res = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: data.email, password: data.password, name: data.name }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json() as { error?: string };
+      setError(body.error ?? 'Signup failed');
+      setLoading(false);
+      return;
+    }
+
+    await signIn('credentials', {
       email: data.email,
       password: data.password,
       callbackUrl: '/dashboard',
-      redirect: false,
     });
-    setLoading(false);
-    if (result?.error) {
-      setError('Invalid email or password');
-    } else if (result?.url) {
-      window.location.href = result.url;
-    }
   }
 
   return (
@@ -69,6 +79,17 @@ export function SignInForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-[var(--space-3)]">
         <div className="space-y-[var(--space-2)]">
           <input
+            type="text"
+            placeholder="Name (optional)"
+            autoComplete="name"
+            className="w-full bg-[--bg-surface-2] px-[var(--space-4)] py-[var(--space-3)] text-body text-[--text-primary] placeholder:text-[--text-ghost] outline-none"
+            style={{ boxShadow: 'inset 0 0 0 1px var(--border-default)' }}
+            {...register('name')}
+          />
+        </div>
+
+        <div className="space-y-[var(--space-2)]">
+          <input
             type="email"
             placeholder="Email"
             autoComplete="email"
@@ -84,14 +105,34 @@ export function SignInForm() {
         <div className="space-y-[var(--space-2)]">
           <input
             type="password"
-            placeholder="Password"
-            autoComplete="current-password"
+            placeholder="Password (min 8 characters)"
+            autoComplete="new-password"
             className="w-full bg-[--bg-surface-2] px-[var(--space-4)] py-[var(--space-3)] text-body text-[--text-primary] placeholder:text-[--text-ghost] outline-none"
             style={{ boxShadow: 'inset 0 0 0 1px var(--border-default)' }}
-            {...register('password', { required: 'Password is required' })}
+            {...register('password', {
+              required: 'Password is required',
+              minLength: { value: 8, message: 'Password must be at least 8 characters' },
+            })}
           />
           {errors.password && (
             <p className="text-caption text-[--text-secondary]">{errors.password.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-[var(--space-2)]">
+          <input
+            type="password"
+            placeholder="Confirm password"
+            autoComplete="new-password"
+            className="w-full bg-[--bg-surface-2] px-[var(--space-4)] py-[var(--space-3)] text-body text-[--text-primary] placeholder:text-[--text-ghost] outline-none"
+            style={{ boxShadow: 'inset 0 0 0 1px var(--border-default)' }}
+            {...register('confirmPassword', {
+              required: 'Please confirm your password',
+              validate: (v) => v === password || 'Passwords do not match',
+            })}
+          />
+          {errors.confirmPassword && (
+            <p className="text-caption text-[--text-secondary]">{errors.confirmPassword.message}</p>
           )}
         </div>
 
@@ -100,14 +141,14 @@ export function SignInForm() {
         )}
 
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign In'}
+          {loading ? 'Creating account...' : 'Create Account'}
         </Button>
       </form>
 
       <p className="text-center text-caption text-[--text-tertiary]">
-        Don&apos;t have an account?{' '}
-        <Link href="/auth/signup" className="text-[--text-secondary] underline underline-offset-2">
-          Sign up
+        Already have an account?{' '}
+        <Link href="/auth/signin" className="text-[--text-secondary] underline underline-offset-2">
+          Sign in
         </Link>
       </p>
     </div>
