@@ -48,20 +48,12 @@ const IndexPage: NextPageWithLayout = () => {
             <p className="text-caption text-[--text-tertiary]">
               Sign in to get started.
             </p>
-            <div className="flex flex-col items-center gap-px sm:flex-row sm:justify-center">
-              <Link
-                href="/auth/signin"
-                className="bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-4)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] transition-all hover:bg-[#1A1A18]/90"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="surface-1 px-[var(--space-4)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] text-[--text-tertiary] transition-all hover:bg-[--bg-surface-2] hover:text-[--text-secondary]"
-              >
-                Create Account
-              </Link>
-            </div>
+            <Link
+              href="/auth/signin"
+              className="bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-4)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] transition-all hover:bg-[#1A1A18]/90"
+            >
+              Sign In with GitHub
+            </Link>
           </div>
         )}
       </div>
