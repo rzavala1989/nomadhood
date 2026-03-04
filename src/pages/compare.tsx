@@ -9,9 +9,30 @@ import { FavoriteButton } from '@/components/favorite-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { trpc } from '@/utils/trpc';
 
+function formatCompactDollars(value: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function getRiskLabel(violent: number | null, property: number | null) {
+  if (violent == null && property == null) return null;
+  const v = violent ?? 0;
+  const p = property ?? 0;
+  if (v < 200 && p < 1500) return 'LOW';
+  if (v < 400 && p < 2500) return 'MOD';
+  return 'HIGH';
+}
+
 function CompareColumn({ id }: { id: string }) {
   const { data: neighborhood, isLoading } =
     trpc.neighborhoods.getById.useQuery({ id });
+  const { data: extData } = trpc.data.getAll.useQuery(
+    { neighborhoodId: id },
+    { enabled: !!id },
+  );
 
   if (isLoading) {
     return (
@@ -74,6 +95,42 @@ function CompareColumn({ id }: { id: string }) {
             {neighborhood._count.favorites}
           </span>
         </div>
+
+        {extData?.walkScore?.walkScore != null && (
+          <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+            <span className="text-micro text-[--text-ghost]">WALK SCORE</span>
+            <span className="text-body text-[--text-primary] tabular-nums">
+              {extData.walkScore.walkScore}
+            </span>
+          </div>
+        )}
+
+        {extData?.rentData?.medianRent != null && (
+          <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+            <span className="text-micro text-[--text-ghost]">MEDIAN RENT</span>
+            <span className="text-body text-[--text-primary] tabular-nums">
+              {formatCompactDollars(extData.rentData.medianRent)}
+            </span>
+          </div>
+        )}
+
+        {extData?.crimeData && extData.crimeData.dataQuality !== 'unavailable' && (
+          <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+            <span className="text-micro text-[--text-ghost]">SAFETY</span>
+            <span className="text-body text-[--text-primary]">
+              {getRiskLabel(extData.crimeData.violentCrimeRate, extData.crimeData.propertyCrimeRate) ?? '—'}
+            </span>
+          </div>
+        )}
+
+        {extData?.costOfLiving?.cpi?.value != null && (
+          <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+            <span className="text-micro text-[--text-ghost]">CPI INDEX</span>
+            <span className="text-body text-[--text-primary] tabular-nums">
+              {extData.costOfLiving.cpi.value.toFixed(1)}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Rating Distribution */}

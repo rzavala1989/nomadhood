@@ -6,8 +6,14 @@ import {
   adminProcedure,
 } from '@/server/trpc';
 import { prisma } from '@/server/prisma';
-import { calculateAvgRating, calculateNomadScore } from '@/server/utils/scores';
+import { calculateAvgRating, calculateNomadScore, calculateEnhancedNomadScore } from '@/server/utils/scores';
 import { getMaxCounts } from '@/server/utils/queries';
+import { getWalkScore } from '@/server/services/walkScore';
+import { getRentData } from '@/server/services/rentcast';
+import { getCrimeData } from '@/server/services/crimeData';
+import { getBlsData } from '@/server/services/blsData';
+import { getEvents } from '@/server/services/eventbrite';
+import type { NeighborhoodExternalData } from '@/server/services/types';
 
 const createNeighborhoodSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
@@ -135,8 +141,33 @@ export const neighborhoodsRouter = router({
         });
       }
 
+      // Fetch external data for enhanced score (DB reads only, no API calls)
+      const [walkScore, rentData, crimeData, costOfLiving, events] =
+        await Promise.all([
+          getWalkScore(input.id),
+          getRentData(input.id),
+          getCrimeData(input.id),
+          getBlsData(input.id),
+          getEvents(input.id),
+        ]);
+
+      const externalData: NeighborhoodExternalData = {
+        walkScore,
+        rentData,
+        crimeData,
+        costOfLiving,
+        events,
+      };
+
       const avgRating = calculateAvgRating(neighborhood.reviews);
-      const nomadScore = calculateNomadScore(avgRating, neighborhood._count.reviews, neighborhood._count.favorites, maxReviews, maxFavorites);
+      const nomadScore = calculateEnhancedNomadScore(
+        avgRating,
+        neighborhood._count.reviews,
+        neighborhood._count.favorites,
+        maxReviews,
+        maxFavorites,
+        externalData,
+      );
 
       return {
         ...neighborhood,

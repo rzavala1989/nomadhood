@@ -1,7 +1,7 @@
 {
   "name": "nomadhood",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "generate": "bun prisma generate",
     "prisma-studio": "bun prisma studio",

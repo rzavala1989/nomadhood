@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.1 — 2026-03-03
+
+Enhanced Nomad Score, Detail page score, and Compare page with measurable metrics from the service layer
+
 ## [Unreleased]
 
 ### Added
