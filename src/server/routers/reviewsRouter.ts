@@ -7,6 +7,7 @@ import {
   adminProcedure,
 } from '@/server/trpc';
 import { prisma } from '@/server/prisma';
+import { calculateAvgRating } from '@/server/utils/scores';
 
 const createReviewSchema = z.object({
   neighborhoodId: z.string().uuid(),
@@ -263,7 +264,7 @@ export const reviewsRouter = router({
       }
 
       const totalReviews = reviews.length;
-      const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
+      const averageRating = calculateAvgRating(reviews)!;
       
       const ratingDistribution = reviews.reduce(
         (acc, review) => {

@@ -12,11 +12,12 @@ import { StarRating } from '@/components/star-rating';
 import { ReviewForm } from '@/components/review-form';
 import { RatingDistributionChart } from '@/components/rating-distribution-chart';
 import { NeighborhoodMap } from '@/components/neighborhood-map-wrapper';
-import { NeighborhoodCard } from '@/components/neighborhood-card';
+import { SimilarNeighborhoods } from '@/components/similar-neighborhoods';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { trpc } from '@/utils/trpc';
+import { getInitials } from '@/utils/format';
 
 function formatDate(date: string | Date) {
   return format(new Date(date), 'MMM d, yyyy');
@@ -41,7 +42,7 @@ export default function NeighborhoodDetailPage() {
     onSuccess: () => {
       utils.reviews.getUserReview.invalidate({ neighborhoodId: id });
       utils.neighborhoods.getById.invalidate({ id });
-      utils.getDashboardStats.invalidate();
+      utils.dashboard.getStats.invalidate();
       toast.success('Review deleted');
     },
     onError: () => {
@@ -229,12 +230,7 @@ export default function NeighborhoodDetailPage() {
                       alt={review.user.name ?? 'User'}
                     />
                     <AvatarFallback className="rounded-full bg-[--bg-surface-2] text-[7px] tracking-[0.15em] text-[--text-tertiary]">
-                      {(review.user.name ?? 'U')
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')
-                        .toUpperCase()
-                        .slice(0, 2)}
+                      {getInitials(review.user.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-[var(--space-1)]">
@@ -266,29 +262,5 @@ export default function NeighborhoodDetailPage() {
         <SimilarNeighborhoods neighborhoodId={neighborhood.id} state={neighborhood.state} />
       </div>
     </DashboardLayout>
-  );
-}
-
-function SimilarNeighborhoods({ neighborhoodId, state }: { neighborhoodId: string; state: string }) {
-  const { data: similar } = trpc.neighborhoods.getSimilar.useQuery(
-    { id: neighborhoodId, limit: 4 },
-    { enabled: !!neighborhoodId },
-  );
-
-  if (!similar || similar.length === 0) return null;
-
-  return (
-    <div className="animate-fade-up" style={{ animationDelay: '360ms' }}>
-      <p className="text-label text-[--text-ghost] mb-[var(--space-4)]">
-        SIMILAR IN {state}
-      </p>
-      <div className="grid grid-cols-1 gap-px md:grid-cols-2">
-        {similar.map((n, i) => (
-          <div key={n.id} className="animate-fade-up" style={{ animationDelay: `${400 + i * 60}ms` }}>
-            <NeighborhoodCard neighborhood={n} />
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }

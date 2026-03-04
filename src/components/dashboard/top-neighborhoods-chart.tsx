@@ -14,7 +14,7 @@ const chartConfig = {
 
 export function TopNeighborhoodsChart() {
   const { data: neighborhoods, isLoading } =
-    trpc.getTopNeighborhoods.useQuery({ limit: 8 });
+    trpc.dashboard.getTopNeighborhoods.useQuery({ limit: 8 });
 
   if (isLoading) {
     return <Skeleton className="h-[200px] w-full" />;

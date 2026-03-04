@@ -1,7 +1,7 @@
 import { trpc } from '@/utils/trpc';
 
 export function SectionCards() {
-  const { data: stats } = trpc.getDashboardStats.useQuery();
+  const { data: stats } = trpc.dashboard.getStats.useQuery();
 
   const cards = [
     { label: 'Neighborhoods', value: stats?.neighborhoodCount, desc: 'Total listed' },

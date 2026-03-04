@@ -52,7 +52,7 @@ export function ReviewForm({
     onSuccess: () => {
       utils.reviews.getUserReview.invalidate({ neighborhoodId });
       utils.neighborhoods.getById.invalidate({ id: neighborhoodId });
-      utils.getDashboardStats.invalidate();
+      utils.dashboard.getStats.invalidate();
       reset();
       setRating(0);
       onSuccess?.();

@@ -10,5 +10,12 @@
       <working-dir>$ProjectFileDir$</working-dir>
       <time-zone>America/Los_Angeles</time-zone>
     </data-source>
+    <data-source source="LOCAL" name="neondb@ep-jolly-butterfly-a5a36sdt-pooler.us-east-2.aws.neon.tech" uuid="70c0ecc6-ea46-49c4-aee5-fbd68d99f6c8">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ep-jolly-butterfly-a5a36sdt-pooler.us-east-2.aws.neon.tech:5432/neondb</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

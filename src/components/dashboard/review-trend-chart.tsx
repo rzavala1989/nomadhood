@@ -12,7 +12,7 @@ const chartConfig = {
 };
 
 export function ReviewTrendChart() {
-  const { data: trend, isLoading } = trpc.getReviewTrend.useQuery();
+  const { data: trend, isLoading } = trpc.dashboard.getReviewTrend.useQuery();
 
   if (isLoading) {
     return <Skeleton className="h-[160px] w-full" />;

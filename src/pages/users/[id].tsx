@@ -8,6 +8,7 @@ import { StarRating } from '@/components/star-rating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { trpc } from '@/utils/trpc';
+import { getInitials } from '@/utils/format';
 
 export default function PublicUserProfilePage() {
   const router = useRouter();
@@ -41,12 +42,7 @@ export default function PublicUserProfilePage() {
     );
   }
 
-  const initials = (user.name ?? 'U')
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+  const initials = getInitials(user.name);
 
   return (
     <DashboardLayout title={user.name ?? 'User'}>

@@ -5,7 +5,7 @@ import type { NextPageWithLayout } from './_app';
 
 const IndexPage: NextPageWithLayout = () => {
   const { data: me, isLoading: meLoading } = trpc.user.me.useQuery();
-  const { data: stats } = trpc.getDashboardStats.useQuery();
+  const { data: stats } = trpc.dashboard.getStats.useQuery();
   const { data: recent } = trpc.neighborhoods.list.useQuery({ limit: 6, sortBy: 'most_reviews' });
 
   return (

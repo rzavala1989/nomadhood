@@ -5,9 +5,10 @@ import { StarRating } from '@/components/star-rating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { trpc } from '@/utils/trpc';
+import { getInitials } from '@/utils/format';
 
 export function ActivityFeed() {
-  const { data: reviews, isLoading } = trpc.getRecentActivity.useQuery({
+  const { data: reviews, isLoading } = trpc.dashboard.getRecentActivity.useQuery({
     limit: 10,
   });
 
@@ -43,12 +44,7 @@ export function ActivityFeed() {
               alt={review.user.name ?? 'User'}
             />
             <AvatarFallback className="rounded-full bg-[--bg-surface-2] text-[7px] tracking-[0.15em] text-[--text-tertiary]">
-              {(review.user.name ?? 'U')
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .toUpperCase()
-                .slice(0, 2)}
+              {getInitials(review.user.name)}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">

@@ -18,7 +18,6 @@ Requires Node 18+, Bun, and a PostgreSQL database (Neon free tier works).
 
 Next.js 15 (Pages Router) / React 19 / tRPC v11 / Prisma v6 / Auth.js v5 / PostgreSQL / Tailwind and shadcn/ui
 
-## Documentation
 
 | Document | What it covers |
 |----------|---------------|
@@ -49,3 +48,4 @@ docs/              Detailed documentation
 ## License
 
 Private.
+

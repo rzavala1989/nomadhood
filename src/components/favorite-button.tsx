@@ -24,7 +24,7 @@ export function FavoriteButton({
     onSuccess: (data) => {
       utils.favorites.isFavorite.invalidate({ neighborhoodId });
       utils.favorites.getMine.invalidate();
-      utils.getDashboardStats.invalidate();
+      utils.dashboard.getStats.invalidate();
       toast.success(data.added ? 'Saved to favorites' : 'Removed from favorites');
     },
     onError: () => {
