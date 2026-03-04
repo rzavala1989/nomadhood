@@ -109,3 +109,47 @@ When you remove color entirely, every other design decision has to be perfect. T
 8. Labels are tiny, tracked-out machine annotations
 9. Giant serif + tiny mono feel unified
 10. Looks like a tool built by someone who hates unnecessary UI
+
+---
+
+## Push Pipeline
+
+**Trigger:** User says "run the push pipeline" + a commit message.
+
+**Requirements:** `gh` CLI must be authenticated. Verify with `gh auth status` before starting. Stop and tell the user if it is not.
+
+### Bump Type from Commit Message
+
+| Prefix | Bump |
+|--------|------|
+| `fix:`, `chore:`, `docs:`, `refactor:`, `style:`, `test:`, `perf:` | patch |
+| `feat:` | minor |
+| `BREAKING CHANGE` anywhere in message | major |
+
+If the commit message has no recognized prefix, default to patch and note it.
+
+### Steps (execute in order, stop on any error)
+
+1. Run `gh auth status` — stop if not authenticated
+2. Read `version` from `package.json`
+3. Determine bump type from the commit message using the table above
+4. Compute new semver version
+5. Update `version` in `package.json`
+6. Prepend this block to `CHANGELOG.md` (create the file if it does not exist):
+   ```
+   ## v{new-version} — {YYYY-MM-DD}
+
+   {commit message}
+
+   ```
+7. Stage only `package.json` and `CHANGELOG.md`
+8. Commit with the exact message the user provided (no Co-Authored-By, no AI attribution)
+9. Create tag: `git tag v{new-version}`
+10. Push commit and tag: `git push && git push --tags`
+11. Create GitHub release:
+    ```bash
+    gh release create v{new-version} \
+      --title "v{new-version}" \
+      --notes "{the changelog entry body — just the commit message line}"
+    ```
+12. Report the release URL to the user

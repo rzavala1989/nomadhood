@@ -1,106 +1,106 @@
-name: Testing
-on: [push]
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
 jobs:
+  typecheck:
+    name: Type Check and Lint
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres@localhost:5432/nomadhood
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache bun store
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: ${{ runner.os }}-bun-
+
+      - name: Install deps
+        run: bun install
+
+      - name: Generate Prisma client
+        run: bun run generate
+
+      - name: Type check
+        run: bun run type-check
+
+      - name: Lint
+        run: bun run lint
+
   e2e:
-    name: 'Build + E2E tests'
+    name: Build and E2E Tests
+    runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres
+        image: postgres:16
         env:
-          POSTGRES_DATABASE: trpcdb
+          POSTGRES_DB: nomadhood
           POSTGRES_USER: postgres
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
+      DATABASE_URL: postgresql://postgres@localhost:5432/nomadhood
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+      GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
       NODE_ENV: test
-      NEXTAUTH_SECRET: supersecret
-    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
         with:
-          fetch-depth: 0
+          bun-version: latest
 
-      - uses: pnpm/action-setup@v2
+      - name: Cache bun store
+        uses: actions/cache@v4
         with:
-          version: 8.5.1
+          path: ~/.bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: ${{ runner.os }}-bun-
 
-      - uses: actions/setup-node@v3
+      - name: Cache Next.js build
+        uses: actions/cache@v4
         with:
-          node-version: 22.x
-          cache: 'pnpm' # You can active this cache when your repo has a lockfile
+          path: .next/cache
+          key: ${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-nextjs
 
-      - name: Install deps (with cache)
-        run: pnpm install
+      - name: Install deps
+        run: bun install
 
-      - name: Install playwright
-        run: pnpm exec playwright install chromium
+      - name: Install Playwright browsers
+        run: bunx playwright install chromium
 
-      - name: Next.js cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-nextjs
+      - name: Generate Prisma client
+        run: bun run generate
 
-      - name: Setup Prisma
-        run: pnpm prebuild
+      - name: Run DB migrations
+        run: bun run migrate
 
-      - run: pnpm build
-      - run: pnpm test-e2e
+      - name: Build
+        run: bun run build
 
-      - name: Check types
-        run: pnpm tsc
+      - name: Run E2E tests
+        run: bun run test-e2e
 
       - name: Upload test results
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: test results
-          path: |
-            playwright/test-results
-
-  unit:
-    name: 'Unit tests + typecheck'
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_DATABASE: trpcdb
-          POSTGRES_USER: postgres
-          POSTGRES_HOST_AUTH_METHOD: trust
-        ports:
-          - 5432:5432
-    env:
-      NODE_ENV: test
-      NEXTAUTH_SECRET: supersecret
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8.5.1
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22.x
-          cache: 'pnpm' # You can active this cache when your repo has a lockfile
-
-      - name: Install deps (with cache)
-        run: pnpm install
-
-      - name: Next.js cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}-nextjs
-
-      - name: Setup Prisma
-        run: pnpm prebuild
-
-      - run: pnpm test-unit
-      - run: pnpm tsc
+          name: playwright-results
+          path: playwright/test-results
