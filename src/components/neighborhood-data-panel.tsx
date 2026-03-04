@@ -77,6 +77,141 @@ function WalkScoreCard({
   );
 }
 
+function formatDollars(value: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function RentDataCard({
+  medianRent,
+  medianRentSqft,
+  medianSalePrice,
+  medianSaleSqft,
+  fetchedAt,
+}: {
+  medianRent: number | null;
+  medianRentSqft: number | null;
+  medianSalePrice: number | null;
+  medianSaleSqft: number | null;
+  fetchedAt: Date;
+}) {
+  const hasRent = medianRent != null;
+  const hasSale = medianSalePrice != null;
+  if (!hasRent && !hasSale) return null;
+
+  return (
+    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+      <p className="text-label text-[--text-ghost]">HOUSING COST</p>
+
+      {hasRent && (
+        <div>
+          <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
+            {formatDollars(medianRent)}{' '}
+            <span className="text-caption text-[--text-tertiary]">/MO</span>
+          </p>
+          <p className="text-micro text-[--text-ghost] mt-[var(--space-1)]">
+            MEDIAN RENT
+          </p>
+        </div>
+      )}
+
+      <div className="flex gap-[var(--space-6)]">
+        {medianRentSqft != null && (
+          <span className="text-micro text-[--text-tertiary] tabular-nums">
+            ${medianRentSqft.toFixed(2)} /SQFT RENT
+          </span>
+        )}
+        {medianSaleSqft != null && (
+          <span className="text-micro text-[--text-tertiary] tabular-nums">
+            ${medianSaleSqft.toFixed(0)} /SQFT SALE
+          </span>
+        )}
+      </div>
+
+      {hasSale && (
+        <p className="text-caption text-[--text-secondary] tabular-nums">
+          {formatDollars(medianSalePrice)} median sale price
+        </p>
+      )}
+
+      <p className="text-micro text-[--text-ghost] pt-[var(--space-1)]">
+        LAST UPDATED: {formatUpdatedAt(fetchedAt)}
+      </p>
+    </div>
+  );
+}
+
+function getRiskLevel(violentRate: number | null, propertyRate: number | null) {
+  // Based on FBI national averages: violent ~380/100k, property ~2,000/100k
+  if (violentRate == null && propertyRate == null) return null;
+  const v = violentRate ?? 0;
+  const p = propertyRate ?? 0;
+  if (v < 200 && p < 1500) return 'LOW RISK';
+  if (v < 400 && p < 2500) return 'MODERATE';
+  return 'HIGH RISK';
+}
+
+function formatRate(rate: number) {
+  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(rate);
+}
+
+function CrimeDataCard({
+  violentCrimeRate,
+  propertyCrimeRate,
+  dataYear,
+  dataQuality,
+  fetchedAt,
+}: {
+  violentCrimeRate: number | null;
+  propertyCrimeRate: number | null;
+  dataYear: number | null;
+  dataQuality: string;
+  fetchedAt: Date;
+}) {
+  if (dataQuality === 'unavailable') return null;
+
+  const riskLevel = getRiskLevel(violentCrimeRate, propertyCrimeRate);
+
+  return (
+    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+      <p className="text-label text-[--text-ghost]">SAFETY</p>
+
+      {riskLevel && (
+        <p className="text-heading font-light text-[--text-primary]">
+          {riskLevel}
+        </p>
+      )}
+
+      <div className="space-y-[var(--space-1)]">
+        {violentCrimeRate != null && (
+          <p className="text-micro text-[--text-tertiary] tabular-nums">
+            VIOLENT {formatRate(violentCrimeRate)}/100K
+          </p>
+        )}
+        {propertyCrimeRate != null && (
+          <p className="text-micro text-[--text-tertiary] tabular-nums">
+            PROPERTY {formatRate(propertyCrimeRate)}/100K
+          </p>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between pt-[var(--space-1)]">
+        <p className="text-micro text-[--text-ghost]">
+          LAST UPDATED: {formatUpdatedAt(fetchedAt)}
+        </p>
+        {dataYear && (
+          <p className="text-micro text-[--text-ghost]">
+            DATA YEAR {dataYear}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function NeighborhoodDataPanel({
   neighborhoodId,
 }: {
@@ -89,7 +224,10 @@ export function NeighborhoodDataPanel({
 
   if (!data) return null;
 
-  const hasAnyData = data.walkScore != null;
+  const hasAnyData =
+    data.walkScore != null ||
+    data.rentData != null ||
+    data.crimeData != null;
   if (!hasAnyData) return null;
 
   return (
@@ -101,6 +239,24 @@ export function NeighborhoodDataPanel({
           bikeScore={data.walkScore.bikeScore}
           walkDescription={data.walkScore.walkDescription}
           fetchedAt={data.walkScore.fetchedAt}
+        />
+      )}
+      {data.rentData && (
+        <RentDataCard
+          medianRent={data.rentData.medianRent}
+          medianRentSqft={data.rentData.medianRentSqft}
+          medianSalePrice={data.rentData.medianSalePrice}
+          medianSaleSqft={data.rentData.medianSaleSqft}
+          fetchedAt={data.rentData.fetchedAt}
+        />
+      )}
+      {data.crimeData && (
+        <CrimeDataCard
+          violentCrimeRate={data.crimeData.violentCrimeRate}
+          propertyCrimeRate={data.crimeData.propertyCrimeRate}
+          dataYear={data.crimeData.dataYear}
+          dataQuality={data.crimeData.dataQuality}
+          fetchedAt={data.crimeData.fetchedAt}
         />
       )}
     </div>
