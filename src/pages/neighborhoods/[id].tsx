@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { trpc } from '@/utils/trpc';
 import { getInitials } from '@/utils/format';
+import { NeighborhoodDataPanel } from '@/components/neighborhood-data-panel';
 
 function formatDate(date: string | Date) {
   return format(new Date(date), 'MMM d, yyyy');
@@ -147,8 +148,13 @@ export default function NeighborhoodDetailPage() {
           </div>
         </div>
 
+        {/* External Data */}
+        <div style={{ animationDelay: '150ms' }}>
+          <NeighborhoodDataPanel neighborhoodId={neighborhood.id} />
+        </div>
+
         {/* Rating Distribution */}
-        <div className="animate-fade-up" style={{ animationDelay: '150ms' }}>
+        <div className="animate-fade-up" style={{ animationDelay: '180ms' }}>
           <RatingDistributionChart neighborhoodId={neighborhood.id} />
         </div>
 
@@ -157,7 +163,7 @@ export default function NeighborhoodDetailPage() {
 
         {/* Review Form / User Review */}
         {session && (
-          <div className="surface-1 p-[var(--space-5)] animate-fade-up" style={{ animationDelay: '180ms' }}>
+          <div className="surface-1 p-[var(--space-5)] animate-fade-up" style={{ animationDelay: '210ms' }}>
             <p className="text-label text-[--text-ghost] mb-[var(--space-4)]">
               {userReview
                 ? editingReview
@@ -207,7 +213,7 @@ export default function NeighborhoodDetailPage() {
         )}
 
         {/* All Reviews */}
-        <div className="animate-fade-up" style={{ animationDelay: '240ms' }}>
+        <div className="animate-fade-up" style={{ animationDelay: '270ms' }}>
           <p className="text-label text-[--text-ghost] mb-[var(--space-4)]">
             {neighborhood._count.reviews} REVIEW{neighborhood._count.reviews !== 1 ? 'S' : ''}
           </p>
@@ -222,7 +228,7 @@ export default function NeighborhoodDetailPage() {
                 <div
                   key={review.id}
                   className="flex gap-[var(--space-3)] py-[var(--space-4)] border-t border-black/[0.06] animate-fade-up"
-                  style={{ animationDelay: `${300 + i * 60}ms` }}
+                  style={{ animationDelay: `${330 + i * 60}ms` }}
                 >
                   <Avatar className="h-8 w-8 rounded-full shrink-0">
                     <AvatarImage
