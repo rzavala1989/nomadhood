@@ -28,19 +28,20 @@ model User {
 }
 
 model Neighborhood {
-  id          String     @id @default(uuid())
-  name        String     @db.VarChar(100)
-  city        String     @db.VarChar(50)
-  state       String     @db.Char(2)
-  zip         String     @db.VarChar(10)
-  description String?    @db.Text
-  latitude    Float?
-  longitude   Float?
-  boundary    Json?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  reviews     Review[]
-  favorites   Favorite[]
+  id             String          @id @default(uuid())
+  name           String          @db.VarChar(100)
+  city           String          @db.VarChar(50)
+  state          String          @db.Char(2)
+  zip            String          @db.VarChar(10)
+  description    String?         @db.Text
+  latitude       Float?
+  longitude      Float?
+  boundary       Json?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  reviews        Review[]
+  favorites      Favorite[]
+  walkScoreCache WalkScoreCache?
 
   @@index([city, state])
   @@index([zip])
@@ -110,4 +111,96 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// --- External API Cache Models ---
+
+model WalkScoreCache {
+  id             String       @id @default(uuid())
+  neighborhoodId String       @unique
+  neighborhood   Neighborhood @relation(fields: [neighborhoodId], references: [id], onDelete: Cascade)
+  walkScore      Int?
+  transitScore   Int?
+  bikeScore      Int?
+  walkDescription    String?  @db.VarChar(100)
+  transitDescription String?  @db.VarChar(100)
+  bikeDescription    String?  @db.VarChar(100)
+  rawResponse    Json
+  fetchedAt      DateTime     @default(now())
+  expiresAt      DateTime
+
+  @@index([expiresAt])
+}
+
+model RentcastCache {
+  id               String   @id @default(uuid())
+  zip              String   @unique @db.VarChar(10)
+  medianRent       Float?
+  medianRentSqft   Float?
+  medianSalePrice  Float?
+  medianSaleSqft   Float?
+  rawResponse      Json
+  fetchedAt        DateTime @default(now())
+  expiresAt        DateTime
+
+  @@index([expiresAt])
+}
+
+model CrimeDataCache {
+  id                  String   @id @default(uuid())
+  city                String   @db.VarChar(100)
+  state               String   @db.Char(2)
+  oriCode             String?  @db.VarChar(20)
+  violentCrimeRate    Float?
+  propertyCrimeRate   Float?
+  population          Int?
+  dataYear            Int?
+  dataQuality         String   @default("unavailable") @db.VarChar(20)
+  rawResponse         Json
+  fetchedAt           DateTime @default(now())
+  expiresAt           DateTime
+
+  @@unique([city, state])
+  @@index([expiresAt])
+}
+
+model BlsDataCache {
+  id         String   @id @default(uuid())
+  seriesId   String   @unique @db.VarChar(30)
+  city       String   @db.VarChar(100)
+  state      String   @db.Char(2)
+  seriesType String   @db.VarChar(20)
+  value      Float?
+  period     String?  @db.VarChar(10)
+  year       Int?
+  rawResponse Json
+  fetchedAt  DateTime @default(now())
+  expiresAt  DateTime
+
+  @@index([city, state])
+  @@index([seriesType])
+  @@index([expiresAt])
+}
+
+model EventbriteCache {
+  id                 String   @id @default(uuid())
+  city               String   @db.VarChar(100)
+  state              String   @db.Char(2)
+  upcomingEventCount Int      @default(0)
+  events             Json     @default("[]")
+  rawResponse        Json
+  fetchedAt          DateTime @default(now())
+  expiresAt          DateTime
+
+  @@unique([city, state])
+  @@index([expiresAt])
+}
+
+model ApiRateLimitTracker {
+  id           String   @id @default(uuid())
+  apiName      String   @unique @db.VarChar(50)
+  callCount    Int      @default(0)
+  periodStart  DateTime @default(now())
+  periodEnd    DateTime
+  lastCalledAt DateTime?
 }

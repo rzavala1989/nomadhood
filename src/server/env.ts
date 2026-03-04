@@ -25,6 +25,13 @@ const envSchema = z.object({
 
   // Admin Configuration
   ADMIN_EMAIL: z.string().email('ADMIN_EMAIL must be a valid email').optional(),
+
+  // External API Keys (optional, services return null when absent)
+  WALKSCORE_API_KEY: z.string().min(1).optional(),
+  RENTCAST_API_KEY: z.string().min(1).optional(),
+  FBI_CRIME_API_KEY: z.string().min(1).optional(),
+  BLS_API_KEY: z.string().min(1).optional(),
+  EVENTBRITE_API_KEY: z.string().min(1).optional(),
 });
 
 const _env = envSchema.safeParse(process.env);
