@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { UsersIcon, MapIcon, MessageSquareIcon } from 'lucide-react';
+import { UsersIcon, MapIcon, MessageSquareIcon, DatabaseIcon } from 'lucide-react';
 
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +11,7 @@ const adminTabs = [
   { label: 'Users', href: '/admin/users', icon: UsersIcon },
   { label: 'Neighborhoods', href: '/admin/neighborhoods', icon: MapIcon },
   { label: 'Reviews', href: '/admin/reviews', icon: MessageSquareIcon },
+  { label: 'Data', href: '/admin/data', icon: DatabaseIcon },
 ];
 
 export function AdminLayout({
