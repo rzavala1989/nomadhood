@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { SearchIcon, MapIcon, ListIcon } from 'lucide-react';
 
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { NeighborhoodCard } from '@/components/neighborhood-card';
 import { NeighborhoodMap } from '@/components/neighborhood-map-wrapper';
+import { Pagination } from '@/components/pagination';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -15,7 +17,8 @@ import {
 } from '@/components/ui/select';
 import { trpc } from '@/utils/trpc';
 
-const PAGE_SIZE = 12;
+const DEFAULT_PAGE = 1;
+const DEFAULT_PAGE_SIZE = 10;
 
 const US_STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
@@ -28,24 +31,48 @@ const US_STATES = [
 type SortOption = 'newest' | 'oldest' | 'name_asc' | 'name_desc' | 'most_reviews' | 'most_favorites';
 
 export default function NeighborhoodsPage() {
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const [offset, setOffset] = useState(0);
   const [view, setView] = useState<'list' | 'map' | 'split'>('split');
   const [selectedMapId, setSelectedMapId] = useState<string | null>(null);
+
+  const rawPage = Number(router.query.page);
+  const rawPageSize = Number(router.query.pageSize);
+  const page = Number.isFinite(rawPage) && rawPage >= 1 ? Math.floor(rawPage) : DEFAULT_PAGE;
+  const pageSize = Number.isFinite(rawPageSize) && rawPageSize >= 1 ? Math.floor(rawPageSize) : DEFAULT_PAGE_SIZE;
+  const offset = (page - 1) * pageSize;
 
   const { data, isLoading } = trpc.neighborhoods.list.useQuery({
     search: search || undefined,
     city: city || undefined,
     state: state || undefined,
     sortBy,
-    limit: PAGE_SIZE,
+    limit: pageSize,
     offset,
   });
 
-  const resetOffset = () => setOffset(0);
+  const totalItems = data?.pagination.total ?? 0;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+
+  const pushPage = (newPage: number, newPageSize?: number) => {
+    void router.push(
+      {
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          page: String(newPage),
+          pageSize: String(newPageSize ?? pageSize),
+        },
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
+
+  const resetPage = () => pushPage(1);
 
   return (
     <DashboardLayout title="Neighborhoods">
@@ -60,7 +87,7 @@ export default function NeighborhoodsPage() {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
-                  resetOffset();
+                  resetPage();
                 }}
                 className="pl-9"
               />
@@ -70,7 +97,7 @@ export default function NeighborhoodsPage() {
               value={city}
               onChange={(e) => {
                 setCity(e.target.value);
-                resetOffset();
+                resetPage();
               }}
               className="sm:w-36"
             />
@@ -78,7 +105,7 @@ export default function NeighborhoodsPage() {
               value={state}
               onValueChange={(v) => {
                 setState(v === 'all' ? '' : v);
-                resetOffset();
+                resetPage();
               }}
             >
               <SelectTrigger className="sm:w-28 text-micro">
@@ -100,7 +127,7 @@ export default function NeighborhoodsPage() {
               value={sortBy}
               onValueChange={(v) => {
                 setSortBy(v as SortOption);
-                resetOffset();
+                resetPage();
               }}
             >
               <SelectTrigger className="w-44 text-micro">
@@ -179,10 +206,6 @@ export default function NeighborhoodsPage() {
                 </div>
               ) : (
                 <>
-                  <p className="text-micro text-[--text-ghost] mb-[var(--space-3)]">
-                    {data?.pagination.total} RESULTS
-                  </p>
-
                   <div className={`grid gap-px ${view === 'list' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
                     {data?.neighborhoods.map((n, i) => (
                       <div
@@ -200,29 +223,16 @@ export default function NeighborhoodsPage() {
                   </div>
 
                   {/* Pagination */}
-                  {data?.pagination && (
-                    <div className="mt-[var(--space-8)] flex items-center justify-between">
-                      <p className="text-micro text-[--text-ghost] tabular-nums">
-                        {offset + 1}&ndash;{Math.min(offset + PAGE_SIZE, data.pagination.total)} OF {data.pagination.total}
-                      </p>
-                      <div className="flex gap-px">
-                        <button
-                          onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
-                          disabled={offset === 0}
-                          className="surface-1 px-[var(--space-4)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] text-[--text-tertiary] transition-colors hover:bg-[--bg-surface-2] hover:text-[--text-secondary] disabled:opacity-30 disabled:cursor-not-allowed"
-                        >
-                          Previous
-                        </button>
-                        <button
-                          onClick={() => setOffset(offset + PAGE_SIZE)}
-                          disabled={!data.pagination.hasMore}
-                          className="surface-1 px-[var(--space-4)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] text-[--text-tertiary] transition-colors hover:bg-[--bg-surface-2] hover:text-[--text-secondary] disabled:opacity-30 disabled:cursor-not-allowed"
-                        >
-                          Next
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <div className="mt-[var(--space-8)]">
+                    <Pagination
+                      currentPage={page}
+                      totalPages={totalPages}
+                      pageSize={pageSize}
+                      totalItems={totalItems}
+                      onPageChange={(newPage) => pushPage(newPage)}
+                      onPageSizeChange={(newSize) => pushPage(1, newSize)}
+                    />
+                  </div>
                 </>
               )}
             </div>
