@@ -10,6 +10,10 @@ import {
   getCrimeData,
   fetchAllCrimeData,
 } from '@/server/services/crimeData';
+import {
+  getBlsData,
+  fetchAllBlsData,
+} from '@/server/services/blsData';
 import type { NeighborhoodExternalData } from '@/server/services/types';
 
 export const dataRouter = router({
@@ -17,18 +21,19 @@ export const dataRouter = router({
   getAll: publicProcedure
     .input(z.object({ neighborhoodId: z.string().uuid() }))
     .query(async ({ input }): Promise<NeighborhoodExternalData> => {
-      const [walkScore, rentData, crimeData] = await Promise.all([
+      const [walkScore, rentData, crimeData, costOfLiving] = await Promise.all([
         getWalkScore(input.neighborhoodId),
         getRentData(input.neighborhoodId),
         getCrimeData(input.neighborhoodId),
+        getBlsData(input.neighborhoodId),
       ]);
 
-      // Remaining sources wired in later phases
+      // Remaining source (events) wired in next phase
       return {
         walkScore,
         rentData,
         crimeData,
-        costOfLiving: { cpi: null, wage: null },
+        costOfLiving,
         events: null,
       };
     }),
@@ -53,6 +58,11 @@ export const dataRouter = router({
   /** Admin: fetch FBI crime data for all unique city/state pairs (skips valid cache). */
   fetchCrimeData: adminProcedure.mutation(async () => {
     return fetchAllCrimeData();
+  }),
+
+  /** Admin: fetch BLS cost-of-living data for all mapped metros (skips valid cache). */
+  fetchCostOfLiving: adminProcedure.mutation(async () => {
+    return fetchAllBlsData();
   }),
 
   /** Admin: get current Rentcast monthly usage. */

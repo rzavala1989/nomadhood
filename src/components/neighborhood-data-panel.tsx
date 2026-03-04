@@ -212,6 +212,60 @@ function CrimeDataCard({
   );
 }
 
+function CostOfLivingCard({
+  cpiValue,
+  cpiFetchedAt,
+  wageValue,
+  wageFetchedAt,
+}: {
+  cpiValue: number | null;
+  cpiFetchedAt: Date | null;
+  wageValue: number | null;
+  wageFetchedAt: Date | null;
+}) {
+  if (cpiValue == null && wageValue == null) return null;
+
+  const fetchedAt = cpiFetchedAt ?? wageFetchedAt;
+  // CPI values are index numbers; compute YoY-style display
+  // For now, show the raw index value since we'd need two data points for YoY
+  const medianAnnual = wageValue != null ? Math.round(wageValue * 2080) : null;
+
+  return (
+    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+      <p className="text-label text-[--text-ghost]">COST OF LIVING</p>
+
+      {cpiValue != null && (
+        <div>
+          <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
+            {cpiValue.toFixed(1)}
+          </p>
+          <p className="text-micro text-[--text-ghost] mt-[var(--space-1)]">
+            CPI INDEX
+          </p>
+        </div>
+      )}
+
+      {medianAnnual != null && (
+        <p className="text-micro text-[--text-tertiary] tabular-nums">
+          MEDIAN WAGE {formatDollars(medianAnnual)}/YR
+        </p>
+      )}
+
+      {wageValue != null && medianAnnual == null && (
+        <p className="text-micro text-[--text-tertiary] tabular-nums">
+          MEDIAN HOURLY ${wageValue.toFixed(2)}
+        </p>
+      )}
+
+      {fetchedAt && (
+        <p className="text-micro text-[--text-ghost] pt-[var(--space-1)]">
+          LAST UPDATED: {formatUpdatedAt(fetchedAt)}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function NeighborhoodDataPanel({
   neighborhoodId,
 }: {
@@ -224,10 +278,13 @@ export function NeighborhoodDataPanel({
 
   if (!data) return null;
 
+  const hasCostOfLiving =
+    data.costOfLiving.cpi != null || data.costOfLiving.wage != null;
   const hasAnyData =
     data.walkScore != null ||
     data.rentData != null ||
-    data.crimeData != null;
+    data.crimeData != null ||
+    hasCostOfLiving;
   if (!hasAnyData) return null;
 
   return (
@@ -257,6 +314,14 @@ export function NeighborhoodDataPanel({
           dataYear={data.crimeData.dataYear}
           dataQuality={data.crimeData.dataQuality}
           fetchedAt={data.crimeData.fetchedAt}
+        />
+      )}
+      {hasCostOfLiving && (
+        <CostOfLivingCard
+          cpiValue={data.costOfLiving.cpi?.value ?? null}
+          cpiFetchedAt={data.costOfLiving.cpi?.fetchedAt ?? null}
+          wageValue={data.costOfLiving.wage?.value ?? null}
+          wageFetchedAt={data.costOfLiving.wage?.fetchedAt ?? null}
         />
       )}
     </div>
