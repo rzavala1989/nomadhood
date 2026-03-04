@@ -266,6 +266,57 @@ function CostOfLivingCard({
   );
 }
 
+function EventsCard({
+  upcomingEventCount,
+  events,
+  fetchedAt,
+}: {
+  upcomingEventCount: number;
+  events: { name: string; date: string; url: string; isFree: boolean }[];
+  fetchedAt: Date;
+}) {
+  return (
+    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+      <p className="text-label text-[--text-ghost]">LOCAL EVENTS</p>
+
+      <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
+        {upcomingEventCount}{' '}
+        <span className="text-caption text-[--text-tertiary]">UPCOMING</span>
+      </p>
+
+      {events.length > 0 && (
+        <div className="space-y-[var(--space-2)] pt-[var(--space-1)]">
+          {events.slice(0, 3).map((event) => (
+            <a
+              key={event.url}
+              href={event.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block group"
+            >
+              <p className="text-caption text-[--text-secondary] group-hover:text-[--text-primary] transition-colors truncate">
+                {event.name}
+              </p>
+              <div className="flex gap-[var(--space-3)]">
+                <span className="text-micro text-[--text-ghost]">
+                  {format(new Date(event.date), 'MMM d').toUpperCase()}
+                </span>
+                {event.isFree && (
+                  <span className="text-micro text-[--text-tertiary]">FREE</span>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+
+      <p className="text-micro text-[--text-ghost] pt-[var(--space-1)]">
+        LAST UPDATED: {formatUpdatedAt(fetchedAt)}
+      </p>
+    </div>
+  );
+}
+
 export function NeighborhoodDataPanel({
   neighborhoodId,
 }: {
@@ -284,7 +335,8 @@ export function NeighborhoodDataPanel({
     data.walkScore != null ||
     data.rentData != null ||
     data.crimeData != null ||
-    hasCostOfLiving;
+    hasCostOfLiving ||
+    data.events != null;
   if (!hasAnyData) return null;
 
   return (
@@ -322,6 +374,13 @@ export function NeighborhoodDataPanel({
           cpiFetchedAt={data.costOfLiving.cpi?.fetchedAt ?? null}
           wageValue={data.costOfLiving.wage?.value ?? null}
           wageFetchedAt={data.costOfLiving.wage?.fetchedAt ?? null}
+        />
+      )}
+      {data.events && (
+        <EventsCard
+          upcomingEventCount={data.events.upcomingEventCount}
+          events={data.events.events}
+          fetchedAt={data.events.fetchedAt}
         />
       )}
     </div>

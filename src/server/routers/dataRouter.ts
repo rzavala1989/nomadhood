@@ -14,6 +14,10 @@ import {
   getBlsData,
   fetchAllBlsData,
 } from '@/server/services/blsData';
+import {
+  getEvents,
+  fetchAllEvents,
+} from '@/server/services/eventbrite';
 import type { NeighborhoodExternalData } from '@/server/services/types';
 
 export const dataRouter = router({
@@ -21,20 +25,21 @@ export const dataRouter = router({
   getAll: publicProcedure
     .input(z.object({ neighborhoodId: z.string().uuid() }))
     .query(async ({ input }): Promise<NeighborhoodExternalData> => {
-      const [walkScore, rentData, crimeData, costOfLiving] = await Promise.all([
-        getWalkScore(input.neighborhoodId),
-        getRentData(input.neighborhoodId),
-        getCrimeData(input.neighborhoodId),
-        getBlsData(input.neighborhoodId),
-      ]);
+      const [walkScore, rentData, crimeData, costOfLiving, events] =
+        await Promise.all([
+          getWalkScore(input.neighborhoodId),
+          getRentData(input.neighborhoodId),
+          getCrimeData(input.neighborhoodId),
+          getBlsData(input.neighborhoodId),
+          getEvents(input.neighborhoodId),
+        ]);
 
-      // Remaining source (events) wired in next phase
       return {
         walkScore,
         rentData,
         crimeData,
         costOfLiving,
-        events: null,
+        events,
       };
     }),
 
@@ -63,6 +68,11 @@ export const dataRouter = router({
   /** Admin: fetch BLS cost-of-living data for all mapped metros (skips valid cache). */
   fetchCostOfLiving: adminProcedure.mutation(async () => {
     return fetchAllBlsData();
+  }),
+
+  /** Admin: fetch Eventbrite events for all cities with configured sources. */
+  fetchEvents: adminProcedure.mutation(async () => {
+    return fetchAllEvents();
   }),
 
   /** Admin: get current Rentcast monthly usage. */
