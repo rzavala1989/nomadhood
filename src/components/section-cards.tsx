@@ -3,28 +3,28 @@ import { trpc } from '@/utils/trpc';
 export function SectionCards() {
   const { data: stats } = trpc.dashboard.getStats.useQuery();
 
-  const cards = [
-    { label: 'Neighborhoods', value: stats?.neighborhoodCount, desc: 'Total listed' },
-    { label: 'Users', value: stats?.userCount, desc: 'Registered' },
-    { label: 'Reviews', value: stats?.reviewCount, desc: 'Submitted' },
-    { label: 'Favorites', value: stats?.favoriteCount, desc: 'Saved' },
+  const chips = [
+    { label: 'NEIGHBORHOODS', value: stats?.neighborhoodCount },
+    { label: 'USERS', value: stats?.userCount },
+    { label: 'REVIEWS', value: stats?.reviewCount },
+    { label: 'FAVORITES', value: stats?.favoriteCount },
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-px px-[var(--space-6)] @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      {cards.map((card, i) => (
-        <div
-          key={card.label}
-          className="surface-1 p-[var(--space-5)] animate-fade-up"
-          style={{ animationDelay: `${i * 60}ms` }}
-        >
-          <p className="text-label text-[--text-ghost]">{card.label}</p>
-          <p className="mt-[var(--space-2)] text-[28px] font-light text-[--text-primary] tabular-nums">
-            {card.value ?? '\u2014'}
-          </p>
-          <p className="mt-[var(--space-1)] text-micro text-[--text-tertiary]">
-            {card.desc}
-          </p>
+    <div className="flex items-center h-[56px] px-[var(--space-6)] animate-fade-up">
+      {chips.map((chip, i) => (
+        <div key={chip.label} className="flex items-center flex-1 min-w-0">
+          {i > 0 && (
+            <div className="w-px h-8 bg-[--border-default] shrink-0" />
+          )}
+          <div className={`flex-1 ${i > 0 ? 'pl-[var(--space-4)]' : ''} ${i < chips.length - 1 ? 'pr-[var(--space-4)]' : ''}`}>
+            <p className="text-[9px] uppercase tracking-[0.18em] text-[--text-ghost] leading-none">
+              {chip.label}
+            </p>
+            <p className="text-[28px] font-medium text-[--text-primary] tabular-nums leading-none mt-[2px]">
+              {chip.value ?? '\u2014'}
+            </p>
+          </div>
         </div>
       ))}
     </div>

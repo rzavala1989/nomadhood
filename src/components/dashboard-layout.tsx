@@ -30,7 +30,7 @@ export function DashboardLayout({
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title={title} />

@@ -1,6 +1,5 @@
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { SectionCards } from '@/components/section-cards';
-import { RecentNeighborhoods } from '@/components/recent-neighborhoods';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { TopNeighborhoodsChart } from '@/components/dashboard/top-neighborhoods-chart';
 import { ReviewTrendChart } from '@/components/dashboard/review-trend-chart';
@@ -8,18 +7,19 @@ import { ReviewTrendChart } from '@/components/dashboard/review-trend-chart';
 export default function Dashboard() {
   return (
     <DashboardLayout title="Dashboard">
-      <div className="flex flex-col gap-[var(--space-8)] py-[var(--space-6)]">
+      <div className="flex flex-col gap-[var(--space-6)] py-[var(--space-6)]">
+        {/* Row 1: Stat strip */}
         <SectionCards />
 
-        {/* Charts row */}
-        <div className="grid grid-cols-1 gap-px px-[var(--space-6)] lg:grid-cols-2">
-          <div className="surface-1 p-[var(--space-5)] animate-fade-up" style={{ animationDelay: '200ms' }}>
+        {/* Row 2: Charts — 60/40 split */}
+        <div className="grid grid-cols-1 gap-px px-[var(--space-6)] lg:grid-cols-[3fr_2fr]">
+          <div className="surface-1 p-[var(--space-5)] animate-fade-up" style={{ animationDelay: '100ms' }}>
             <p className="text-label text-[--text-ghost] mb-[var(--space-3)]">
-              REVIEW TREND
+              REVIEW ACTIVITY
             </p>
             <ReviewTrendChart />
           </div>
-          <div className="surface-1 p-[var(--space-5)] animate-fade-up" style={{ animationDelay: '260ms' }}>
+          <div className="surface-1 p-[var(--space-5)] animate-fade-up" style={{ animationDelay: '160ms' }}>
             <p className="text-label text-[--text-ghost] mb-[var(--space-3)]">
               TOP NEIGHBORHOODS
             </p>
@@ -27,19 +27,16 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Activity Feed */}
-        <div className="px-[var(--space-6)] animate-fade-up" style={{ animationDelay: '320ms' }}>
+        {/* Row 3: Recent Activity */}
+        <div className="px-[var(--space-6)] animate-fade-up" style={{ animationDelay: '220ms' }}>
           <div className="surface-1 p-[var(--space-5)]">
-            <p className="text-label text-[--text-ghost] mb-[var(--space-3)]">
-              RECENT ACTIVITY
-            </p>
+            <div className="flex items-center justify-between mb-[var(--space-3)]">
+              <p className="text-label text-[--text-ghost]">
+                RECENT ACTIVITY
+              </p>
+            </div>
             <ActivityFeed />
           </div>
-        </div>
-
-        {/* Recent Neighborhoods */}
-        <div className="px-[var(--space-6)]">
-          <RecentNeighborhoods />
         </div>
       </div>
     </DashboardLayout>
