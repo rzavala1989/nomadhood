@@ -75,3 +75,68 @@ sonner toasts on all mutations: favorite toggle, review create/update/delete, an
 ## Similar Neighborhoods
 
 On each neighborhood detail page, a "Similar Neighborhoods" section shows other neighborhoods in the same city or state. Uses the `neighborhoods.getSimilar` procedure.
+
+## External Data Pipeline
+
+Five external APIs provide objective neighborhood metrics. Data is fetched into DB cache tables via admin triggers or a daily cron job, never during user requests. The frontend reads pre-fetched data from the DB. If data hasn't been fetched for a neighborhood, that section simply doesn't render.
+
+### Data Sources
+
+| Source | What it provides | Cache TTL | Key |
+|--------|-----------------|-----------|-----|
+| Walk Score | Walk, transit, and bike scores (0-100) | 60 days | `WALKSCORE_API_KEY` |
+| Rentcast | Median rent, sale prices, per-sqft rates | 30 days | `RENTCAST_API_KEY` |
+| FBI Crime Data (CDE) | State-level violent and property crime rates per 100K | 90 days | `FBI_CRIME_DATA_API_KEY` |
+| BLS | CPI index, median hourly wage | 30-180 days | `BLS_API_KEY` |
+| Eventbrite | Upcoming event count and listings | 24 hours | `EVENTBRITE_API_KEY` |
+
+### Architecture
+
+```
+Admin triggers fetch (button on /admin/data) or cron (/api/cron/fetch-data)
+  -> Service iterates neighborhoods, calls external API, writes to DB cache
+  -> Each row stores fetchedAt and expiresAt timestamps
+
+Client visits detail or compare page
+  -> trpc.data.getAll({ neighborhoodId })
+       -> DB reads only, zero API calls
+       -> Returns data + fetchedAt per source, or null
+       -> UI renders cards with "LAST UPDATED" timestamps
+```
+
+### Optimizations
+
+- **Rentcast**: Fetches one representative zip per city, propagates to sibling zips (16 API calls cover ~70 zips, stays under the 45/month hard cap)
+- **FBI Crime Data**: Fetches once per state, propagates to all cities in that state
+- **BLS**: Batches up to 50 series per POST request
+- **All services**: Skip neighborhoods with valid (non-expired) cache entries
+
+### Enhanced Nomad Score
+
+When external data is available, the Nomad Score blends community and external data:
+
+| Component | Weight | Source |
+|-----------|--------|--------|
+| Average Rating | 20% | Community reviews |
+| Review Volume | 12% | Community reviews |
+| Favorites | 8% | Community favorites |
+| Walkability | 15% | Walk Score |
+| Transit and Bike | 10% | Walk Score |
+| Safety | 15% | FBI Crime Data (inverse crime rate) |
+| Affordability | 20% | Rentcast median rent |
+
+Falls back to the community-only formula (50/30/20) when no external data is present. List pages always use community-only scoring.
+
+### Admin Data Management
+
+`/admin/data`: fetch buttons per service, bulk "Fetch All" button, and Rentcast usage counter. Each button triggers the corresponding admin mutation and shows a toast with results.
+
+### Cron Job
+
+Vercel Cron hits `/api/cron/fetch-data` daily at 6 AM UTC. Secured via `CRON_SECRET` (Authorization bearer token). Runs all five services in parallel. Configure the schedule in `vercel.json`.
+
+Components: `neighborhood-data-panel.tsx` (WalkScoreCard, RentDataCard, CrimeDataCard, CostOfLivingCard, EventsCard)
+
+Services: `src/server/services/` (walkScore.ts, rentcast.ts, crimeData.ts, blsData.ts, eventbrite.ts)
+
+tRPC: `data.getAll`, `data.fetchWalkScores`, `data.fetchRentData`, `data.fetchCrimeData`, `data.fetchCostOfLiving`, `data.fetchEvents`, `data.getRentcastUsage`

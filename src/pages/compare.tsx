@@ -66,7 +66,7 @@ function CompareColumn({ id }: { id: string }) {
 
       {/* Stats */}
       <div className="space-y-[var(--space-3)] mb-[var(--space-4)]">
-        <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+        <div className="flex items-center justify-between border-b border-[rgba(120,80,200,0.08)] pb-[var(--space-2)]">
           <span className="text-micro text-[--text-ghost]">AVG RATING</span>
           <div className="flex items-center gap-[var(--space-2)]">
             {neighborhood.avgRating !== null ? (
@@ -82,14 +82,14 @@ function CompareColumn({ id }: { id: string }) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+        <div className="flex items-center justify-between border-b border-[rgba(120,80,200,0.08)] pb-[var(--space-2)]">
           <span className="text-micro text-[--text-ghost]">REVIEWS</span>
           <span className="text-body text-[--text-primary] tabular-nums">
             {neighborhood._count.reviews}
           </span>
         </div>
 
-        <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+        <div className="flex items-center justify-between border-b border-[rgba(120,80,200,0.08)] pb-[var(--space-2)]">
           <span className="text-micro text-[--text-ghost]">FAVORITES</span>
           <span className="text-body text-[--text-primary] tabular-nums">
             {neighborhood._count.favorites}
@@ -97,7 +97,7 @@ function CompareColumn({ id }: { id: string }) {
         </div>
 
         {extData?.walkScore?.walkScore != null && (
-          <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+          <div className="flex items-center justify-between border-b border-[rgba(120,80,200,0.08)] pb-[var(--space-2)]">
             <span className="text-micro text-[--text-ghost]">WALK SCORE</span>
             <span className="text-body text-[--text-primary] tabular-nums">
               {extData.walkScore.walkScore}
@@ -106,7 +106,7 @@ function CompareColumn({ id }: { id: string }) {
         )}
 
         {extData?.rentData?.medianRent != null && (
-          <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+          <div className="flex items-center justify-between border-b border-[rgba(120,80,200,0.08)] pb-[var(--space-2)]">
             <span className="text-micro text-[--text-ghost]">MEDIAN RENT</span>
             <span className="text-body text-[--text-primary] tabular-nums">
               {formatCompactDollars(extData.rentData.medianRent)}
@@ -115,7 +115,7 @@ function CompareColumn({ id }: { id: string }) {
         )}
 
         {extData?.crimeData && extData.crimeData.dataQuality !== 'unavailable' && (
-          <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+          <div className="flex items-center justify-between border-b border-[rgba(120,80,200,0.08)] pb-[var(--space-2)]">
             <span className="text-micro text-[--text-ghost]">SAFETY</span>
             <span className="text-body text-[--text-primary]">
               {getRiskLabel(extData.crimeData.violentCrimeRate, extData.crimeData.propertyCrimeRate) ?? '—'}
@@ -124,7 +124,7 @@ function CompareColumn({ id }: { id: string }) {
         )}
 
         {extData?.costOfLiving?.cpi?.value != null && (
-          <div className="flex items-center justify-between border-b border-black/[0.06] pb-[var(--space-2)]">
+          <div className="flex items-center justify-between border-b border-[rgba(120,80,200,0.08)] pb-[var(--space-2)]">
             <span className="text-micro text-[--text-ghost]">CPI INDEX</span>
             <span className="text-body text-[--text-primary] tabular-nums">
               {extData.costOfLiving.cpi.value.toFixed(1)}

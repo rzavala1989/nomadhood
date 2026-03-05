@@ -1,6 +1,6 @@
 # Nomadhood
 
-Neighborhood discovery and review platform for digital nomads. Search, compare, and review neighborhoods with interactive maps, composite scoring, and community reviews.
+Neighborhood discovery and review platform for digital nomads. Search, compare, and review neighborhoods with interactive maps, composite scoring, community reviews, and external data (walkability, housing costs, safety, wages, local events).
 
 ## Quickstart
 
@@ -33,7 +33,7 @@ Next.js 15 (Pages Router) / React 19 / tRPC v11 / Prisma v6 / Auth.js v5 / Postg
 src/
   pages/           Next.js pages (Pages Router)
   components/      React components
-  server/          tRPC routers, Prisma client, auth context
+  server/          tRPC routers, Prisma client, auth context, external API services
   styles/          Global CSS and design tokens
   utils/           tRPC client, helpers
   contexts/        React context providers

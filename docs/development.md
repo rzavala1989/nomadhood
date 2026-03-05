@@ -34,6 +34,12 @@ bun dev                # http://localhost:3000
 | `NEXTAUTH_URL` | no | Base URL, defaults to `http://localhost:3000` |
 | `NEXT_PUBLIC_MAPTILER_KEY` | no | MapTiler API key for map tiles. Falls back to CartoDB Positron |
 | `ADMIN_EMAIL` | no | Email address to auto-promote as admin |
+| `WALKSCORE_API_KEY` | no | Walk Score API key (5,000 calls/day) |
+| `RENTCAST_API_KEY` | no | Rentcast API key (50 calls/month, hard-capped at 45) |
+| `FBI_CRIME_DATA_API_KEY` | no | FBI Crime Data Explorer API key |
+| `BLS_API_KEY` | no | BLS v2 API key (higher rate limits) |
+| `EVENTBRITE_API_KEY` | no | Eventbrite private token |
+| `CRON_SECRET` | no | Secures the `/api/cron/fetch-data` endpoint |
 
 Validated at build time by `src/server/env.ts` (Zod schema). Invalid vars fail the build.
 

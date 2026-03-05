@@ -2,70 +2,116 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Local fonts */
+@font-face {
+  font-family: 'Raleway';
+  src: url('/Raleway/Raleway-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raleway';
+  src: url('/Raleway/Raleway-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rocket Clouds';
+  src: url('/RocketClouds/Rocket Clouds.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root,
   .dark {
-    --background: #F0EDE8;
-    --foreground: rgba(0, 0, 0, 0.90);
+    --background: #F8F6FC;
+    --foreground: rgba(26, 16, 40, 0.90);
 
-    --card: rgba(0, 0, 0, 0.02);
-    --card-foreground: rgba(0, 0, 0, 0.90);
+    --card: rgba(120, 80, 200, 0.025);
+    --card-foreground: rgba(26, 16, 40, 0.90);
 
-    --popover: rgba(0, 0, 0, 0.04);
-    --popover-foreground: rgba(0, 0, 0, 0.90);
+    --popover: rgba(120, 80, 200, 0.04);
+    --popover-foreground: rgba(26, 16, 40, 0.90);
 
-    --primary: #1A1A18;
-    --primary-foreground: #F0EDE8;
+    --primary: #1A1028;
+    --primary-foreground: #F8F6FC;
 
-    --secondary: rgba(0, 0, 0, 0.04);
-    --secondary-foreground: rgba(0, 0, 0, 0.65);
+    --secondary: rgba(120, 80, 200, 0.05);
+    --secondary-foreground: rgba(26, 16, 40, 0.60);
 
-    --muted: rgba(0, 0, 0, 0.04);
-    --muted-foreground: rgba(0, 0, 0, 0.65);
+    --muted: rgba(120, 80, 200, 0.05);
+    --muted-foreground: rgba(26, 16, 40, 0.60);
 
-    --accent: rgba(0, 0, 0, 0.07);
-    --accent-foreground: rgba(0, 0, 0, 0.90);
+    --accent: rgba(120, 80, 200, 0.07);
+    --accent-foreground: rgba(26, 16, 40, 0.90);
 
-    --destructive: rgba(0, 0, 0, 0.85);
-    --destructive-foreground: #F0EDE8;
+    --destructive: #E8457C;
+    --destructive-foreground: #ffffff;
 
-    --border: rgba(0, 0, 0, 0.08);
-    --input: rgba(0, 0, 0, 0.08);
-    --ring: rgba(0, 0, 0, 0.25);
+    --border: rgba(120, 80, 200, 0.08);
+    --input: rgba(120, 80, 200, 0.08);
+    --ring: #B36BFF;
 
     --radius: 0px;
 
-    --sidebar-background: #EBE8E3;
-    --sidebar-foreground: rgba(0, 0, 0, 0.65);
-    --sidebar-primary: #1A1A18;
-    --sidebar-primary-foreground: #F0EDE8;
-    --sidebar-accent: rgba(0, 0, 0, 0.07);
-    --sidebar-accent-foreground: rgba(0, 0, 0, 0.85);
-    --sidebar-border: rgba(0, 0, 0, 0.06);
-    --sidebar-ring: rgba(0, 0, 0, 0.25);
+    --sidebar-background: #F0EDF8;
+    --sidebar-foreground: rgba(26, 16, 40, 0.60);
+    --sidebar-primary: #1A1028;
+    --sidebar-primary-foreground: #F8F6FC;
+    --sidebar-accent: rgba(120, 80, 200, 0.07);
+    --sidebar-accent-foreground: rgba(26, 16, 40, 0.85);
+    --sidebar-border: rgba(120, 80, 200, 0.06);
+    --sidebar-ring: #B36BFF;
 
     /* Design system tokens */
-    --bg-root: #F0EDE8;
-    --bg-surface-1: rgba(0, 0, 0, 0.02);
-    --bg-surface-2: rgba(0, 0, 0, 0.04);
-    --bg-surface-3: rgba(0, 0, 0, 0.07);
-    --bg-inverse: #1A1A18;
+    --bg-root: #F8F6FC;
+    --bg-surface-1: rgba(120, 80, 200, 0.03);
+    --bg-surface-2: rgba(120, 80, 200, 0.06);
+    --bg-surface-3: rgba(120, 80, 200, 0.10);
+    --bg-inverse: #1A1028;
 
-    --border-subtle: rgba(0, 0, 0, 0.04);
-    --border-default: rgba(0, 0, 0, 0.08);
-    --border-hover: rgba(0, 0, 0, 0.15);
-    --border-focus: rgba(0, 0, 0, 0.25);
+    --border-subtle: rgba(120, 80, 200, 0.04);
+    --border-default: rgba(120, 80, 200, 0.08);
+    --border-hover: rgba(120, 80, 200, 0.16);
+    --border-focus: #B36BFF;
 
-    --text-primary: rgba(0, 0, 0, 0.90);
-    --text-secondary: rgba(0, 0, 0, 0.65);
-    --text-tertiary: rgba(0, 0, 0, 0.45);
-    --text-ghost: rgba(0, 0, 0, 0.28);
-    --text-inverse: #F0EDE8;
-    --text-label: rgba(0, 0, 0, 0.40);
+    --text-primary: rgba(26, 16, 40, 0.90);
+    --text-secondary: rgba(26, 16, 40, 0.58);
+    --text-tertiary: rgba(26, 16, 40, 0.38);
+    --text-ghost: rgba(26, 16, 40, 0.22);
+    --text-inverse: #F8F6FC;
+    --text-label: rgba(26, 16, 40, 0.35);
+
+    /* Vaporwave accent palette */
+    --vapor-pink: #FF6B9D;
+    --vapor-magenta: #E8457C;
+    --vapor-purple: #B36BFF;
+    --vapor-violet: #7B61FF;
+    --vapor-cyan: #01CDFE;
+    --vapor-teal: #00BFA5;
+    --vapor-sunset: #FF9A56;
+
+    /* Accent gradients */
+    --gradient-vapor: linear-gradient(135deg, #FF6B9D, #B36BFF, #01CDFE);
+    --gradient-sunset: linear-gradient(135deg, #FF6B9D, #FF9A56);
+    --gradient-aurora: linear-gradient(135deg, #B36BFF, #01CDFE);
+    --gradient-heat: linear-gradient(135deg, #E8457C, #B36BFF);
+
+    /* Score color stops */
+    --score-low: #FF6B9D;
+    --score-mid: #B36BFF;
+    --score-high: #01CDFE;
 
     /* Typography */
-    --font-mono: 'DM Mono', 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
-    --font-serif: 'Instrument Serif', 'Editorial New', Georgia, serif;
+    --font-mono: 'Raleway', system-ui, sans-serif;
+    --font-serif: 'Raleway', system-ui, sans-serif;
+    --font-brand: 'Rocket Clouds', cursive;
 
     /* Spacing */
     --space-1: 4px;
@@ -113,9 +159,15 @@
   50% { opacity: 1; }
 }
 
-@keyframes scanline {
-  from { transform: translateY(-100vh); }
-  to { transform: translateY(100vh); }
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @layer utilities {
@@ -133,6 +185,10 @@
 
   .font-chrome {
     font-family: var(--font-mono);
+  }
+
+  .font-brand {
+    font-family: var(--font-brand);
   }
 
   .text-display {
@@ -204,13 +260,33 @@
   .surface-hover:active {
     transform: translateY(0);
   }
+
+  /* Vaporwave gradient text */
+  .text-vapor {
+    background: var(--gradient-vapor);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gradient badge background */
+  .bg-vapor {
+    background: var(--gradient-vapor);
+    background-size: 200% 200%;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  /* Accent glow on hover */
+  .glow-hover:hover {
+    box-shadow: 0 0 20px rgba(179, 107, 255, 0.15), 0 0 40px rgba(255, 107, 157, 0.08);
+  }
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.10); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.20); }
+::-webkit-scrollbar-thumb { background: rgba(120, 80, 200, 0.12); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(179, 107, 255, 0.30); }
 
 /* Remove all default border-radius globally */
 @layer base {
@@ -223,7 +299,7 @@
 .maplibregl-popup-content {
   background: var(--bg-root) !important;
   border-radius: 0 !important;
-  box-shadow: inset 0 0 0 1px var(--border-default), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: inset 0 0 0 1px var(--border-default), 0 4px 16px rgba(179, 107, 255, 0.10) !important;
   padding: 0 !important;
 }
 .maplibregl-popup-tip {
@@ -235,7 +311,7 @@
   padding: 4px 8px;
 }
 .maplibregl-popup-close-button:hover {
-  color: var(--text-primary);
+  color: var(--vapor-purple);
   background: transparent;
 }
 .maplibregl-ctrl-group {
@@ -244,4 +320,37 @@
 }
 .maplibregl-ctrl-group button {
   border-radius: 0 !important;
+}
+
+/* Range input (score slider) */
+.nomad-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  background: rgba(120, 80, 200, 0.10);
+  outline: none;
+  cursor: pointer;
+}
+.nomad-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: var(--vapor-purple);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+}
+.nomad-range::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: var(--vapor-purple);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+}
+.nomad-range::-moz-range-track {
+  height: 3px;
+  background: rgba(120, 80, 200, 0.10);
+  border: none;
 }

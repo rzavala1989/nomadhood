@@ -157,6 +157,7 @@ export const neighborhoodsRouter = router({
         crimeData,
         costOfLiving,
         events,
+        images: [],
       };
 
       const avgRating = calculateAvgRating(neighborhood.reviews);

@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import Map, {
-  Marker,
   Popup,
   NavigationControl,
   Source,
   Layer,
   type MapRef,
+  type MapLayerMouseEvent,
 } from 'react-map-gl/maplibre';
 import maplibregl from 'maplibre-gl';
 import Link from 'next/link';
@@ -21,25 +21,70 @@ type Neighborhood = {
   latitude: number | null;
   longitude: number | null;
   boundary?: unknown;
+  avgRating?: number | null;
+  nomadScore?: number;
   _count: { reviews: number; favorites: number };
+};
+
+type ImageMapEntry = {
+  thumbUrl: string | null;
+  imageUrl: string;
+  altText?: string | null;
 };
 
 export default function NeighborhoodMap({
   neighborhoods,
   selectedId,
   onSelect,
+  minScore = 0,
+  imageMap,
 }: {
   neighborhoods: Neighborhood[];
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
+  minScore?: number;
+  imageMap?: Record<string, ImageMapEntry[]>;
 }) {
   const mapRef = useRef<MapRef>(null);
   const [popupId, setPopupId] = useState<string | null>(null);
 
-  const markers = useMemo(
-    () => neighborhoods.filter((n) => n.latitude != null && n.longitude != null),
+  /* ---------- GeoJSON data ---------- */
+
+  const pointsCollection = useMemo(
+    () => ({
+      type: 'FeatureCollection' as const,
+      features: neighborhoods
+        .filter((n) => n.latitude != null && n.longitude != null)
+        .map((n) => ({
+          type: 'Feature' as const,
+          properties: {
+            id: n.id,
+            name: n.name,
+            city: n.city,
+            state: n.state,
+            reviewCount: n._count.reviews,
+            favoriteCount: n._count.favorites,
+            nomadScore: n.nomadScore ?? 0,
+            avgRating: n.avgRating ?? 0,
+          },
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [n.longitude!, n.latitude!],
+          },
+        })),
+    }),
     [neighborhoods],
   );
+
+  const filteredCollection = useMemo(() => {
+    if (minScore <= 0) return pointsCollection;
+    return {
+      ...pointsCollection,
+      features: pointsCollection.features.filter(
+        (f) => (f.properties?.nomadScore ?? 0) >= minScore,
+      ),
+    };
+  }, [pointsCollection, minScore]);
 
   const boundaryCollection = useMemo(
     () => ({
@@ -56,23 +101,107 @@ export default function NeighborhoodMap({
     [neighborhoods],
   );
 
+  /* ---------- Fit bounds ---------- */
+
+  const validPoints = useMemo(
+    () => neighborhoods.filter((n) => n.latitude != null && n.longitude != null),
+    [neighborhoods],
+  );
+
   const bounds = useMemo(() => {
-    if (markers.length === 0) return null;
-    const lngs = markers.map((n) => n.longitude!);
-    const lats = markers.map((n) => n.latitude!);
+    if (validPoints.length === 0) return null;
+    const lngs = validPoints.map((n) => n.longitude!);
+    const lats = validPoints.map((n) => n.latitude!);
     return new maplibregl.LngLatBounds(
       [Math.min(...lngs) - 1, Math.min(...lats) - 1],
       [Math.max(...lngs) + 1, Math.max(...lats) + 1],
     );
-  }, [markers]);
+  }, [validPoints]);
 
   const onMapLoad = useCallback(() => {
-    if (bounds && mapRef.current) {
+    if (!mapRef.current) return;
+    // Single point: center and zoom in tight instead of fitting a wide bounding box
+    if (validPoints.length === 1) {
+      mapRef.current.jumpTo({
+        center: [validPoints[0].longitude!, validPoints[0].latitude!],
+        zoom: 14,
+      });
+    } else if (bounds) {
       mapRef.current.fitBounds(bounds, { padding: 40, maxZoom: 14 });
     }
-  }, [bounds]);
+  }, [bounds, validPoints]);
 
-  const popupNeighborhood = markers.find((n) => n.id === popupId);
+  /* ---------- Click handlers ---------- */
+
+  const onClick = useCallback(
+    (e: MapLayerMouseEvent) => {
+      const map = mapRef.current?.getMap();
+      if (!map) return;
+
+      // Check cluster click first
+      const clusterFeatures = map.queryRenderedFeatures(e.point, {
+        layers: ['cluster-circles'],
+      });
+      if (clusterFeatures.length > 0) {
+        const feature = clusterFeatures[0];
+        const clusterId = feature.properties?.cluster_id;
+        // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+        const source = map.getSource('neighborhoods') as maplibregl.GeoJSONSource;
+        if (source && clusterId != null) {
+          source.getClusterExpansionZoom(clusterId).then((zoom) => {
+            const geom = feature.geometry as GeoJSON.Point;
+            map.easeTo({
+              center: geom.coordinates as [number, number],
+              zoom: zoom + 0.5,
+              duration: 500,
+            });
+          });
+        }
+        return;
+      }
+
+      // Check unclustered point click
+      const pointFeatures = map.queryRenderedFeatures(e.point, {
+        layers: ['unclustered-point'],
+      });
+      if (pointFeatures.length > 0) {
+        const id = pointFeatures[0].properties?.id;
+        if (id) {
+          setPopupId(id);
+          onSelect?.(id);
+        }
+        return;
+      }
+
+      // Click on empty space
+      setPopupId(null);
+      onSelect?.(null);
+    },
+    [onSelect],
+  );
+
+  const onMouseEnter = useCallback(() => {
+    const map = mapRef.current?.getMap();
+    if (map) map.getCanvas().style.cursor = 'pointer';
+  }, []);
+
+  const onMouseLeave = useCallback(() => {
+    const map = mapRef.current?.getMap();
+    if (map) map.getCanvas().style.cursor = '';
+  }, []);
+
+  /* ---------- Popup data ---------- */
+
+  const popupFeature = useMemo(
+    () => filteredCollection.features.find((f) => f.properties.id === popupId),
+    [filteredCollection, popupId],
+  );
+
+  /* ---------- Selected marker expression ---------- */
+
+  const currentSelectedId = selectedId ?? '';
+
+  /* ---------- Render ---------- */
 
   const maptilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY;
   const mapStyle = maptilerKey
@@ -86,6 +215,10 @@ export default function NeighborhoodMap({
         mapLib={maplibregl}
         mapStyle={mapStyle}
         onLoad={onMapLoad}
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        interactiveLayerIds={['unclustered-point', 'cluster-circles']}
         initialViewState={{
           longitude: -98.5,
           latitude: 39.8,
@@ -96,13 +229,14 @@ export default function NeighborhoodMap({
       >
         <NavigationControl position="top-right" showCompass={false} />
 
+        {/* Boundary polygons */}
         {boundaryCollection.features.length > 0 && (
           <Source id="boundaries" type="geojson" data={boundaryCollection}>
             <Layer
               id="boundary-fill"
               type="fill"
               paint={{
-                'fill-color': '#050505',
+                'fill-color': '#B36BFF',
                 'fill-opacity': 0.06,
               }}
             />
@@ -110,66 +244,108 @@ export default function NeighborhoodMap({
               id="boundary-line"
               type="line"
               paint={{
-                'line-color': '#050505',
-                'line-opacity': 0.4,
+                'line-color': '#B36BFF',
+                'line-opacity': 0.3,
                 'line-width': 1.5,
               }}
             />
           </Source>
         )}
 
-        {markers.map((n) => {
-          const isActive = selectedId === n.id || popupId === n.id;
-          return (
-            <Marker
-              key={n.id}
-              longitude={n.longitude!}
-              latitude={n.latitude!}
-              anchor="center"
-              onClick={(e) => {
-                e.originalEvent.stopPropagation();
-                setPopupId(n.id);
-                onSelect?.(n.id);
-              }}
-            >
-              <div
-                className="group cursor-pointer"
-                style={{ transition: 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-              >
-                {/* Outer pulse ring on active */}
-                <div
-                  className={`absolute inset-0 rounded-full transition-opacity duration-300 ${
-                    isActive ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    marginLeft: -4,
-                    marginTop: -4,
-                    background: 'rgba(255, 255, 255, 0.12)',
-                  }}
-                />
-                {/* Dot */}
-                <div
-                  className="rounded-full transition-all duration-200 ease-out group-hover:scale-150"
-                  style={{
-                    width: isActive ? 10 : 7,
-                    height: isActive ? 10 : 7,
-                    background: isActive ? '#ffffff' : 'rgba(0, 0, 0, 0.7)',
-                    boxShadow: isActive
-                      ? '0 0 0 3px rgba(255,255,255,0.25), 0 0 8px rgba(255,255,255,0.15)'
-                      : '0 0 0 2px rgba(255,255,255,0.9), 0 1px 3px rgba(0,0,0,0.3)',
-                  }}
-                />
-              </div>
-            </Marker>
-          );
-        })}
+        {/* Clustered neighborhood points */}
+        <Source
+          id="neighborhoods"
+          type="geojson"
+          data={filteredCollection}
+          cluster={true}
+          clusterMaxZoom={12}
+          clusterRadius={50}
+        >
+          {/* Cluster circles */}
+          <Layer
+            id="cluster-circles"
+            type="circle"
+            filter={['has', 'point_count']}
+            paint={{
+              'circle-color': '#B36BFF',
+              'circle-radius': [
+                'step',
+                ['get', 'point_count'],
+                14,
+                5, 18,
+                10, 22,
+              ],
+              'circle-stroke-width': 1.5,
+              'circle-stroke-color': '#7B61FF',
+            }}
+          />
 
-        {popupNeighborhood && (
+          {/* Cluster count labels */}
+          <Layer
+            id="cluster-count"
+            type="symbol"
+            filter={['has', 'point_count']}
+            layout={{
+              'text-field': '{point_count_abbreviated}',
+              'text-size': 11,
+            }}
+            paint={{
+              'text-color': '#ffffff',
+            }}
+          />
+
+          {/* Unclustered individual points */}
+          <Layer
+            id="unclustered-point"
+            type="circle"
+            filter={['!', ['has', 'point_count']]}
+            paint={{
+              'circle-radius': [
+                'interpolate', ['linear'], ['get', 'nomadScore'],
+                0, 5,
+                50, 9,
+                100, 14,
+              ],
+              'circle-opacity': [
+                'interpolate', ['linear'], ['get', 'reviewCount'],
+                0, 0.45,
+                3, 0.65,
+                10, 0.85,
+                20, 1.0,
+              ],
+              'circle-color': [
+                'interpolate', ['linear'], ['get', 'nomadScore'],
+                0, '#FF6B9D',
+                50, '#B36BFF',
+                100, '#01CDFE',
+              ],
+              'circle-stroke-width': [
+                'case',
+                ['==', ['get', 'id'], currentSelectedId],
+                2.5,
+                1.5,
+              ],
+              'circle-stroke-color': [
+                'case',
+                ['==', ['get', 'id'], currentSelectedId],
+                '#7B61FF',
+                'rgba(255, 255, 255, 0.9)',
+              ],
+              'circle-stroke-opacity': [
+                'case',
+                ['==', ['get', 'id'], currentSelectedId],
+                1,
+                0.7,
+              ],
+            }}
+          />
+        </Source>
+
+        {/* Popup */}
+        {popupFeature && (
           <Popup
-            longitude={popupNeighborhood.longitude!}
-            latitude={popupNeighborhood.latitude!}
+            longitude={popupFeature.geometry.coordinates[0]}
+            latitude={popupFeature.geometry.coordinates[1]}
             anchor="bottom"
             offset={10}
             closeOnClick={false}
@@ -180,21 +356,41 @@ export default function NeighborhoodMap({
             className="nomad-popup"
           >
             <div className="min-w-[180px] bg-[--bg-root] p-[var(--space-3)]">
-              <Link
-                href={`/neighborhoods/${popupNeighborhood.id}`}
-                className="text-body font-medium text-[--text-primary] hover:text-[--text-secondary] transition-colors"
-              >
-                {popupNeighborhood.name}
-              </Link>
+              {imageMap?.[popupFeature.properties.id]?.[0] && (
+                <img
+                  src={
+                    imageMap[popupFeature.properties.id][0].thumbUrl ??
+                    imageMap[popupFeature.properties.id][0].imageUrl
+                  }
+                  alt={imageMap[popupFeature.properties.id][0].altText ?? popupFeature.properties.name}
+                  className="h-[60px] w-full object-cover mb-[var(--space-2)]"
+                  style={{
+                    opacity: 0.85,
+                  }}
+                />
+              )}
+              <div className="flex items-start justify-between gap-[var(--space-2)]">
+                <Link
+                  href={`/neighborhoods/${popupFeature.properties.id}`}
+                  className="text-body font-medium text-[--text-primary] hover:text-[--text-secondary] transition-colors"
+                >
+                  {popupFeature.properties.name}
+                </Link>
+                {popupFeature.properties.nomadScore > 0 && (
+                  <span className="shrink-0 bg-vapor text-white px-[var(--space-1)] py-px text-[8px] tracking-[0.15em] uppercase">
+                    {popupFeature.properties.nomadScore}
+                  </span>
+                )}
+              </div>
               <p className="text-micro text-[--text-ghost] mt-[var(--space-1)]">
-                {popupNeighborhood.city}, {popupNeighborhood.state}
+                {popupFeature.properties.city}, {popupFeature.properties.state}
               </p>
               <div className="flex gap-[var(--space-3)] mt-[var(--space-2)]">
                 <span className="text-micro text-[--text-tertiary]">
-                  {popupNeighborhood._count.reviews} reviews
+                  {popupFeature.properties.reviewCount} reviews
                 </span>
                 <span className="text-micro text-[--text-tertiary]">
-                  {popupNeighborhood._count.favorites} favorites
+                  {popupFeature.properties.favoriteCount} favorites
                 </span>
               </div>
             </div>

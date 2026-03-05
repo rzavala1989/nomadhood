@@ -3,5 +3,11 @@
   "devCommand": "bun run dev",
   "outputDirectory": ".next",
   "installCommand": "bun install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/cron/fetch-data",
+      "schedule": "0 6 * * *"
+    }
+  ]
 }

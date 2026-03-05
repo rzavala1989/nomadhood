@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { SearchIcon, MapIcon, ListIcon } from 'lucide-react';
 
@@ -38,6 +38,7 @@ export default function NeighborhoodsPage() {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [view, setView] = useState<'list' | 'map' | 'split'>('split');
   const [selectedMapId, setSelectedMapId] = useState<string | null>(null);
+  const [minScore, setMinScore] = useState(0);
 
   const rawPage = Number(router.query.page);
   const rawPageSize = Number(router.query.pageSize);
@@ -53,6 +54,21 @@ export default function NeighborhoodsPage() {
     limit: pageSize,
     offset,
   });
+
+  const neighborhoodIds = useMemo(
+    () => data?.neighborhoods?.map((n) => n.id) ?? [],
+    [data?.neighborhoods],
+  );
+
+  const { data: imageMap } = trpc.data.getImages.useQuery(
+    { neighborhoodIds },
+    { enabled: neighborhoodIds.length > 0 },
+  );
+
+  const filteredNeighborhoods = useMemo(() => {
+    if (!data?.neighborhoods || minScore <= 0) return data?.neighborhoods;
+    return data.neighborhoods.filter((n) => (n.nomadScore ?? 0) >= minScore);
+  }, [data?.neighborhoods, minScore]);
 
   const totalItems = data?.pagination.total ?? 0;
   const totalPages = Math.ceil(totalItems / pageSize) || 1;
@@ -76,7 +92,7 @@ export default function NeighborhoodsPage() {
 
   return (
     <DashboardLayout title="Neighborhoods">
-      <div className="flex h-full flex-col">
+      <div className="flex h-[calc(100vh-3rem)] flex-col overflow-hidden">
         {/* Filter Bar */}
         <div className="flex flex-col gap-[var(--space-2)] px-[var(--space-6)] py-[var(--space-4)] animate-fade-up">
           <div className="flex flex-col gap-[var(--space-2)] sm:flex-row">
@@ -122,7 +138,7 @@ export default function NeighborhoodsPage() {
             </Select>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-[var(--space-4)]">
             <Select
               value={sortBy}
               onValueChange={(v) => {
@@ -143,6 +159,21 @@ export default function NeighborhoodsPage() {
               </SelectContent>
             </Select>
 
+            <div className="hidden sm:flex items-center gap-[var(--space-2)]">
+              <span className="text-micro text-[--text-ghost]">MIN SCORE</span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={minScore}
+                onChange={(e) => setMinScore(Number(e.target.value))}
+                className="nomad-range w-24"
+              />
+              <span className="text-micro text-[--text-tertiary] w-5 text-right tabular-nums">
+                {minScore}
+              </span>
+            </div>
+
             <div className="hidden sm:flex gap-px">
               {([
                 { key: 'list', icon: ListIcon, label: 'List' },
@@ -154,7 +185,7 @@ export default function NeighborhoodsPage() {
                   onClick={() => setView(key)}
                   className={`flex items-center gap-1 px-[var(--space-3)] py-[var(--space-2)] text-[9px] uppercase tracking-[0.18em] transition-colors ${
                     view === key
-                      ? 'bg-[--bg-inverse] text-[--text-inverse]'
+                      ? 'bg-vapor text-white'
                       : 'surface-1 text-[--text-tertiary] hover:text-[--text-secondary]'
                   }`}
                 >
@@ -190,12 +221,12 @@ export default function NeighborhoodsPage() {
               }`}
             >
               {isLoading ? (
-                <div className={`grid gap-px ${view === 'list' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+                <div className={'grid grid-cols-2 gap-px'}>
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <Skeleton key={i} className="h-[180px] w-full" />
+                    <Skeleton key={i} className="aspect-square w-full" />
                   ))}
                 </div>
-              ) : data?.neighborhoods.length === 0 ? (
+              ) : !filteredNeighborhoods || filteredNeighborhoods.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-[var(--space-16)] text-center">
                   <p className="text-heading font-light text-[--text-secondary]">
                     No neighborhoods found
@@ -206,8 +237,13 @@ export default function NeighborhoodsPage() {
                 </div>
               ) : (
                 <>
-                  <div className={`grid gap-px ${view === 'list' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-                    {data?.neighborhoods.map((n, i) => (
+                  {minScore > 0 && data?.neighborhoods && (
+                    <p className="text-micro text-[--text-ghost] mb-[var(--space-2)]">
+                      Showing {filteredNeighborhoods?.length ?? 0} of {data.neighborhoods.length}
+                    </p>
+                  )}
+                  <div className={'grid grid-cols-2 gap-px'}>
+                    {filteredNeighborhoods?.map((n, i) => (
                       <div
                         key={n.id}
                         className={`animate-fade-up ${
@@ -217,7 +253,13 @@ export default function NeighborhoodsPage() {
                         onMouseEnter={() => setSelectedMapId(n.id)}
                         onMouseLeave={() => setSelectedMapId(null)}
                       >
-                        <NeighborhoodCard neighborhood={n} nomadScore={n.nomadScore} />
+                        <NeighborhoodCard
+                          neighborhood={n}
+                          nomadScore={n.nomadScore}
+                          imageUrl={imageMap?.[n.id]?.[0]?.thumbUrl ?? imageMap?.[n.id]?.[0]?.imageUrl}
+                          imageAlt={imageMap?.[n.id]?.[0]?.altText ?? undefined}
+                          imageSource={imageMap?.[n.id]?.[0]?.source}
+                        />
                       </div>
                     ))}
                   </div>
@@ -243,13 +285,15 @@ export default function NeighborhoodsPage() {
             <div
               className={`${
                 view === 'split' ? 'w-full lg:w-1/2' : 'w-full'
-              } min-h-[400px]`}
+              } h-full`}
             >
               {data?.neighborhoods ? (
                 <NeighborhoodMap
                   neighborhoods={data.neighborhoods}
                   selectedId={selectedMapId}
                   onSelect={setSelectedMapId}
+                  minScore={minScore}
+                  imageMap={imageMap}
                 />
               ) : (
                 <Skeleton className="h-full w-full" />

@@ -142,27 +142,38 @@ export async function fetchRentData(zip: string): Promise<RentData | null> {
 }
 
 /**
- * Fetch Rentcast data for all unique zip codes across neighborhoods.
- * Skips zips with valid (non-expired) cache.
+ * Fetch Rentcast data using one representative zip per city, then propagate
+ * the result to all sibling zips in that city. This minimizes API calls:
+ * ~16 calls for 69 unique zips instead of 69.
+ *
+ * Adjacent zips within the same city share a housing market, so one data
+ * point per city is a reasonable approximation.
  */
 export async function fetchAllRentData(): Promise<{
   fetched: number;
   skipped: number;
   failed: number;
   rateLimited: boolean;
+  propagated: number;
 }> {
   if (!env.RENTCAST_API_KEY) {
-    return { fetched: 0, skipped: 0, failed: 0, rateLimited: false };
+    return { fetched: 0, skipped: 0, failed: 0, rateLimited: false, propagated: 0 };
   }
 
-  // Get unique zips from neighborhoods
+  // Group zips by city/state
   const neighborhoods = await prisma.neighborhood.findMany({
-    select: { zip: true },
-    distinct: ['zip'],
+    select: { zip: true, city: true, state: true },
   });
-  const allZips = neighborhoods.map((n) => n.zip);
 
-  // Filter out zips with valid cache
+  const cityZips = new Map<string, string[]>();
+  for (const n of neighborhoods) {
+    const key = `${n.city}|${n.state}`;
+    const zips = cityZips.get(key) ?? [];
+    if (!zips.includes(n.zip)) zips.push(n.zip);
+    cityZips.set(key, zips);
+  }
+
+  // Check which zips already have valid cache
   const now = new Date();
   const existing = await prisma.rentcastCache.findMany({
     where: { expiresAt: { gt: now } },
@@ -174,30 +185,109 @@ export async function fetchAllRentData(): Promise<{
   let skipped = 0;
   let failed = 0;
   let rateLimited = false;
+  let propagated = 0;
 
-  for (const zip of allZips) {
-    if (cachedZips.has(zip)) {
-      skipped++;
+  for (const [, zips] of cityZips) {
+    // Pick a representative zip: first one that isn't already cached, or skip all
+    const uncachedZips = zips.filter((z) => !cachedZips.has(z));
+    if (uncachedZips.length === 0) {
+      skipped += zips.length;
       continue;
     }
 
+    // If at least one zip in this city is cached, propagate from it
+    const alreadyCached = zips.find((z) => cachedZips.has(z));
+    if (alreadyCached) {
+      const source = await prisma.rentcastCache.findUnique({
+        where: { zip: alreadyCached },
+      });
+      if (source) {
+        propagated += await propagateToSiblings(source, uncachedZips);
+        skipped++;
+        continue;
+      }
+    }
+
+    // Fetch one representative zip via API
     if (!(await canMakeCall())) {
       rateLimited = true;
       break;
     }
 
-    const result = await fetchRentData(zip);
+    const representativeZip = uncachedZips[0];
+    if (!representativeZip) continue;
+    const result = await fetchRentData(representativeZip);
+
     if (result) {
       fetched++;
+
+      // Propagate to all other uncached zips in this city
+      const siblings = uncachedZips.slice(1);
+      if (siblings.length > 0) {
+        const source = await prisma.rentcastCache.findUnique({
+          where: { zip: representativeZip },
+        });
+        if (source) {
+          propagated += await propagateToSiblings(source, siblings);
+        }
+      }
     } else {
       failed++;
     }
 
-    // Small delay between calls
     await new Promise((r) => setTimeout(r, 300));
   }
 
-  return { fetched, skipped, failed, rateLimited };
+  return { fetched, skipped, failed, rateLimited, propagated };
+}
+
+/**
+ * Copy a cached Rentcast result to sibling zips (same city, different zip codes).
+ * Returns the number of successfully propagated entries.
+ */
+async function propagateToSiblings(
+  source: {
+    medianRent: number | null;
+    medianRentSqft: number | null;
+    medianSalePrice: number | null;
+    medianSaleSqft: number | null;
+    rawResponse: unknown;
+    fetchedAt: Date;
+    expiresAt: Date;
+  },
+  siblingZips: string[],
+): Promise<number> {
+  let count = 0;
+  for (const zip of siblingZips) {
+    try {
+      await prisma.rentcastCache.upsert({
+        where: { zip },
+        create: {
+          zip,
+          medianRent: source.medianRent,
+          medianRentSqft: source.medianRentSqft,
+          medianSalePrice: source.medianSalePrice,
+          medianSaleSqft: source.medianSaleSqft,
+          rawResponse: JSON.parse(JSON.stringify(source.rawResponse)),
+          fetchedAt: source.fetchedAt,
+          expiresAt: source.expiresAt,
+        },
+        update: {
+          medianRent: source.medianRent,
+          medianRentSqft: source.medianRentSqft,
+          medianSalePrice: source.medianSalePrice,
+          medianSaleSqft: source.medianSaleSqft,
+          rawResponse: JSON.parse(JSON.stringify(source.rawResponse)),
+          fetchedAt: source.fetchedAt,
+          expiresAt: source.expiresAt,
+        },
+      });
+      count++;
+    } catch {
+      // Skip on conflict
+    }
+  }
+  return count;
 }
 
 /**

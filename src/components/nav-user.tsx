@@ -89,7 +89,7 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-black/[0.06]" />
+            <DropdownMenuSeparator className="bg-[rgba(120,80,200,0.08)]" />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild className="text-[10px] uppercase tracking-[0.15em] text-[--text-tertiary] hover:text-[--text-secondary]">
                 <Link href="/profile">
@@ -98,7 +98,7 @@ export function NavUser({
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator className="bg-black/[0.06]" />
+            <DropdownMenuSeparator className="bg-[rgba(120,80,200,0.08)]" />
             <DropdownMenuItem
               onClick={() => signOut({ callbackUrl: '/' })}
               className="text-[10px] uppercase tracking-[0.15em] text-[--text-tertiary] hover:text-[--text-secondary]"

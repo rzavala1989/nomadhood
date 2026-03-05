@@ -29,9 +29,13 @@ const envSchema = z.object({
   // External API Keys (optional, services return null when absent)
   WALKSCORE_API_KEY: z.string().min(1).optional(),
   RENTCAST_API_KEY: z.string().min(1).optional(),
-  FBI_CRIME_API_KEY: z.string().min(1).optional(),
+  FBI_CRIME_DATA_API_KEY: z.string().min(1).optional(),
   BLS_API_KEY: z.string().min(1).optional(),
   EVENTBRITE_API_KEY: z.string().min(1).optional(),
+  UNSPLASH_ACCESS_KEY: z.string().min(1).optional(),
+
+  // Cron secret for securing scheduled data pipeline endpoint
+  CRON_SECRET: z.string().min(1).optional(),
 });
 
 const _env = envSchema.safeParse(process.env);

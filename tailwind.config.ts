@@ -15,6 +15,7 @@ const config: Config = {
       fontFamily: {
         mono: ['var(--font-mono)'],
         serif: ['var(--font-serif)'],
+        brand: ['var(--font-brand)'],
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -87,12 +87,18 @@ export default function AdminDataPage() {
     onError: () => toast.error('Events fetch failed'),
   });
 
+  const fetchImages = trpc.data.fetchImages.useMutation({
+    onSuccess: (r) => toast.success(`Images: ${r.fetched} fetched, ${r.skipped} skipped`),
+    onError: () => toast.error('Image fetch failed'),
+  });
+
   const anyPending =
     fetchWalkScores.isPending ||
     fetchRentData.isPending ||
     fetchCrimeData.isPending ||
     fetchCostOfLiving.isPending ||
-    fetchEvents.isPending;
+    fetchEvents.isPending ||
+    fetchImages.isPending;
 
   function fetchAll() {
     fetchWalkScores.mutate();
@@ -100,6 +106,7 @@ export default function AdminDataPage() {
     fetchCrimeData.mutate();
     fetchCostOfLiving.mutate();
     fetchEvents.mutate();
+    fetchImages.mutate();
   }
 
   return (
@@ -163,6 +170,14 @@ export default function AdminDataPage() {
             onFetch={() => fetchEvents.mutate()}
             isPending={fetchEvents.isPending}
             result={fetchEvents.data ?? null}
+          />
+
+          <ServiceCard
+            label="NEIGHBORHOOD IMAGES"
+            description="Photos from Unsplash and Wikimedia Commons. 90-day cache."
+            onFetch={() => fetchImages.mutate()}
+            isPending={fetchImages.isPending}
+            result={fetchImages.data ?? null}
           />
         </div>
       </div>

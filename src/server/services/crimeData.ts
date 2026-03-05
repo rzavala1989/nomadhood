@@ -2,151 +2,118 @@ import { prisma } from '@/server/prisma';
 import { env } from '@/server/env';
 import type { CrimeData } from './types';
 
-const FBI_API_BASE = 'https://api.usa.gov/crime/fbi/sapi';
+const FBI_CDE_BASE = 'https://api.usa.gov/crime/fbi/cde';
 const CACHE_TTL_DAYS = 90;
 
-type FbiAgency = {
-  ori: string;
-  agency_name: string;
-  city_name: string | null;
-  state_abbr: string;
-};
-
-type FbiCrimeSummary = {
-  results: {
-    data_year: number;
-    actual: number;
-  }[];
+type CdeRatesResponse = {
+  offenses?: {
+    rates?: Record<string, Record<string, number>>;
+  };
 };
 
 /**
- * Fuzzy-match a city name against FBI agency records.
- * Matches "police department" agencies first, then any agency in that city.
+ * Extract the most recent annual rate from FBI CDE monthly data.
+ * The API returns monthly rates keyed as "MM-YYYY". We sum the 12 months
+ * of the most recent full year to get an annualized rate per 100k.
  */
-function findBestAgency(
-  agencies: FbiAgency[],
-  targetCity: string,
-): FbiAgency | null {
-  const normalized = targetCity.toLowerCase().trim();
+function extractAnnualRate(
+  rates: Record<string, number>,
+): { rate: number; year: number } | null {
+  // Group by year
+  const byYear = new Map<number, number[]>();
+  for (const [key, value] of Object.entries(rates)) {
+    const parts = key.split('-');
+    if (parts.length !== 2) continue;
+    const yearStr = parts[1];
+    if (!yearStr) continue;
+    const year = parseInt(yearStr, 10);
+    if (isNaN(year)) continue;
+    const existing = byYear.get(year) ?? [];
+    existing.push(value);
+    byYear.set(year, existing);
+  }
 
-  // Filter agencies whose city matches
-  const cityMatches = agencies.filter(
-    (a) => a.city_name?.toLowerCase().trim() === normalized,
-  );
+  // Find the most recent year with all 12 months (or closest to it)
+  const years = [...byYear.keys()].sort((a, b) => b - a);
+  for (const year of years) {
+    const months = byYear.get(year)!;
+    if (months.length >= 10) {
+      // Sum monthly rates to approximate annual rate
+      const annual = months.reduce((sum, v) => sum + v, 0);
+      return { rate: Math.round(annual * 10) / 10, year };
+    }
+  }
 
-  if (cityMatches.length === 0) return null;
-
-  // Prefer police departments
-  const pd = cityMatches.find((a) =>
-    a.agency_name.toLowerCase().includes('police'),
-  );
-  return pd ?? cityMatches[0] ?? null;
+  return null;
 }
 
 /**
- * Fetch crime data for a single city/state and cache in DB.
+ * Fetch state-level crime data from FBI CDE and cache in DB.
+ * Data is per-state (the finest grain available from this API).
  */
 export async function fetchCrimeData(
   city: string,
   state: string,
 ): Promise<CrimeData | null> {
-  const apiKey = env.FBI_CRIME_API_KEY;
+  const apiKey = env.FBI_CRIME_DATA_API_KEY;
   if (!apiKey) return null;
 
   try {
-    // Step 1: Find ORI code by state, then match city
-    const agencyRes = await fetch(
-      `${FBI_API_BASE}/api/agencies/byStateAbbr/${state}?api_key=${apiKey}`,
-    );
-    if (!agencyRes.ok) return null;
+    const from = '01-2020';
+    const to = '12-2024';
 
-    const agencyData: { results: FbiAgency[] } = await agencyRes.json();
-    const agency = findBestAgency(agencyData.results ?? [], city);
-
-    if (!agency) {
-      // No agency found: cache as unavailable so we don't retry
-      return saveCacheEntry(city, state, null, null, null, null, null, 'unavailable', {});
-    }
-
-    // Step 2: Fetch violent crime and property crime summaries
     const [violentRes, propertyRes] = await Promise.all([
       fetch(
-        `${FBI_API_BASE}/api/summarized/agencies/${agency.ori}/violent-crime?api_key=${apiKey}`,
+        `${FBI_CDE_BASE}/summarized/state/${state}/violent-crime?from=${from}&to=${to}&api_key=${apiKey}`,
       ),
       fetch(
-        `${FBI_API_BASE}/api/summarized/agencies/${agency.ori}/property-crime?api_key=${apiKey}`,
+        `${FBI_CDE_BASE}/summarized/state/${state}/property-crime?from=${from}&to=${to}&api_key=${apiKey}`,
       ),
     ]);
 
-    if (!violentRes.ok || !propertyRes.ok) {
-      return saveCacheEntry(city, state, agency.ori, null, null, null, null, 'unavailable', {});
+    if (!violentRes.ok && !propertyRes.ok) {
+      return saveCacheEntry(city, state, null, null, null, null, 'unavailable', {});
     }
 
-    const violentData: FbiCrimeSummary = await violentRes.json();
-    const propertyData: FbiCrimeSummary = await propertyRes.json();
+    const violentData: CdeRatesResponse = violentRes.ok
+      ? await violentRes.json()
+      : {};
+    const propertyData: CdeRatesResponse = propertyRes.ok
+      ? await propertyRes.json()
+      : {};
 
-    // Get the most recent year with data
-    const violentYears = (violentData.results ?? []).sort(
-      (a, b) => b.data_year - a.data_year,
-    );
-    const propertyYears = (propertyData.results ?? []).sort(
-      (a, b) => b.data_year - a.data_year,
-    );
+    // Extract rates from the first key in the rates object (state name)
+    const violentRates = violentData.offenses?.rates
+      ? Object.values(violentData.offenses.rates)[0]
+      : undefined;
+    const propertyRates = propertyData.offenses?.rates
+      ? Object.values(propertyData.offenses.rates)[0]
+      : undefined;
 
-    const latestViolent = violentYears[0];
-    const latestProperty = propertyYears[0];
+    const violent = violentRates ? extractAnnualRate(violentRates) : null;
+    const property = propertyRates ? extractAnnualRate(propertyRates) : null;
 
-    if (!latestViolent && !latestProperty) {
-      return saveCacheEntry(city, state, agency.ori, null, null, null, null, 'unavailable', {
+    if (!violent && !property) {
+      return saveCacheEntry(city, state, null, null, null, null, 'unavailable', {
         violent: violentData,
         property: propertyData,
       });
     }
 
-    // Use the year that has the most data
-    const dataYear = latestViolent?.data_year ?? latestProperty?.data_year ?? null;
+    const dataYear = violent?.year ?? property?.year ?? null;
+    const quality: CrimeData['dataQuality'] =
+      violent && property ? 'complete' : 'partial';
 
-    // We need population to compute per-capita rates.
-    // FBI summarized endpoint doesn't always include population directly.
-    // We'll fetch it from the agency detail if available, or estimate.
-    let population: number | null = null;
-    let violentRate: number | null = null;
-    let propertyRate: number | null = null;
-    let quality: CrimeData['dataQuality'] = 'unavailable';
-
-    // Try to get population from a separate call
-    const detailRes = await fetch(
-      `${FBI_API_BASE}/api/agencies/${agency.ori}?api_key=${apiKey}`,
+    return saveCacheEntry(
+      city,
+      state,
+      violent?.rate ?? null,
+      property?.rate ?? null,
+      null,
+      dataYear,
+      quality,
+      { violent: violentData, property: propertyData },
     );
-    if (detailRes.ok) {
-      const detail = await detailRes.json();
-      // FBI agency detail sometimes has county population or agency population
-      population =
-        detail.nibrs_start_date != null
-          ? (detail.population ?? null)
-          : (detail.population ?? null);
-    }
-
-    if (population && population > 0) {
-      if (latestViolent) {
-        violentRate = (latestViolent.actual / population) * 100_000;
-      }
-      if (latestProperty) {
-        propertyRate = (latestProperty.actual / population) * 100_000;
-      }
-      quality =
-        latestViolent && latestProperty ? 'complete' : 'partial';
-    } else {
-      // Store raw counts without per-capita conversion
-      violentRate = latestViolent?.actual ?? null;
-      propertyRate = latestProperty?.actual ?? null;
-      quality = 'partial';
-    }
-
-    return saveCacheEntry(city, state, agency.ori, violentRate, propertyRate, population, dataYear, quality, {
-      violent: violentData,
-      property: propertyData,
-    });
   } catch {
     return null;
   }
@@ -155,7 +122,6 @@ export async function fetchCrimeData(
 async function saveCacheEntry(
   city: string,
   state: string,
-  oriCode: string | null,
   violentCrimeRate: number | null,
   propertyCrimeRate: number | null,
   population: number | null,
@@ -171,7 +137,7 @@ async function saveCacheEntry(
     create: {
       city,
       state,
-      oriCode,
+      oriCode: null,
       violentCrimeRate,
       propertyCrimeRate,
       population,
@@ -182,7 +148,6 @@ async function saveCacheEntry(
       expiresAt,
     },
     update: {
-      oriCode,
       violentCrimeRate,
       propertyCrimeRate,
       population,
@@ -208,15 +173,16 @@ async function saveCacheEntry(
 }
 
 /**
- * Fetch crime data for all unique city/state pairs across neighborhoods.
- * Skips pairs with valid (non-expired) cache.
+ * Fetch crime data for all unique city/state pairs.
+ * Since data is state-level, we fetch once per state and propagate
+ * to all cities in that state.
  */
 export async function fetchAllCrimeData(): Promise<{
   fetched: number;
   skipped: number;
   failed: number;
 }> {
-  if (!env.FBI_CRIME_API_KEY) {
+  if (!env.FBI_CRIME_DATA_API_KEY) {
     return { fetched: 0, skipped: 0, failed: 0 };
   }
 
@@ -224,6 +190,14 @@ export async function fetchAllCrimeData(): Promise<{
     select: { city: true, state: true },
     distinct: ['city', 'state'],
   });
+
+  // Group cities by state so we only call the API once per state
+  const stateGroups = new Map<string, string[]>();
+  for (const n of neighborhoods) {
+    const cities = stateGroups.get(n.state) ?? [];
+    if (!cities.includes(n.city)) cities.push(n.city);
+    stateGroups.set(n.state, cities);
+  }
 
   const now = new Date();
   const existing = await prisma.crimeDataCache.findMany({
@@ -236,21 +210,44 @@ export async function fetchAllCrimeData(): Promise<{
   let skipped = 0;
   let failed = 0;
 
-  for (const n of neighborhoods) {
-    if (cachedKeys.has(`${n.city}|${n.state}`)) {
-      skipped++;
+  for (const [state, cities] of stateGroups) {
+    const uncachedCities = cities.filter((c) => !cachedKeys.has(`${c}|${state}`));
+    if (uncachedCities.length === 0) {
+      skipped += cities.length;
       continue;
     }
 
-    const result = await fetchCrimeData(n.city, n.state);
+    // Fetch once for the first city (data is state-level anyway)
+    const representativeCity = uncachedCities[0];
+    if (!representativeCity) continue;
+    const result = await fetchCrimeData(representativeCity, state);
+
     if (result) {
       fetched++;
+
+      // Propagate to other cities in the same state
+      for (const city of uncachedCities.slice(1)) {
+        try {
+          await saveCacheEntry(
+            city,
+            state,
+            result.violentCrimeRate,
+            result.propertyCrimeRate,
+            result.population,
+            result.dataYear,
+            result.dataQuality,
+            {},
+          );
+          fetched++;
+        } catch {
+          failed++;
+        }
+      }
     } else {
-      failed++;
+      failed += uncachedCities.length;
     }
 
-    // Respect rate limits: delay between calls
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 300));
   }
 
   return { fetched, skipped, failed };

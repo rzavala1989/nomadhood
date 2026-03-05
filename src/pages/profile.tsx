@@ -142,7 +142,7 @@ export default function ProfilePage() {
                     <Link
                       key={fav.id}
                       href={`/neighborhoods/${fav.neighborhood.id}`}
-                      className="flex items-center justify-between py-[10px] border-t border-black/[0.06] transition-colors hover:bg-[--bg-surface-1]"
+                      className="flex items-center justify-between py-[10px] border-t border-[rgba(120,80,200,0.08)] transition-colors hover:bg-[--bg-surface-1]"
                     >
                       <div className="flex items-center gap-[var(--space-3)]">
                         <MapPinIcon className="h-3.5 w-3.5 text-[--text-ghost]" />
@@ -155,7 +155,7 @@ export default function ProfilePage() {
                           </p>
                         </div>
                       </div>
-                      <HeartIcon className="h-3.5 w-3.5 fill-black/70 text-black/70" />
+                      <HeartIcon className="h-3.5 w-3.5 fill-[--vapor-pink] text-[--vapor-pink]" />
                     </Link>
                   ))}
                 </div>

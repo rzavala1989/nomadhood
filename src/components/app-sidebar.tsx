@@ -68,7 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     : navItems;
 
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -78,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="/dashboard" className="flex items-center gap-[var(--space-2)]">
                 <MapPinIcon className="h-4 w-4 text-[--text-secondary]" />
-                <span className="text-[10px] uppercase tracking-[0.18em] font-medium text-[--text-primary]">
+                <span className="font-brand text-sm normal-case tracking-normal text-[--text-primary]">
                   Nomadhood
                 </span>
               </a>

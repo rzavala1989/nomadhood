@@ -36,7 +36,7 @@ export default function AdminReviewsPage() {
           </p>
 
           <div className="surface-1">
-            <div className="grid grid-cols-[120px_1fr_80px_1fr_80px_60px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] border-b border-black/[0.06]">
+            <div className="grid grid-cols-[120px_1fr_80px_1fr_80px_60px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] border-b border-[rgba(120,80,200,0.08)]">
               <span className="text-micro text-[--text-ghost]">USER</span>
               <span className="text-micro text-[--text-ghost]">NEIGHBORHOOD</span>
               <span className="text-micro text-[--text-ghost]">RATING</span>
@@ -48,7 +48,7 @@ export default function AdminReviewsPage() {
             {data?.reviews.map((review, i) => (
               <div
                 key={review.id}
-                className="grid grid-cols-[120px_1fr_80px_1fr_80px_60px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] border-b border-black/[0.06] animate-fade-up items-center"
+                className="grid grid-cols-[120px_1fr_80px_1fr_80px_60px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] border-b border-[rgba(120,80,200,0.08)] animate-fade-up items-center"
                 style={{ animationDelay: `${i * 20}ms` }}
               >
                 <span className="text-caption text-[--text-secondary] truncate">

@@ -36,7 +36,7 @@ export function RecentNeighborhoods() {
             <Link
               key={n.id}
               href={`/neighborhoods/${n.id}`}
-              className="flex items-center justify-between px-[var(--space-5)] py-[10px] transition-colors hover:bg-[--bg-surface-2] border-t border-black/[0.06]"
+              className="flex items-center justify-between px-[var(--space-5)] py-[10px] transition-colors hover:bg-[--bg-surface-2] border-t border-[rgba(120,80,200,0.08)]"
             >
               <div className="flex items-center gap-[var(--space-3)]">
                 <span className="text-body text-[--text-primary] font-medium">

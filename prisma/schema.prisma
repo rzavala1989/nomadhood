@@ -18,10 +18,11 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts  Account[]
-  sessions  Session[]
-  reviews   Review[]
-  favorites Favorite[]
+  accounts        Account[]
+  sessions        Session[]
+  reviews         Review[]
+  favorites       Favorite[]
+  recommendations RecommendationCache[]
 
   @@index([email])
   @@index([isAdmin])
@@ -42,6 +43,7 @@ model Neighborhood {
   reviews        Review[]
   favorites      Favorite[]
   walkScoreCache WalkScoreCache?
+  imageCache     NeighborhoodImageCache[]
 
   @@index([city, state])
   @@index([zip])
@@ -58,11 +60,24 @@ model Review {
   neighborhoodId String
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   neighborhood   Neighborhood @relation(fields: [neighborhoodId], references: [id], onDelete: Cascade)
+  dimensions     ReviewDimension[]
 
   @@index([neighborhoodId])
   @@index([userId])
   @@index([rating])
   @@unique([userId, neighborhoodId])
+}
+
+model ReviewDimension {
+  id         String   @id @default(uuid())
+  reviewId   String
+  review     Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  dimension  String   @db.VarChar(30)
+  rating     Int      @db.SmallInt
+
+  @@unique([reviewId, dimension])
+  @@index([reviewId])
+  @@index([dimension])
 }
 
 model Favorite {
@@ -193,6 +208,28 @@ model EventbriteCache {
   expiresAt          DateTime
 
   @@unique([city, state])
+  @@index([expiresAt])
+}
+
+model NeighborhoodImageCache {
+  id               String       @id @default(uuid())
+  neighborhoodId   String
+  neighborhood     Neighborhood @relation(fields: [neighborhoodId], references: [id], onDelete: Cascade)
+  position         Int          @default(0)
+  source           String       @db.VarChar(20)
+  imageUrl         String
+  thumbUrl         String?
+  altText          String?
+  photographerName String?
+  photographerUrl  String?
+  pageUrl          String?
+  unsplashDownloadUrl String?
+  rawResponse      Json
+  fetchedAt        DateTime     @default(now())
+  expiresAt        DateTime
+
+  @@unique([neighborhoodId, imageUrl])
+  @@index([neighborhoodId])
   @@index([expiresAt])
 }
 

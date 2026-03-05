@@ -12,10 +12,10 @@ const IndexPage: NextPageWithLayout = () => {
     <main className="min-h-screen bg-[--bg-root]">
       {/* Ambient grid */}
       <div
-        className="pointer-events-none fixed inset-0 opacity-[0.02]"
+        className="pointer-events-none fixed inset-0 opacity-[0.03]"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)',
+            'linear-gradient(rgba(179,107,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(179,107,255,0.3) 1px, transparent 1px)',
           backgroundSize: '60px 60px',
         }}
       />
@@ -24,8 +24,8 @@ const IndexPage: NextPageWithLayout = () => {
 
         {/* Nav strip */}
         <div className="mb-[var(--space-16)] flex items-center justify-between">
-          <p className="text-[9px] uppercase tracking-[0.25em] text-[--text-ghost]">
-            Nomadhood <span className="text-[--text-ghost] opacity-50">Beta</span>
+          <p className="text-[--text-ghost]">
+            <span className="font-brand text-sm">Nomadhood</span> <span className="text-[9px] uppercase tracking-[0.25em] opacity-50">Beta</span>
           </p>
           <div className="flex items-center gap-px">
             <Link
@@ -117,7 +117,7 @@ const IndexPage: NextPageWithLayout = () => {
             { icon: BarChart2Icon, title: 'Nomad Score', desc: 'Composite score ranking neighborhoods by data' },
           ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="surface-1 p-[var(--space-5)] space-y-[var(--space-2)]">
-              <Icon className="h-4 w-4 text-[--text-ghost]" />
+              <Icon className="h-4 w-4 text-[--vapor-purple]" />
               <p className="text-caption text-[--text-secondary]">{title}</p>
               <p className="text-micro text-[--text-tertiary] leading-relaxed">{desc}</p>
             </div>
@@ -156,7 +156,7 @@ const IndexPage: NextPageWithLayout = () => {
                       </p>
                     </div>
                     {n.nomadScore > 0 && (
-                      <span className="shrink-0 bg-[--bg-surface-3] px-[var(--space-2)] py-[1px] text-[8px] tracking-[0.1em] text-[--text-ghost] tabular-nums">
+                      <span className="shrink-0 bg-vapor text-white px-[var(--space-2)] py-[1px] text-[8px] tracking-[0.1em] tabular-nums">
                         {n.nomadScore}
                       </span>
                     )}
@@ -179,7 +179,7 @@ const IndexPage: NextPageWithLayout = () => {
 
         {/* Footer */}
         <div className="mt-[var(--space-16)] flex items-center justify-between border-t border-[--border-subtle] pt-[var(--space-6)]">
-          <p className="text-micro text-[--text-ghost] uppercase tracking-[0.18em]">Nomadhood</p>
+          <p className="font-brand text-xs text-[--text-ghost]">Nomadhood</p>
           <p className="text-micro text-[--text-ghost]">v0.1.0</p>
         </div>
       </div>

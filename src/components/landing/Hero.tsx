@@ -4,7 +4,7 @@ export function Hero() {
   return (
     <section className="text-center py-[var(--space-16)]">
       <h1 className="text-title mb-[var(--space-4)]">
-        Welcome to <em>Nomadhood</em>
+        Welcome to <em className="font-brand not-italic">Nomadhood</em>
       </h1>
       <p className="text-body text-[--text-secondary] mb-[var(--space-8)]">
         Explore, review, and save neighborhoods worldwide.

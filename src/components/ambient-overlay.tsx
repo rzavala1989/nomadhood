@@ -20,7 +20,7 @@ export function AmbientOverlay() {
         aria-hidden="true"
       >
         <div
-          className="absolute left-0 right-0 h-[2px] bg-black/[0.02]"
+          className="absolute left-0 right-0 h-[2px] bg-[rgba(120,80,200,0.03)]"
           style={{
             animation: 'scanline 8s linear infinite',
           }}

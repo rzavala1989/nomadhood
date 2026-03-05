@@ -59,6 +59,17 @@ export type EventbriteListing = {
   isFree: boolean;
 };
 
+export type NeighborhoodImageData = {
+  source: 'unsplash' | 'wikimedia';
+  imageUrl: string;
+  thumbUrl: string | null;
+  altText: string | null;
+  photographerName: string | null;
+  photographerUrl: string | null;
+  pageUrl: string | null;
+  fetchedAt: Date;
+};
+
 // Aggregated result returned by data.getAll
 export type NeighborhoodExternalData = {
   walkScore: WalkScoreData | null;
@@ -69,6 +80,7 @@ export type NeighborhoodExternalData = {
     wage: BlsData | null;
   };
   events: EventbriteData | null;
+  images: NeighborhoodImageData[];
 };
 
 // Rate limit tracker info for admin UI

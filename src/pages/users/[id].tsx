@@ -66,7 +66,7 @@ export default function PublicUserProfilePage() {
             </div>
           </div>
 
-          <div className="flex gap-[var(--space-8)] mt-[var(--space-4)] pt-[var(--space-3)] border-t border-black/[0.06]">
+          <div className="flex gap-[var(--space-8)] mt-[var(--space-4)] pt-[var(--space-3)] border-t border-[rgba(120,80,200,0.08)]">
             <div>
               <p className="text-micro text-[--text-ghost]">REVIEWS</p>
               <p className="text-[20px] font-light text-[--text-primary] tabular-nums">
@@ -92,7 +92,7 @@ export default function PublicUserProfilePage() {
               {user.reviews.map((review, i) => (
                 <div
                   key={review.id}
-                  className="flex gap-[var(--space-3)] py-[var(--space-3)] border-t border-black/[0.06] animate-fade-up"
+                  className="flex gap-[var(--space-3)] py-[var(--space-3)] border-t border-[rgba(120,80,200,0.08)] animate-fade-up"
                   style={{ animationDelay: `${150 + i * 40}ms` }}
                 >
                   <div className="flex-1 space-y-[var(--space-1)]">
@@ -131,7 +131,7 @@ export default function PublicUserProfilePage() {
                 <Link
                   key={fav.id}
                   href={`/neighborhoods/${fav.neighborhood.id}`}
-                  className="flex items-center gap-[var(--space-3)] py-[10px] border-t border-black/[0.06] transition-colors hover:bg-[--bg-surface-1]"
+                  className="flex items-center gap-[var(--space-3)] py-[10px] border-t border-[rgba(120,80,200,0.08)] transition-colors hover:bg-[--bg-surface-1]"
                 >
                   <MapPinIcon className="h-3.5 w-3.5 text-[--text-ghost]" />
                   <div>

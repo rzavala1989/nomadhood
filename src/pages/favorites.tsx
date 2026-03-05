@@ -139,7 +139,7 @@ export default function FavoritesPage() {
             </div>
           ) : !favorites || favorites.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-[var(--space-16)] text-center">
-              <HeartIcon className="mb-[var(--space-4)] h-8 w-8 text-black/[0.12] stroke-[1]" />
+              <HeartIcon className="mb-[var(--space-4)] h-8 w-8 text-[rgba(120,80,200,0.15)] stroke-[1]" />
               <p className="text-heading font-light text-[--text-secondary]">
                 No favorites yet.
               </p>
@@ -148,7 +148,7 @@ export default function FavoritesPage() {
               </p>
               <Link
                 href="/neighborhoods"
-                className="mt-[var(--space-6)] bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-4)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] transition-all hover:bg-[#1A1A18]/90"
+                className="mt-[var(--space-6)] bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-4)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] transition-all hover:bg-[#1A1028]/90"
               >
                 Browse Neighborhoods
               </Link>

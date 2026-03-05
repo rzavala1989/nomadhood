@@ -42,8 +42,10 @@ src/
       users.tsx                 User management (admin)
       neighborhoods.tsx         Neighborhood CRUD (admin)
       reviews.tsx               Review moderation (admin)
+      data.tsx                  External data pipeline management (admin)
     api/
       auth/[...nextauth]/       Auth.js API handler (App Router)
+      cron/fetch-data.ts        Scheduled data pipeline (Vercel Cron)
       trpc/[trpc].ts            tRPC API handler
 
   components/
@@ -62,6 +64,7 @@ src/
     dashboard-layout.tsx        Authenticated layout with sidebar
     favorite-button.tsx         Toggle favorite with toast
     neighborhood-card.tsx       Card with compare and Nomad Score
+    neighborhood-data-panel.tsx External API data cards (walk score, rent, crime, BLS, events)
     neighborhood-map.tsx        MapLibre GL map with markers
     neighborhood-map-wrapper.tsx  Dynamic import wrapper (SSR disabled)
     rating-distribution-chart.tsx  Horizontal bar chart (1-5 stars)
@@ -71,6 +74,8 @@ src/
 
   server/
     routers/                    tRPC routers (see below)
+    services/                   External API integrations (see below)
+    utils/                      Score calculations
     context.ts                  tRPC context, reads session from cookie
     env.ts                      Zod environment validation
     prisma.ts                   Prisma client singleton
@@ -109,6 +114,17 @@ Browser -> /api/auth/* (App Router) -> Auth.js -> GitHub OAuth -> Prisma Adapter
 ```
 
 The tRPC context reads the session token cookie directly from the request and looks it up in the database via Prisma; it does not call the Auth.js `auth()` function.
+
+External data pipeline (fetch and display are decoupled):
+```
+Admin or Cron -> /api/cron/fetch-data or admin mutation
+                       |
+                 Service layer (src/server/services/)
+                       |
+                 External API -> DB cache tables (WalkScoreCache, RentcastCache, etc.)
+
+Client -> trpc.data.getAll -> DB reads only -> UI cards with "LAST UPDATED" timestamps
+```
 
 ## tRPC Router Map
 
@@ -169,6 +185,30 @@ The tRPC context reads the session token cookie directly from the request and lo
 | `getMine` | query | protected |
 | `isFavorite` | query | protected |
 | `reorder` | mutation | protected |
+
+### `data`
+
+| Procedure | Type | Access |
+|-----------|------|--------|
+| `getAll` | query | public |
+| `getWalkScore` | query | public |
+| `fetchWalkScores` | mutation | admin |
+| `fetchRentData` | mutation | admin |
+| `fetchCrimeData` | mutation | admin |
+| `fetchCostOfLiving` | mutation | admin |
+| `fetchEvents` | mutation | admin |
+| `getRentcastUsage` | query | admin |
+
+### Service Layer (`src/server/services/`)
+
+| File | External API | Cache Model |
+|------|-------------|-------------|
+| `walkScore.ts` | Walk Score API | `WalkScoreCache` |
+| `rentcast.ts` | Rentcast API (rate-limited to 45/month) | `RentcastCache` |
+| `crimeData.ts` | FBI CDE API (state-level) | `CrimeDataCache` |
+| `blsData.ts` | BLS v2 API (CPI and wages) | `BlsDataCache` |
+| `eventbrite.ts` | Eventbrite v3 API | `EventbriteCache` |
+| `types.ts` | Shared return types | n/a |
 
 Access levels:
 - **public**: no authentication required

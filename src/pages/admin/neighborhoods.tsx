@@ -147,7 +147,7 @@ export default function AdminNeighborhoodsPage() {
         </div>
       ) : (
         <div className="surface-1">
-          <div className="grid grid-cols-[1fr_100px_50px_60px_60px_80px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] border-b border-black/[0.06]">
+          <div className="grid grid-cols-[1fr_100px_50px_60px_60px_80px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] border-b border-[rgba(120,80,200,0.08)]">
             <span className="text-micro text-[--text-ghost]">NAME</span>
             <span className="text-micro text-[--text-ghost]">LOCATION</span>
             <span className="text-micro text-[--text-ghost]">STATE</span>
@@ -159,7 +159,7 @@ export default function AdminNeighborhoodsPage() {
           {data?.neighborhoods.map((n, i) => (
             <div key={n.id}>
               <div
-                className="grid grid-cols-[1fr_100px_50px_60px_60px_80px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] border-b border-black/[0.06] animate-fade-up items-center"
+                className="grid grid-cols-[1fr_100px_50px_60px_60px_80px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] border-b border-[rgba(120,80,200,0.08)] animate-fade-up items-center"
                 style={{ animationDelay: `${i * 20}ms` }}
               >
                 <span className="text-body text-[--text-primary] truncate">{n.name}</span>
@@ -192,7 +192,7 @@ export default function AdminNeighborhoodsPage() {
 
               {/* Inline edit form */}
               {editId === n.id && (
-                <div className="px-[var(--space-4)] py-[var(--space-4)] bg-[--bg-surface-1] border-b border-black/[0.06] animate-fade-up">
+                <div className="px-[var(--space-4)] py-[var(--space-4)] bg-[--bg-surface-1] border-b border-[rgba(120,80,200,0.08)] animate-fade-up">
                   <p className="text-label text-[--text-ghost] mb-[var(--space-3)]">EDIT NEIGHBORHOOD</p>
                   <NeighborhoodForm
                     defaultValues={{

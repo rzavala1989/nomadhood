@@ -1,15 +1,5 @@
-import { BarChart, Bar, XAxis, YAxis, Cell } from 'recharts';
-
-import { ChartContainer } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { trpc } from '@/utils/trpc';
-
-const chartConfig = {
-  count: {
-    label: 'Reviews',
-    color: 'rgba(0, 0, 0, 0.70)',
-  },
-};
 
 export function RatingDistributionChart({
   neighborhoodId,
@@ -28,53 +18,44 @@ export function RatingDistributionChart({
     return null;
   }
 
-  const chartData = [5, 4, 3, 2, 1].map((star) => ({
-    star: `${star}`,
+  const rows = [5, 4, 3, 2, 1].map((star) => ({
+    star,
     count: stats.ratingDistribution[star as keyof typeof stats.ratingDistribution],
   }));
 
-  const maxCount = Math.max(...chartData.map((d) => d.count), 1);
+  const maxCount = Math.max(...rows.map((r) => r.count), 1);
 
   return (
-    <div className="surface-1 p-[var(--space-5)]">
-      <p className="text-label text-[--text-ghost] mb-[var(--space-3)]">
-        RATING DISTRIBUTION
-      </p>
+    <div>
+      <div className="space-y-[6px]">
+        {rows.map((row) => {
+          const widthPct = (row.count / maxCount) * 100;
+          const isDominant = row.count === maxCount && row.count > 0;
 
-      <ChartContainer config={chartConfig} className="h-[120px] w-full aspect-auto">
-        <BarChart
-          data={chartData}
-          layout="vertical"
-          margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-        >
-          <XAxis type="number" hide domain={[0, maxCount]} />
-          <YAxis
-            type="category"
-            dataKey="star"
-            width={24}
-            axisLine={false}
-            tickLine={false}
-            tick={{
-              fontSize: 10,
-              fill: 'rgba(0, 0, 0, 0.45)',
-              fontFamily: 'var(--font-mono)',
-            }}
-            tickFormatter={(value: string) => `${value}\u2605`}
-          />
-          <Bar dataKey="count" radius={0} maxBarSize={14}>
-            {chartData.map((entry) => (
-              <Cell
-                key={entry.star}
-                fill={
-                  entry.count > 0
-                    ? 'rgba(0, 0, 0, 0.70)'
-                    : 'rgba(0, 0, 0, 0.06)'
-                }
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ChartContainer>
+          return (
+            <div key={row.star} className="flex items-center gap-[var(--space-2)]">
+              <span className="text-micro text-[--text-tertiary] tabular-nums w-[20px] text-right shrink-0">
+                {row.star}★
+              </span>
+              <div className="flex-1 h-[10px] bg-[rgba(120,80,200,0.06)]">
+                <div
+                  className={`h-full transition-all duration-500 ${
+                    isDominant
+                      ? 'bg-[--vapor-pink]'
+                      : row.count > 0
+                        ? 'bg-[rgba(120,80,200,0.12)]'
+                        : ''
+                  }`}
+                  style={{ width: `${widthPct}%` }}
+                />
+              </div>
+              <span className="text-micro text-[--text-ghost] tabular-nums w-[16px] shrink-0">
+                {row.count}
+              </span>
+            </div>
+          );
+        })}
+      </div>
 
       <div className="mt-[var(--space-3)] flex items-baseline gap-[var(--space-3)]">
         <span className="text-[20px] font-light text-[--text-primary] tabular-nums">

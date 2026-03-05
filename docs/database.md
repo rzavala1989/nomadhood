@@ -42,7 +42,7 @@ A reviewable neighborhood.
 
 Indexes: `(city, state)`, `zip`, `(latitude, longitude)`
 
-Relations: has many Reviews, Favorites
+Relations: has many Reviews, Favorites, optional WalkScoreCache
 
 ### Review
 
@@ -75,6 +75,72 @@ A saved neighborhood with drag-and-drop ordering.
 | createdAt | DateTime | auto |
 
 Unique constraint: `(userId, neighborhoodId)`
+
+### External Data Cache Models
+
+Six models cache data from external APIs. All share a common pattern: `fetchedAt` (when data was retrieved), `expiresAt` (cache validity), and `rawResponse` (full API response for debugging).
+
+**WalkScoreCache**: Walk, transit, and bike scores per neighborhood.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | UUID | primary key |
+| neighborhoodId | UUID | unique, FK to Neighborhood |
+| walkScore, transitScore, bikeScore | Int | nullable, 0-100 |
+| walkDescription, transitDescription, bikeDescription | String | nullable |
+| fetchedAt, expiresAt | DateTime | cache lifecycle |
+| rawResponse | Json | full API response |
+
+**RentcastCache**: Housing cost data keyed by zip code (multiple neighborhoods share a zip).
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | UUID | primary key |
+| zip | String | unique |
+| medianRent, medianRentSqft, medianSalePrice, medianSaleSqft | Float | nullable |
+| fetchedAt, expiresAt | DateTime | |
+| rawResponse | Json | |
+
+**CrimeDataCache**: FBI crime rates keyed by city and state (state-level data).
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | UUID | primary key |
+| city, state | String | unique together |
+| violentCrimeRate, propertyCrimeRate | Float | nullable, per 100K |
+| population | Int | nullable |
+| dataYear | Int | nullable |
+| dataQuality | String | 'complete', 'partial', or 'unavailable' |
+| oriCode | String | nullable, FBI agency code |
+
+**BlsDataCache**: BLS economic data (CPI index, wages) keyed by series ID.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | UUID | primary key |
+| seriesId | String | unique, BLS series identifier |
+| city, state | String | metro area |
+| dataType | String | 'cpi' or 'wage' |
+| value | Float | |
+| period, year | String, Int | BLS reporting period |
+
+**EventbriteCache**: Upcoming events keyed by city and state.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | UUID | primary key |
+| city, state | String | unique together |
+| upcomingEventCount | Int | default 0 |
+| events | Json | array of top 5 events |
+
+**ApiRateLimitTracker**: Monthly API call counter (used for Rentcast's 50/month limit).
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | UUID | primary key |
+| apiName | String | unique, e.g. 'rentcast' |
+| monthKey | String | 'YYYY-MM' format |
+| callCount | Int | default 0 |
 
 ### Auth Models (managed by Auth.js adapter)
 

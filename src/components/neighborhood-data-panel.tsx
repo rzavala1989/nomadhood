@@ -1,17 +1,32 @@
 import { format } from 'date-fns';
 import { trpc } from '@/utils/trpc';
+import { NATIONAL, formatUpdatedAt, pctDiff, formatDollars, formatRate, getRiskLevel } from '@/components/neighborhood-data-utils';
 
-function formatUpdatedAt(date: Date) {
-  return format(new Date(date), 'MMM d, yyyy').toUpperCase();
+function DiffBadge({ value, baseline, invert = false }: { value: number; baseline: number; invert?: boolean }) {
+  const diff = pctDiff(value, baseline);
+  if (diff === 0) return <span className="text-micro text-[--text-ghost] tabular-nums">AT NATIONAL AVG</span>;
+  // invert: for crime/cost, lower is better so negative diff is positive
+  const isGood = invert ? diff < 0 : diff > 0;
+  return (
+    <span className={`text-micro tabular-nums ${isGood ? 'text-[--text-secondary]' : 'text-[--text-tertiary]'}`}>
+      {diff > 0 ? '+' : ''}{diff}% VS NATIONAL AVG
+    </span>
+  );
 }
 
-function ScoreBar({ value, max = 100 }: { value: number; max?: number }) {
-  const pct = Math.min((value / max) * 100, 100);
+function ComparisonBar({ value, benchmark, max }: { value: number; benchmark: number; max: number }) {
+  const valuePct = Math.min((value / max) * 100, 100);
+  const benchPct = Math.min((benchmark / max) * 100, 100);
   return (
-    <div className="h-[3px] w-full bg-white/[0.08]">
+    <div className="relative h-[3px] w-full bg-[rgba(120,80,200,0.08)]">
       <div
-        className="h-full bg-white/[0.30] transition-all duration-500"
-        style={{ width: `${pct}%` }}
+        className="h-full bg-[#B36BFF99] transition-all duration-500"
+        style={{ width: `${valuePct}%` }}
+      />
+      {/* Benchmark tick */}
+      <div
+        className="absolute top-[-2px] h-[7px] w-[1px] bg-[#FF6B9D66]"
+        style={{ left: `${benchPct}%` }}
       />
     </div>
   );
@@ -36,29 +51,45 @@ function WalkScoreCard({
 
       {walkScore != null && (
         <>
-          <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
-            {walkScore}
+          <div className="flex items-baseline gap-[var(--space-3)]">
+            <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
+              {walkScore}
+            </p>
+            <DiffBadge value={walkScore} baseline={NATIONAL.walkScore} />
+          </div>
+          <ComparisonBar value={walkScore} benchmark={NATIONAL.walkScore} max={100} />
+          <p className="text-micro text-[--text-ghost] tabular-nums">
+            US AVG {NATIONAL.walkScore}
           </p>
-          <ScoreBar value={walkScore} />
         </>
       )}
-
-      <div className="flex gap-[var(--space-6)]">
-        {transitScore != null && (
-          <span className="text-micro text-[--text-tertiary] tabular-nums">
-            TRANSIT {transitScore}
-          </span>
-        )}
-        {bikeScore != null && (
-          <span className="text-micro text-[--text-tertiary] tabular-nums">
-            BIKE {bikeScore}
-          </span>
-        )}
-      </div>
 
       {walkDescription && (
         <p className="text-caption text-[--text-secondary]">{walkDescription}</p>
       )}
+
+      <div className="flex gap-[var(--space-6)]">
+        {transitScore != null && (
+          <div>
+            <span className="text-micro text-[--text-tertiary] tabular-nums">
+              TRANSIT {transitScore}
+            </span>
+            <span className="text-micro text-[--text-ghost] tabular-nums ml-[var(--space-2)]">
+              AVG {NATIONAL.transitScore}
+            </span>
+          </div>
+        )}
+        {bikeScore != null && (
+          <div>
+            <span className="text-micro text-[--text-tertiary] tabular-nums">
+              BIKE {bikeScore}
+            </span>
+            <span className="text-micro text-[--text-ghost] tabular-nums ml-[var(--space-2)]">
+              AVG {NATIONAL.bikeScore}
+            </span>
+          </div>
+        )}
+      </div>
 
       <div className="flex items-center justify-between pt-[var(--space-1)]">
         <p className="text-micro text-[--text-ghost]">
@@ -75,14 +106,6 @@ function WalkScoreCard({
       </div>
     </div>
   );
-}
-
-function formatDollars(value: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value);
 }
 
 function RentDataCard({
@@ -108,12 +131,15 @@ function RentDataCard({
 
       {hasRent && (
         <div>
-          <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
-            {formatDollars(medianRent)}{' '}
-            <span className="text-caption text-[--text-tertiary]">/MO</span>
-          </p>
-          <p className="text-micro text-[--text-ghost] mt-[var(--space-1)]">
-            MEDIAN RENT
+          <div className="flex items-baseline gap-[var(--space-3)]">
+            <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
+              {formatDollars(medianRent)}{' '}
+              <span className="text-caption text-[--text-tertiary]">/MO</span>
+            </p>
+            <DiffBadge value={medianRent} baseline={NATIONAL.medianRent} invert />
+          </div>
+          <p className="text-micro text-[--text-ghost] mt-[var(--space-1)] tabular-nums">
+            MEDIAN RENT — NATIONAL MEDIAN {formatDollars(NATIONAL.medianRent)}/MO
           </p>
         </div>
       )}
@@ -144,18 +170,45 @@ function RentDataCard({
   );
 }
 
-function getRiskLevel(violentRate: number | null, propertyRate: number | null) {
-  // Based on FBI national averages: violent ~380/100k, property ~2,000/100k
-  if (violentRate == null && propertyRate == null) return null;
-  const v = violentRate ?? 0;
-  const p = propertyRate ?? 0;
-  if (v < 200 && p < 1500) return 'LOW RISK';
-  if (v < 400 && p < 2500) return 'MODERATE';
-  return 'HIGH RISK';
-}
+function CrimeRateRow({
+  label,
+  rate,
+  nationalAvg,
+}: {
+  label: string;
+  rate: number;
+  nationalAvg: number;
+}) {
+  const diff = pctDiff(rate, nationalAvg);
+  const barMax = Math.max(rate, nationalAvg) * 1.3;
+  const ratePct = Math.min((rate / barMax) * 100, 100);
+  const avgPct = Math.min((nationalAvg / barMax) * 100, 100);
 
-function formatRate(rate: number) {
-  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(rate);
+  return (
+    <div className="space-y-[var(--space-1)]">
+      <div className="flex items-center justify-between">
+        <span className="text-micro text-[--text-tertiary] tabular-nums">
+          {label} {formatRate(rate)}/100K
+        </span>
+        <span className={`text-micro tabular-nums ${diff <= 0 ? 'text-[--text-secondary]' : 'text-[--text-tertiary]'}`}>
+          {diff > 0 ? '+' : ''}{diff}%
+        </span>
+      </div>
+      <div className="relative h-[3px] w-full bg-[rgba(120,80,200,0.08)]">
+        <div
+          className="h-full bg-[#B36BFF99] transition-all duration-500"
+          style={{ width: `${ratePct}%` }}
+        />
+        <div
+          className="absolute top-[-2px] h-[7px] w-[1px] bg-[#FF6B9D66]"
+          style={{ left: `${avgPct}%` }}
+        />
+      </div>
+      <span className="text-micro text-[--text-ghost] tabular-nums">
+        US AVG {formatRate(nationalAvg)}/100K
+      </span>
+    </div>
+  );
 }
 
 function CrimeDataCard({
@@ -177,7 +230,7 @@ function CrimeDataCard({
 
   return (
     <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
-      <p className="text-label text-[--text-ghost]">SAFETY</p>
+      <p className="text-label text-[--text-ghost]">SAFETY (STATE)</p>
 
       {riskLevel && (
         <p className="text-heading font-light text-[--text-primary]">
@@ -185,16 +238,20 @@ function CrimeDataCard({
         </p>
       )}
 
-      <div className="space-y-[var(--space-1)]">
+      <div className="space-y-[var(--space-3)]">
         {violentCrimeRate != null && (
-          <p className="text-micro text-[--text-tertiary] tabular-nums">
-            VIOLENT {formatRate(violentCrimeRate)}/100K
-          </p>
+          <CrimeRateRow
+            label="VIOLENT"
+            rate={violentCrimeRate}
+            nationalAvg={NATIONAL.violentCrime}
+          />
         )}
         {propertyCrimeRate != null && (
-          <p className="text-micro text-[--text-tertiary] tabular-nums">
-            PROPERTY {formatRate(propertyCrimeRate)}/100K
-          </p>
+          <CrimeRateRow
+            label="PROPERTY"
+            rate={propertyCrimeRate}
+            nationalAvg={NATIONAL.propertyCrime}
+          />
         )}
       </div>
 
@@ -226,9 +283,8 @@ function CostOfLivingCard({
   if (cpiValue == null && wageValue == null) return null;
 
   const fetchedAt = cpiFetchedAt ?? wageFetchedAt;
-  // CPI values are index numbers; compute YoY-style display
-  // For now, show the raw index value since we'd need two data points for YoY
   const medianAnnual = wageValue != null ? Math.round(wageValue * 2080) : null;
+  const nationalAnnual = Math.round(NATIONAL.medianHourlyWage * 2080);
 
   return (
     <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
@@ -236,24 +292,43 @@ function CostOfLivingCard({
 
       {cpiValue != null && (
         <div>
-          <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
-            {cpiValue.toFixed(1)}
-          </p>
-          <p className="text-micro text-[--text-ghost] mt-[var(--space-1)]">
-            CPI INDEX
-          </p>
+          <div className="flex items-baseline gap-[var(--space-3)]">
+            <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
+              {pctDiff(cpiValue, NATIONAL.cpi) > 0 ? '+' : ''}{pctDiff(cpiValue, NATIONAL.cpi)}%
+            </p>
+            <span className="text-micro text-[--text-ghost]">
+              VS NATIONAL AVG
+            </span>
+          </div>
+          <ComparisonBar value={cpiValue} benchmark={NATIONAL.cpi} max={Math.max(cpiValue, NATIONAL.cpi) * 1.2} />
+          <div className="flex items-center justify-between mt-[var(--space-1)]">
+            <p className="text-micro text-[--text-ghost] tabular-nums">
+              LOCAL CPI {cpiValue.toFixed(1)}
+            </p>
+            <p className="text-micro text-[--text-ghost] tabular-nums">
+              US AVG {NATIONAL.cpi.toFixed(1)}
+            </p>
+          </div>
         </div>
       )}
 
       {medianAnnual != null && (
-        <p className="text-micro text-[--text-tertiary] tabular-nums">
-          MEDIAN WAGE {formatDollars(medianAnnual)}/YR
-        </p>
+        <div className="space-y-[var(--space-1)]">
+          <div className="flex items-baseline gap-[var(--space-3)]">
+            <p className="text-caption text-[--text-secondary] tabular-nums">
+              MEDIAN WAGE {formatDollars(medianAnnual)}/YR
+            </p>
+            <DiffBadge value={medianAnnual} baseline={nationalAnnual} />
+          </div>
+          <p className="text-micro text-[--text-ghost] tabular-nums">
+            US MEDIAN {formatDollars(nationalAnnual)}/YR
+          </p>
+        </div>
       )}
 
       {wageValue != null && medianAnnual == null && (
         <p className="text-micro text-[--text-tertiary] tabular-nums">
-          MEDIAN HOURLY ${wageValue.toFixed(2)}
+          MEDIAN HOURLY ${wageValue.toFixed(2)} — US AVG ${NATIONAL.medianHourlyWage.toFixed(2)}
         </p>
       )}
 
@@ -279,10 +354,16 @@ function EventsCard({
     <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
       <p className="text-label text-[--text-ghost]">LOCAL EVENTS</p>
 
-      <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
-        {upcomingEventCount}{' '}
-        <span className="text-caption text-[--text-tertiary]">UPCOMING</span>
-      </p>
+      {upcomingEventCount > 0 ? (
+        <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
+          {upcomingEventCount}{' '}
+          <span className="text-caption text-[--text-tertiary]">UPCOMING</span>
+        </p>
+      ) : (
+        <p className="text-caption text-[--text-tertiary]">
+          No upcoming events tracked for this area
+        </p>
+      )}
 
       {events.length > 0 && (
         <div className="space-y-[var(--space-2)] pt-[var(--space-1)]">
@@ -319,13 +400,23 @@ function EventsCard({
 
 export function NeighborhoodDataPanel({
   neighborhoodId,
+  externalData,
 }: {
   neighborhoodId: string;
+  externalData?: {
+    walkScore: Parameters<typeof WalkScoreCard>[0] | null;
+    rentData: Parameters<typeof RentDataCard>[0] | null;
+    crimeData: Parameters<typeof CrimeDataCard>[0] | null;
+    costOfLiving: { cpi: { value: number | null; fetchedAt: Date } | null; wage: { value: number | null; fetchedAt: Date } | null };
+    events: Parameters<typeof EventsCard>[0] | null;
+  };
 }) {
-  const { data } = trpc.data.getAll.useQuery(
+  const { data: fetched } = trpc.data.getAll.useQuery(
     { neighborhoodId },
-    { enabled: !!neighborhoodId },
+    { enabled: !!neighborhoodId && externalData === undefined },
   );
+
+  const data = externalData ?? fetched;
 
   if (!data) return null;
 

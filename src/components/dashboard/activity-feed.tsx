@@ -14,9 +14,9 @@ export function ActivityFeed() {
 
   if (isLoading) {
     return (
-      <div className="space-y-px">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 w-full" />
+      <div className="space-y-0">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-[48px] w-full" />
         ))}
       </div>
     );
@@ -33,12 +33,13 @@ export function ActivityFeed() {
   return (
     <div>
       {reviews.map((review, i) => (
-        <div
+        <Link
           key={review.id}
-          className="flex gap-[var(--space-3)] py-[var(--space-3)] border-t border-black/[0.06] animate-fade-up"
-          style={{ animationDelay: `${i * 40}ms` }}
+          href={`/neighborhoods/${review.neighborhood.id}`}
+          className="flex items-center gap-[var(--space-3)] h-[48px] px-[var(--space-2)] border-t border-[rgba(120,80,200,0.06)] hover:bg-[--bg-surface-1] transition-colors animate-fade-up"
+          style={{ animationDelay: `${i * 30}ms` }}
         >
-          <Avatar className="h-7 w-7 rounded-full shrink-0">
+          <Avatar className="h-8 w-8 rounded-full shrink-0">
             <AvatarImage
               src={review.user.image ?? undefined}
               alt={review.user.name ?? 'User'}
@@ -47,29 +48,28 @@ export function ActivityFeed() {
               {getInitials(review.user.name)}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1 min-w-0">
+
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-[var(--space-2)]">
               <span className="text-caption text-[--text-secondary] truncate">
                 {review.user.name ?? 'Anonymous'}
               </span>
-              <StarRating value={review.rating} readonly />
+              <span className="text-micro text-[--text-ghost] truncate shrink-[2]">
+                {review.neighborhood.name}
+              </span>
             </div>
-            <Link
-              href={`/neighborhoods/${review.neighborhood.id}`}
-              className="text-caption text-[--text-tertiary] hover:text-[--text-primary] transition-colors truncate block"
-            >
-              {review.neighborhood.name}
-            </Link>
-            {review.comment && (
-              <p className="text-caption text-[--text-ghost] truncate mt-[var(--space-1)]">
-                &ldquo;{review.comment}&rdquo;
-              </p>
-            )}
+            {/* Snippet slot: always occupies space for uniform height */}
+            <p className="text-micro text-[--text-ghost] truncate h-[14px]">
+              {review.comment ? `\u201C${review.comment}\u201D` : '\u00A0'}
+            </p>
           </div>
-          <span className="text-micro text-[--text-ghost] shrink-0 mt-0.5">
+
+          <StarRating value={review.rating} readonly />
+
+          <span className="text-micro text-[--text-ghost] shrink-0 tabular-nums">
             {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
           </span>
-        </div>
+        </Link>
       ))}
     </div>
   );
