@@ -120,6 +120,7 @@ export const neighborhoodsRouter = router({
                     image: true,
                   },
                 },
+                dimensions: true,
               },
               orderBy: { createdAt: 'desc' },
             },

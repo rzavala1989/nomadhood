@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.0 — 2026-03-05
+
+feat: multi-dimension reviews, personalized recommendations, trend snapshots
+
 ## v0.1.1 — 2026-03-03
 
 Enhanced Nomad Score, Detail page score, and Compare page with measurable metrics from the service layer

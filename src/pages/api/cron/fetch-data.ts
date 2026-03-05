@@ -6,6 +6,7 @@ import { fetchAllCrimeData } from '@/server/services/crimeData';
 import { fetchAllBlsData } from '@/server/services/blsData';
 import { fetchAllEvents } from '@/server/services/eventbrite';
 import { fetchAllNeighborhoodImages } from '@/server/services/neighborhoodImages';
+import { createSnapshotAll } from '@/server/services/snapshots';
 
 /**
  * Cron endpoint that runs the full external data pipeline.
@@ -51,6 +52,16 @@ export default async function handler(
     fetchAllNeighborhoodImages().catch(() => ({ fetched: 0, skipped: 0, failed: 0 })),
   ]);
 
+  // Weekly snapshots: only run on Sundays
+  let snapshots: { neighborhoodsProcessed: number; snapshotsWritten: number; expiredDeleted: number } | null = null;
+  if (new Date().getDay() === 0) {
+    snapshots = await createSnapshotAll().catch(() => ({
+      neighborhoodsProcessed: 0,
+      snapshotsWritten: 0,
+      expiredDeleted: 0,
+    }));
+  }
+
   const duration = Date.now() - start;
 
   const result = {
@@ -62,6 +73,7 @@ export default async function handler(
     bls,
     events,
     images,
+    snapshots,
   };
 
   console.log('[cron/fetch-data]', JSON.stringify(result));

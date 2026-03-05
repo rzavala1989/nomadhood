@@ -8,17 +8,25 @@ import {
 } from '@/server/trpc';
 import { prisma } from '@/server/prisma';
 import { calculateAvgRating } from '@/server/utils/scores';
+import { REVIEW_DIMENSIONS } from '@/server/constants/dimensions';
+
+const dimensionSchema = z.object({
+  dimension: z.enum(REVIEW_DIMENSIONS),
+  rating: z.number().min(1).max(5),
+});
 
 const createReviewSchema = z.object({
   neighborhoodId: z.string().uuid(),
   rating: z.number().min(1).max(5),
   comment: z.string().min(1).max(1000).optional(),
+  dimensions: z.array(dimensionSchema).optional(),
 });
 
 const updateReviewSchema = z.object({
   id: z.string().uuid(),
   rating: z.number().min(1).max(5).optional(),
   comment: z.string().min(1).max(1000).optional(),
+  dimensions: z.array(dimensionSchema).optional(),
 });
 
 export const reviewsRouter = router({
@@ -47,6 +55,7 @@ export const reviewsRouter = router({
                 image: true,
               },
             },
+            dimensions: true,
           },
           orderBy: { createdAt: 'desc' },
           take: limit,
@@ -79,6 +88,7 @@ export const reviewsRouter = router({
             neighborhoodId: input.neighborhoodId,
           },
         },
+        include: { dimensions: true },
       })
     ),
 
@@ -117,27 +127,46 @@ export const reviewsRouter = router({
         });
       }
 
-      return prisma.review.create({
-        data: {
-          ...input,
-          userId: ctx.user.id,
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
-            },
+      const { dimensions, ...reviewData } = input;
+
+      const review = await prisma.$transaction(async (tx) => {
+        const created = await tx.review.create({
+          data: {
+            ...reviewData,
+            userId: ctx.user.id,
           },
-          neighborhood: {
-            select: {
-              id: true,
-              name: true,
-            },
+          include: {
+            user: { select: { id: true, name: true, image: true } },
+            neighborhood: { select: { id: true, name: true } },
           },
-        },
+        });
+
+        if (dimensions && dimensions.length > 0) {
+          await tx.reviewDimension.createMany({
+            data: dimensions.map((d) => ({
+              reviewId: created.id,
+              dimension: d.dimension,
+              rating: d.rating,
+            })),
+          });
+        }
+
+        return tx.review.findUniqueOrThrow({
+          where: { id: created.id },
+          include: {
+            user: { select: { id: true, name: true, image: true } },
+            neighborhood: { select: { id: true, name: true } },
+            dimensions: true,
+          },
+        });
       });
+
+      // Invalidate recommendation cache for this user
+      await prisma.recommendationCache.deleteMany({
+        where: { userId: ctx.user.id },
+      }).catch(() => { /* noop */ });
+
+      return review;
     }),
 
   /**
@@ -167,19 +196,42 @@ export const reviewsRouter = router({
         });
       }
 
-      return prisma.review.update({
-        where: { id },
-        data: updateData,
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
-            },
+      const { dimensions, ...restData } = updateData;
+
+      const review = await prisma.$transaction(async (tx) => {
+        const updated = await tx.review.update({
+          where: { id },
+          data: restData,
+        });
+
+        if (dimensions !== undefined) {
+          await tx.reviewDimension.deleteMany({ where: { reviewId: id } });
+          if (dimensions && dimensions.length > 0) {
+            await tx.reviewDimension.createMany({
+              data: dimensions.map((d) => ({
+                reviewId: id,
+                dimension: d.dimension,
+                rating: d.rating,
+              })),
+            });
+          }
+        }
+
+        return tx.review.findUniqueOrThrow({
+          where: { id: updated.id },
+          include: {
+            user: { select: { id: true, name: true, image: true } },
+            dimensions: true,
           },
-        },
+        });
       });
+
+      // Invalidate recommendation cache for this user
+      await prisma.recommendationCache.deleteMany({
+        where: { userId: ctx.user.id },
+      }).catch(() => { /* noop */ });
+
+      return review;
     }),
 
   /**
@@ -279,6 +331,28 @@ export const reviewsRouter = router({
         averageRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
         ratingDistribution,
       };
+    }),
+
+  /**
+   * Get per-dimension average ratings for a neighborhood
+   */
+  getDimensionStats: publicProcedure
+    .input(z.object({ neighborhoodId: z.string().uuid() }))
+    .query(async ({ input }) => {
+      const stats = await prisma.reviewDimension.groupBy({
+        by: ['dimension'],
+        where: {
+          review: { neighborhoodId: input.neighborhoodId },
+        },
+        _avg: { rating: true },
+        _count: { rating: true },
+      });
+
+      return stats.map((s) => ({
+        dimension: s.dimension,
+        avgRating: Math.round((s._avg.rating ?? 0) * 100) / 100,
+        count: s._count.rating,
+      }));
     }),
 
   /**

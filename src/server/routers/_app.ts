@@ -8,6 +8,8 @@ import { favoritesRouter } from '@/server/routers/favoritesRouter';
 import { reviewsRouter } from '@/server/routers/reviewsRouter';
 import { dashboardRouter } from '@/server/routers/dashboardRouter';
 import { dataRouter } from '@/server/routers/dataRouter';
+import { recommendationsRouter } from '@/server/routers/recommendationsRouter';
+import { trendsRouter } from '@/server/routers/trendsRouter';
 
 export const appRouter = router({
   healthcheck: publicProcedure.query(() => 'yay!'),
@@ -18,6 +20,8 @@ export const appRouter = router({
   neighborhoods: neighborhoodsRouter,
   reviews: reviewsRouter,
   favorites: favoritesRouter,
+  recommendations: recommendationsRouter,
+  trends: trendsRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);

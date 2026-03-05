@@ -44,6 +44,8 @@ model Neighborhood {
   favorites      Favorite[]
   walkScoreCache WalkScoreCache?
   imageCache     NeighborhoodImageCache[]
+  recommendations RecommendationCache[]
+  snapshots      NeighborhoodSnapshot[]
 
   @@index([city, state])
   @@index([zip])
@@ -240,4 +242,35 @@ model ApiRateLimitTracker {
   periodStart  DateTime @default(now())
   periodEnd    DateTime
   lastCalledAt DateTime?
+}
+
+model RecommendationCache {
+  id               String       @id @default(uuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  neighborhoodId   String
+  neighborhood     Neighborhood @relation(fields: [neighborhoodId], references: [id], onDelete: Cascade)
+  matchScore       Float
+  matchReasons     Json
+  computedAt       DateTime     @default(now())
+
+  @@unique([userId, neighborhoodId])
+  @@index([userId, matchScore])
+  @@index([computedAt])
+}
+
+model NeighborhoodSnapshot {
+  id                String       @id @default(uuid())
+  neighborhoodId    String
+  neighborhood      Neighborhood @relation(fields: [neighborhoodId], references: [id], onDelete: Cascade)
+  snapshotDate      DateTime     @db.Date
+  nomadScore        Int
+  avgRating         Float?
+  reviewCount       Int
+  favoriteCount     Int
+  dimensionAvgs     Json?
+
+  @@unique([neighborhoodId, snapshotDate])
+  @@index([neighborhoodId, snapshotDate])
+  @@index([snapshotDate])
 }
