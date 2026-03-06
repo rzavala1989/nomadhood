@@ -52,7 +52,7 @@ export function FavoriteButton({
       <HeartIcon
         className={cn(
           'h-4 w-4 transition-all duration-300',
-          isFavorite ? 'fill-[--vapor-pink] text-[--vapor-pink]' : 'text-[rgba(120,80,200,0.15)]',
+          isFavorite ? 'fill-[--accent-rose] text-[--accent-rose]' : 'text-[rgba(38,38,38,0.15)]',
         )}
       />
     </button>

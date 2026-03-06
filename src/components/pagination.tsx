@@ -98,10 +98,10 @@ export function Pagination({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={isFirstPage}
-          className={`flex items-center justify-center px-[var(--space-3)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] transition-colors surface-1 ${
+          className={`flex items-center justify-center px-[var(--space-3)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] transition-colors surface-flat rounded-md ${
             isFirstPage
               ? 'opacity-30 cursor-not-allowed'
-              : 'text-[--text-tertiary] hover:text-[--text-secondary] hover:bg-[--bg-surface-2]'
+              : 'text-[--text-tertiary] hover:text-[--text-secondary] hover:bg-[--bg-secondary]'
           }`}
           aria-label="Previous page"
         >
@@ -113,7 +113,7 @@ export function Pagination({
           page === '...' ? (
             <span
               key={`ellipsis-${idx}`}
-              className="flex items-center justify-center px-[var(--space-3)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] text-[--text-ghost] surface-1 select-none"
+              className="flex items-center justify-center px-[var(--space-3)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] text-[--text-ghost] surface-flat rounded-md select-none"
             >
               ...
             </span>
@@ -122,10 +122,10 @@ export function Pagination({
               key={page}
               onClick={() => onPageChange(page)}
               disabled={page === currentPage}
-              className={`px-[var(--space-3)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] tabular-nums transition-colors ${
+              className={`px-[var(--space-3)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] tabular-nums transition-colors rounded-md ${
                 page === currentPage
-                  ? 'bg-[--bg-inverse] text-[--text-inverse]'
-                  : 'surface-1 text-[--text-tertiary] hover:text-[--text-secondary] hover:bg-[--bg-surface-2]'
+                  ? 'bg-[--accent-rose] text-[--accent-charcoal]'
+                  : 'surface-flat text-[--text-tertiary] hover:text-[--text-secondary] hover:bg-[--bg-secondary]'
               }`}
             >
               {page}
@@ -137,10 +137,10 @@ export function Pagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={isLastPage}
-          className={`flex items-center justify-center px-[var(--space-3)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] transition-colors surface-1 ${
+          className={`flex items-center justify-center px-[var(--space-3)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] transition-colors surface-flat rounded-md ${
             isLastPage
               ? 'opacity-30 cursor-not-allowed'
-              : 'text-[--text-tertiary] hover:text-[--text-secondary] hover:bg-[--bg-surface-2]'
+              : 'text-[--text-tertiary] hover:text-[--text-secondary] hover:bg-[--bg-secondary]'
           }`}
           aria-label="Next page"
         >

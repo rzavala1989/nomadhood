@@ -28,8 +28,8 @@ export function StarRating({
             className={cn(
               'h-4 w-4',
               star <= value
-                ? 'fill-[--vapor-pink] text-[--vapor-pink]'
-                : 'text-[rgba(120,80,200,0.15)]',
+                ? 'fill-[--accent-rose] text-[--accent-rose]'
+                : 'text-[rgba(38,38,38,0.15)]',
             )}
           />
         </button>

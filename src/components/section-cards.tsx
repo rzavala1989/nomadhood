@@ -1,30 +1,35 @@
 import { trpc } from '@/utils/trpc';
+import { useReveal } from '@/hooks/useReveal';
 
 export function SectionCards() {
   const { data: stats } = trpc.dashboard.getStats.useQuery();
+  const { ref, isVisible } = useReveal();
 
   const chips = [
-    { label: 'NEIGHBORHOODS', value: stats?.neighborhoodCount },
-    { label: 'USERS', value: stats?.userCount },
-    { label: 'REVIEWS', value: stats?.reviewCount },
-    { label: 'FAVORITES', value: stats?.favoriteCount },
+    { label: 'Neighborhoods', value: stats?.neighborhoodCount },
+    { label: 'Users', value: stats?.userCount },
+    { label: 'Reviews', value: stats?.reviewCount },
+    { label: 'Favorites', value: stats?.favoriteCount },
   ];
 
   return (
-    <div className="flex items-center h-[56px] px-[var(--space-6)] animate-fade-up">
-      {chips.map((chip, i) => (
-        <div key={chip.label} className="flex items-center flex-1 min-w-0">
-          {i > 0 && (
-            <div className="w-px h-8 bg-[--border-default] shrink-0" />
-          )}
-          <div className={`flex-1 ${i > 0 ? 'pl-[var(--space-4)]' : ''} ${i < chips.length - 1 ? 'pr-[var(--space-4)]' : ''}`}>
-            <p className="text-[9px] uppercase tracking-[0.18em] text-[--text-ghost] leading-none">
-              {chip.label}
-            </p>
-            <p className="text-[28px] font-medium text-[--text-primary] tabular-nums leading-none mt-[2px]">
-              {chip.value ?? '\u2014'}
-            </p>
-          </div>
+    <div
+      ref={ref}
+      className={`grid grid-cols-2 lg:grid-cols-4 gap-4 ${
+        isVisible ? 'animate-reveal' : 'opacity-0'
+      }`}
+    >
+      {chips.map((chip) => (
+        <div
+          key={chip.label}
+          className="surface-card p-8 group cursor-default"
+        >
+          <p className="text-label text-[--text-ghost] group-hover:text-[--accent-charcoal] mb-3 transition-colors">
+            {chip.label}
+          </p>
+          <p className="text-display tabular-nums text-[--text-primary] group-hover:text-[--accent-charcoal] transition-colors">
+            {chip.value ?? '\u2014'}
+          </p>
         </div>
       ))}
     </div>

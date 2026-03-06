@@ -10,7 +10,7 @@ export function ComparisonBar() {
   if (items.length === 0) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[--bg-inverse] text-[--text-inverse] animate-fade-up">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[--bg-inverse] text-[--text-inverse] animate-reveal">
       <div className="flex items-center justify-between px-[var(--space-6)] py-[var(--space-3)]">
         <div className="flex items-center gap-[var(--space-4)]">
           <span className="text-micro tracking-[0.18em]">

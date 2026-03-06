@@ -37,13 +37,13 @@ export function RatingDistributionChart({
               <span className="text-micro text-[--text-tertiary] tabular-nums w-[20px] text-right shrink-0">
                 {row.star}★
               </span>
-              <div className="flex-1 h-[10px] bg-[rgba(120,80,200,0.06)]">
+              <div className="flex-1 h-[10px] bg-[rgba(38,38,38,0.04)] rounded-sm">
                 <div
-                  className={`h-full transition-all duration-500 ${
+                  className={`h-full transition-all duration-500 rounded-sm ${
                     isDominant
-                      ? 'bg-[--vapor-pink]'
+                      ? 'bg-[--accent-rose]'
                       : row.count > 0
-                        ? 'bg-[rgba(120,80,200,0.12)]'
+                        ? 'bg-[rgba(38,38,38,0.08)]'
                         : ''
                   }`}
                   style={{ width: `${widthPct}%` }}
