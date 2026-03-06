@@ -1,5 +1,7 @@
 import Head from 'next/head';
 import type { ReactNode } from 'react';
+import { SiteHeader } from '@/components/site-header';
+import { Footer } from '@/components/footer';
 
 type DefaultLayoutProps = { children: ReactNode };
 
@@ -11,7 +13,9 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="h-screen">{children}</main>
+      <SiteHeader />
+      <main className="pt-[80px] min-h-screen">{children}</main>
+      <Footer />
     </>
   );
 };

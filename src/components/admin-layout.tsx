@@ -27,9 +27,7 @@ export function AdminLayout({
   if (isLoading) {
     return (
       <DashboardLayout title="Admin">
-        <div className="p-[var(--space-6)]">
-          <Skeleton className="h-[300px] w-full" />
-        </div>
+        <Skeleton className="h-[300px] w-full rounded-lg" />
       </DashboardLayout>
     );
   }
@@ -41,30 +39,27 @@ export function AdminLayout({
 
   return (
     <DashboardLayout title={title}>
-      <div className="flex flex-col">
-        {/* Admin sub-nav */}
-        <div className="flex gap-px px-[var(--space-6)] pt-[var(--space-4)]">
-          {adminTabs.map((tab) => {
-            const isActive = router.pathname === tab.href;
-            return (
-              <Link
-                key={tab.href}
-                href={tab.href}
-                className={`flex items-center gap-[var(--space-2)] px-[var(--space-4)] py-[var(--space-2)] text-[9px] uppercase tracking-[0.18em] transition-colors ${
-                  isActive
-                    ? 'bg-[--bg-inverse] text-[--text-inverse]'
-                    : 'surface-1 text-[--text-tertiary] hover:text-[--text-secondary]'
-                }`}
-              >
-                <tab.icon className="h-3 w-3" />
-                {tab.label}
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className="p-[var(--space-6)]">{children}</div>
+      <div className="flex gap-3 mb-8">
+        {adminTabs.map((tab) => {
+          const isActive = router.pathname === tab.href;
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-label tracking-[0.2em] transition-all ${
+                isActive
+                  ? 'bg-[--accent-rose] text-[--accent-charcoal]'
+                  : 'bg-[--bg-secondary] text-[--text-tertiary] hover:text-[--text-primary]'
+              }`}
+            >
+              <tab.icon className="h-3.5 w-3.5" />
+              {tab.label}
+            </Link>
+          );
+        })}
       </div>
+
+      {children}
     </DashboardLayout>
   );
 }
