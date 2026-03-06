@@ -40,7 +40,7 @@ function ServiceCard({
   extra?: React.ReactNode;
 }) {
   return (
-    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+    <div className="surface-flat rounded-lg p-[var(--space-5)] space-y-[var(--space-3)]">
       <p className="text-label text-[--text-ghost]">{label}</p>
       <p className="text-caption text-[--text-secondary]">{description}</p>
       {extra}
@@ -112,7 +112,7 @@ export default function AdminDataPage() {
   return (
     <AdminLayout title="Admin — Data">
       <div className="space-y-[var(--space-6)]">
-        <div className="flex items-center justify-between animate-fade-up">
+        <div className="flex items-center justify-between animate-reveal">
           <div>
             <p className="text-micro text-[--text-ghost]">EXTERNAL API DATA</p>
             <p className="text-caption text-[--text-secondary] mt-[var(--space-1)]">

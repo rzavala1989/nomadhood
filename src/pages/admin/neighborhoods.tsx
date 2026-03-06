@@ -129,7 +129,7 @@ export default function AdminNeighborhoodsPage() {
 
       {/* Create Form */}
       {showCreate && (
-        <div className="surface-1 p-[var(--space-5)] mb-[var(--space-4)] animate-fade-up">
+        <div className="surface-flat rounded-lg p-[var(--space-5)] mb-[var(--space-4)] animate-reveal">
           <p className="text-label text-[--text-ghost] mb-[var(--space-3)]">NEW NEIGHBORHOOD</p>
           <NeighborhoodForm
             onSubmit={(values) => createMutation.mutate(values)}
@@ -146,8 +146,8 @@ export default function AdminNeighborhoodsPage() {
           ))}
         </div>
       ) : (
-        <div className="surface-1">
-          <div className="grid grid-cols-[1fr_100px_50px_60px_60px_80px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] border-b border-[rgba(120,80,200,0.08)]">
+        <div className="surface-flat rounded-lg">
+          <div className="grid grid-cols-[1fr_100px_50px_60px_60px_80px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] border-b border-[rgba(38,38,38,0.08)]">
             <span className="text-micro text-[--text-ghost]">NAME</span>
             <span className="text-micro text-[--text-ghost]">LOCATION</span>
             <span className="text-micro text-[--text-ghost]">STATE</span>
@@ -159,7 +159,7 @@ export default function AdminNeighborhoodsPage() {
           {data?.neighborhoods.map((n, i) => (
             <div key={n.id}>
               <div
-                className="grid grid-cols-[1fr_100px_50px_60px_60px_80px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] border-b border-[rgba(120,80,200,0.08)] animate-fade-up items-center"
+                className="grid grid-cols-[1fr_100px_50px_60px_60px_80px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] border-b border-[rgba(38,38,38,0.08)] animate-reveal items-center"
                 style={{ animationDelay: `${i * 20}ms` }}
               >
                 <span className="text-body text-[--text-primary] truncate">{n.name}</span>
@@ -192,7 +192,7 @@ export default function AdminNeighborhoodsPage() {
 
               {/* Inline edit form */}
               {editId === n.id && (
-                <div className="px-[var(--space-4)] py-[var(--space-4)] bg-[--bg-surface-1] border-b border-[rgba(120,80,200,0.08)] animate-fade-up">
+                <div className="px-[var(--space-4)] py-[var(--space-4)] bg-[--bg-root] border-b border-[rgba(38,38,38,0.08)] animate-reveal">
                   <p className="text-label text-[--text-ghost] mb-[var(--space-3)]">EDIT NEIGHBORHOOD</p>
                   <NeighborhoodForm
                     defaultValues={{

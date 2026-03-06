@@ -50,8 +50,8 @@ export default function AdminUsersPage() {
             {users?.length ?? 0} USERS
           </p>
 
-          <div className="surface-1">
-            <div className="grid grid-cols-[1fr_1fr_80px_100px_120px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] border-b border-[rgba(120,80,200,0.08)]">
+          <div className="surface-flat rounded-lg">
+            <div className="grid grid-cols-[1fr_1fr_80px_100px_120px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-2)] border-b border-[rgba(38,38,38,0.08)]">
               <span className="text-micro text-[--text-ghost]">NAME</span>
               <span className="text-micro text-[--text-ghost]">EMAIL</span>
               <span className="text-micro text-[--text-ghost]">ROLE</span>
@@ -62,7 +62,7 @@ export default function AdminUsersPage() {
             {users?.map((user, i) => (
               <div
                 key={user.id}
-                className="grid grid-cols-[1fr_1fr_80px_100px_120px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] border-b border-[rgba(120,80,200,0.08)] animate-fade-up items-center"
+                className="grid grid-cols-[1fr_1fr_80px_100px_120px] gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] border-b border-[rgba(38,38,38,0.08)] animate-reveal items-center"
                 style={{ animationDelay: `${i * 30}ms` }}
               >
                 <span className="text-body text-[--text-primary] truncate">
