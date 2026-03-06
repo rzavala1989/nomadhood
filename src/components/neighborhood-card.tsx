@@ -33,88 +33,85 @@ export function NeighborhoodCard({
   const isComparing = has(neighborhood.id);
 
   return (
-    <Link href={`/neighborhoods/${neighborhood.id}`} className="block">
-      <div className="surface-1 surface-hover glow-hover relative aspect-square flex flex-col">
-        {/* Thumbnail */}
+    <Link href={`/neighborhoods/${neighborhood.id}`} className="block group">
+      <div className="relative">
+        {/* Image */}
         {imageUrl && (
-          <div className="relative flex-1 min-h-0 overflow-hidden group/img">
+          <div className="relative aspect-[3/4] overflow-hidden rounded-lg mb-4">
             <img
               src={imageUrl}
               alt={imageAlt ?? `${neighborhood.name} neighborhood`}
               loading="lazy"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover img-hover"
             />
-            {/* Gradient overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent from-70% to-[rgba(248,246,252,0.8)]" />
-            {/* Source label on hover */}
+            {/* Hover overlay */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div className="h-24 w-24 rounded-full bg-[--accent-charcoal] flex items-center justify-center">
+                <span className="text-label text-[--text-inverse] tracking-[0.3em]">VIEW</span>
+              </div>
+            </div>
+            {/* Source attribution */}
             {imageSource && (
-              <span className="absolute bottom-[var(--space-2)] left-[var(--space-2)] text-[8px] tracking-[0.12em] uppercase text-white/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
+              <span className="absolute bottom-3 left-3 text-[9px] tracking-widest uppercase text-white/70 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
                 {imageSource}
               </span>
             )}
           </div>
         )}
 
-        {/* Content pinned to bottom */}
-        <div className={`p-[var(--space-4)] ${imageUrl ? '' : 'flex-1 flex flex-col justify-end'}`}>
-          {/* Nomad Score badge */}
-          {nomadScore != null && nomadScore > 0 && (
-            <div className="absolute top-[var(--space-3)] right-[var(--space-3)] bg-vapor text-white px-[var(--space-2)] py-[2px] text-[9px] tracking-[0.1em] tabular-nums">
-              {nomadScore}
-            </div>
-          )}
+        {/* Action buttons */}
+        <div className="absolute top-3 right-3 flex items-center gap-1 z-10">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (isComparing) {
+                remove(neighborhood.id);
+              } else if (!isFull) {
+                add({ id: neighborhood.id, name: neighborhood.name });
+              }
+            }}
+            disabled={!isComparing && isFull}
+            className={`p-2 rounded-full backdrop-blur-sm transition-all ${
+              isComparing
+                ? 'bg-[--accent-rose] text-[--accent-charcoal]'
+                : 'bg-white/60 text-[--text-tertiary] hover:bg-white/80 disabled:opacity-30'
+            }`}
+            title={isComparing ? 'Remove from comparison' : 'Add to comparison'}
+          >
+            <GitCompareArrowsIcon className="h-3.5 w-3.5" />
+          </button>
+          <FavoriteButton neighborhoodId={neighborhood.id} />
+        </div>
 
-          <div className="flex items-start justify-between">
-            <div className="min-w-0 flex-1">
-              <p className="text-heading font-light text-[--text-primary] truncate">
-                {neighborhood.name}
-              </p>
-              <p className="mt-[var(--space-1)] text-caption text-[--text-tertiary]">
-                {neighborhood.city}, {neighborhood.state}
-              </p>
-            </div>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (isComparing) {
-                    remove(neighborhood.id);
-                  } else if (!isFull) {
-                    add({ id: neighborhood.id, name: neighborhood.name });
-                  }
-                }}
-                disabled={!isComparing && isFull}
-                className={`p-1 transition-all hover:scale-110 ${
-                  isComparing
-                    ? 'text-[--vapor-purple]'
-                    : 'text-[--text-ghost] disabled:opacity-30'
-                }`}
-                title={isComparing ? 'Remove from comparison' : 'Add to comparison'}
-              >
-                <GitCompareArrowsIcon className="h-3.5 w-3.5" />
-              </button>
-              <FavoriteButton neighborhoodId={neighborhood.id} />
-            </div>
+        {/* Score badge */}
+        {nomadScore != null && nomadScore > 0 && (
+          <div className="absolute top-3 left-3 badge-accent px-3 py-1 z-10">
+            {nomadScore}
           </div>
+        )}
+
+        {/* Content */}
+        <div>
+          <p className="text-label text-[--accent-rose] mb-2">
+            {neighborhood.city}, {neighborhood.state}
+          </p>
+          <p className="text-heading text-[--text-primary] mb-2">
+            {neighborhood.name}
+          </p>
 
           {neighborhood.description && (
-            <p className="mt-[var(--space-2)] text-body text-[--text-secondary] line-clamp-2">
+            <p className="text-body text-[--text-secondary] line-clamp-2 mb-3">
               {neighborhood.description}
             </p>
           )}
 
-          <div className="mt-[var(--space-3)] flex items-center justify-between pt-[var(--space-3)] shadow-[inset_0_1px_0_var(--border-default)]">
-            <div className="flex items-center gap-[var(--space-1)]">
-              <StarIcon className="h-3 w-3 fill-[--vapor-pink] text-[--vapor-pink]" />
-              <span className="text-caption text-[--text-secondary] tabular-nums">
-                {neighborhood._count.reviews}
-              </span>
-              <span className="text-micro text-[--text-ghost]">REVIEWS</span>
-            </div>
-            <span className="text-micro text-[--text-ghost]">
-              {neighborhood._count.favorites} SAVED
+          <div className="flex items-center gap-4 text-micro text-[--text-ghost]">
+            <span className="flex items-center gap-1">
+              <StarIcon className="h-3 w-3 fill-[--accent-rose] text-[--accent-rose]" />
+              {neighborhood._count.reviews} review{neighborhood._count.reviews !== 1 ? 's' : ''}
             </span>
+            <span>{neighborhood._count.favorites} saved</span>
           </div>
         </div>
       </div>
