@@ -1,189 +1,205 @@
 import Link from 'next/link';
-import { MapPinIcon, StarIcon, HeartIcon, BarChart2Icon } from 'lucide-react';
+import { MapPinIcon, StarIcon, BarChart2Icon, ArrowDownIcon } from 'lucide-react';
 import { trpc } from '../utils/trpc';
+import { useReveal } from '@/hooks/useReveal';
+import { NeighborhoodCard } from '@/components/neighborhood-card';
 import type { NextPageWithLayout } from './_app';
 
-const IndexPage: NextPageWithLayout = () => {
+const services = [
+  { icon: MapPinIcon, title: 'Interactive Map', desc: 'Browse neighborhoods on a live map with markers, clusters, and popup detail cards.' },
+  { icon: StarIcon, title: 'Rated Reviews', desc: 'Read honest reviews with multi-dimension ratings from people who actually lived there.' },
+  { icon: BarChart2Icon, title: 'Nomad Score', desc: 'Data-backed composite scores ranking neighborhoods by walkability, safety, cost, and more.' },
+];
+
+function HeroSection() {
   const { data: me, isLoading: meLoading } = trpc.user.me.useQuery();
-  const { data: stats } = trpc.dashboard.getStats.useQuery();
-  const { data: recent } = trpc.neighborhoods.list.useQuery({ limit: 6, sortBy: 'most_reviews' });
 
   return (
-    <main className="min-h-screen bg-[--bg-root]">
-      {/* Ambient grid */}
-      <div
-        className="pointer-events-none fixed inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(179,107,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(179,107,255,0.3) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
-
-      <div className="relative z-10 mx-auto max-w-5xl px-[var(--space-6)] py-[var(--space-16)]">
-
-        {/* Nav strip */}
-        <div className="mb-[var(--space-16)] flex items-center justify-between">
-          <p className="text-[--text-ghost]">
-            <span className="font-brand text-sm">Nomadhood</span> <span className="text-[9px] uppercase tracking-[0.25em] opacity-50">Beta</span>
-          </p>
-          <div className="flex items-center gap-px">
-            <Link
-              href="/neighborhoods"
-              className="px-[var(--space-3)] py-[var(--space-2)] text-[9px] uppercase tracking-[0.18em] text-[--text-tertiary] transition-colors hover:text-[--text-secondary]"
-            >
-              Browse
-            </Link>
-            {!meLoading && (
-              me ? (
-                <Link
-                  href="/dashboard"
-                  className="bg-[--bg-surface-2] px-[var(--space-3)] py-[var(--space-2)] text-[9px] uppercase tracking-[0.18em] text-[--text-secondary] transition-colors hover:bg-[--bg-surface-3]"
-                >
-                  Dashboard
-                </Link>
-              ) : (
-                <Link
-                  href="/auth/signin"
-                  className="bg-[--bg-inverse] px-[var(--space-3)] py-[var(--space-2)] text-[9px] uppercase tracking-[0.18em] text-[--text-inverse] transition-colors hover:opacity-90"
-                >
-                  Sign In / Sign Up
-                </Link>
-              )
-            )}
-          </div>
-        </div>
-
-        {/* Hero */}
-        <div className="mb-[var(--space-16)] max-w-2xl space-y-[var(--space-6)]">
-          <h1 className="text-display font-normal leading-none text-[--text-primary]">
+    <section className="min-h-screen flex items-center relative overflow-hidden">
+      <div className="mx-auto max-w-7xl px-6 grid grid-cols-12 gap-8 items-center w-full">
+        {/* Left: Headline */}
+        <div className="col-span-12 lg:col-span-7">
+          <h1 className="text-hero text-[--text-primary] mb-8">
             Know the<br />
-            <em>neighborhood</em><br />
-            before you move.
+            <em className="not-italic lowercase text-[--accent-rose]">neighborhood</em><br />
+            before you<br />
+            move.
           </h1>
-          <p className="text-body text-[--text-secondary] max-w-md leading-relaxed">
+          <p className="text-body text-[--text-secondary] max-w-md mb-8 text-xl leading-relaxed">
             Reviews, ratings, and maps from people who actually live there.
-            Browse free. Save favorites and write reviews with a free account.
           </p>
-
-          <div className="flex flex-wrap items-center gap-px pt-[var(--space-2)]">
-            <Link
-              href="/neighborhoods"
-              className="bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-6)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] transition-colors hover:opacity-90"
-            >
+          <div className="flex items-center gap-4">
+            <Link href="/neighborhoods" className="btn-pill">
               Browse Neighborhoods
             </Link>
             {!meLoading && !me && (
-              <Link
-                href="/auth/signin"
-                className="surface-1 px-[var(--space-6)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] text-[--text-tertiary] transition-colors hover:text-[--text-secondary] hover:bg-[--bg-surface-2]"
-              >
-                Sign In / Sign Up
+              <Link href="/auth/signin" className="btn-secondary">
+                Sign In
               </Link>
             )}
-            {!meLoading && me && (
-              <Link
-                href="/dashboard"
-                className="surface-1 px-[var(--space-6)] py-[var(--space-3)] text-[10px] uppercase tracking-[0.18em] text-[--text-tertiary] transition-colors hover:text-[--text-secondary] hover:bg-[--bg-surface-2]"
-              >
-                Dashboard
-              </Link>
-            )}
+          </div>
+          {/* Arrow CTA */}
+          <div className="mt-16 flex items-center gap-3 group cursor-pointer">
+            <span className="text-micro text-[--text-tertiary] border-b-2 border-[--accent-rose] pb-1">
+              SCROLL TO EXPLORE
+            </span>
+            <ArrowDownIcon className="h-4 w-4 text-[--accent-rose] group-hover:translate-y-1 transition-transform" />
           </div>
         </div>
 
-        {/* Stats */}
-        {stats && (
-          <div className="mb-[var(--space-16)] flex flex-wrap gap-[var(--space-8)]">
-            {[
-              { value: stats.neighborhoodCount, label: 'Neighborhoods' },
-              { value: stats.reviewCount, label: 'Reviews' },
-              { value: stats.userCount, label: 'Members' },
-            ].map(({ value, label }) => (
-              <div key={label}>
-                <p className="text-heading tabular-nums text-[--text-primary]">{value}</p>
-                <p className="text-micro uppercase tracking-[0.18em] text-[--text-ghost]">{label}</p>
-              </div>
-            ))}
+        {/* Right: Image card */}
+        <div className="col-span-12 lg:col-span-5 relative">
+          <div className="rounded-3xl overflow-hidden aspect-[3/4] bg-[--bg-secondary]">
+            <img
+              src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&h=800&fit=crop"
+              alt="City neighborhood"
+              className="h-full w-full object-cover"
+            />
           </div>
-        )}
+          {/* Floating badge */}
+          <div className="absolute -bottom-6 -left-6 floating-badge">
+            <span className="text-3xl italic font-light">01</span>
+            <span className="text-[8px] font-black tracking-[0.4em]">NOMADHOOD</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-        {/* Feature grid */}
-        <div className="mb-[var(--space-16)] grid grid-cols-2 gap-px sm:grid-cols-4">
-          {[
-            { icon: MapPinIcon, title: 'Interactive Map', desc: 'Browse on a live map with markers and popups' },
-            { icon: StarIcon, title: 'Rated Reviews', desc: '1-5 star ratings and written reviews from residents' },
-            { icon: HeartIcon, title: 'Save Favorites', desc: 'Build a shortlist and drag to reorder' },
-            { icon: BarChart2Icon, title: 'Nomad Score', desc: 'Composite score ranking neighborhoods by data' },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="surface-1 p-[var(--space-5)] space-y-[var(--space-2)]">
-              <Icon className="h-4 w-4 text-[--vapor-purple]" />
-              <p className="text-caption text-[--text-secondary]">{title}</p>
-              <p className="text-micro text-[--text-tertiary] leading-relaxed">{desc}</p>
+function ServicesSection() {
+  const { ref, isVisible } = useReveal();
+
+  return (
+    <section ref={ref} className="bg-[--bg-secondary] py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <h2
+          className={`text-display mb-16 ${
+            isVisible ? 'animate-reveal' : 'opacity-0'
+          }`}
+        >
+          What we offer
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 divide-x divide-[rgba(38,38,38,0.06)]">
+          {services.map((svc, i) => (
+            <div
+              key={svc.title}
+              className={`p-10 group cursor-default transition-all duration-700 ease-luxury hover:bg-[--accent-rose] ${
+                isVisible ? 'animate-reveal' : 'opacity-0'
+              }`}
+              style={{ animationDelay: `${200 + i * 100}ms` }}
+            >
+              <svc.icon className="h-8 w-8 text-[--accent-rose] group-hover:text-[--accent-charcoal] mb-6 transition-colors" />
+              <h3 className="text-subheading text-[--text-primary] group-hover:text-[--accent-charcoal] mb-3 transition-colors">
+                {svc.title}
+              </h3>
+              <p className="text-body text-[--text-secondary] group-hover:text-[--accent-charcoal] leading-relaxed transition-colors">
+                {svc.desc}
+              </p>
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
 
-        {/* Neighborhood previews */}
-        {recent && recent.neighborhoods.length > 0 && (
-          <div className="space-y-[var(--space-4)]">
-            <div className="flex items-center justify-between">
-              <p className="text-[9px] uppercase tracking-[0.25em] text-[--text-ghost]">
-                Most Reviewed
-              </p>
-              <Link
-                href="/neighborhoods"
-                className="text-[9px] uppercase tracking-[0.18em] text-[--text-ghost] transition-colors hover:text-[--text-tertiary]"
-              >
-                View All
-              </Link>
+function FeaturedSection() {
+  const { data: recent } = trpc.neighborhoods.list.useQuery({ limit: 6, sortBy: 'most_reviews' });
+  const neighborhoodIds = recent?.neighborhoods.map((n) => n.id) ?? [];
+  const { data: imageMap } = trpc.data.getImages.useQuery(
+    { neighborhoodIds },
+    { enabled: neighborhoodIds.length > 0 },
+  );
+  const { ref, isVisible } = useReveal();
+
+  if (!recent || recent.neighborhoods.length === 0) return null;
+
+  return (
+    <section ref={ref} className="py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="flex items-end justify-between mb-16">
+          <h2
+            className={`text-display ${isVisible ? 'animate-reveal' : 'opacity-0'}`}
+          >
+            Featured
+          </h2>
+          <Link
+            href="/neighborhoods"
+            className={`text-micro text-[--text-tertiary] hover:text-[--text-primary] transition-colors border-b-2 border-[--accent-rose] pb-1 ${
+              isVisible ? 'animate-reveal' : 'opacity-0'
+            }`}
+            style={{ animationDelay: '200ms' }}
+          >
+            VIEW ALL
+          </Link>
+        </div>
+
+        {/* Staggered 2-column grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-0">
+          {recent.neighborhoods.map((n, i) => (
+            <div
+              key={n.id}
+              className={`${i % 2 === 1 ? 'md:mt-[100px]' : ''} mb-12 ${
+                isVisible ? 'animate-reveal' : 'opacity-0'
+              }`}
+              style={{ animationDelay: `${300 + i * 100}ms` }}
+            >
+              <NeighborhoodCard
+                neighborhood={n}
+                nomadScore={n.nomadScore}
+                imageUrl={imageMap?.[n.id]?.[0]?.thumbUrl ?? imageMap?.[n.id]?.[0]?.imageUrl}
+                imageAlt={imageMap?.[n.id]?.[0]?.altText ?? undefined}
+                imageSource={imageMap?.[n.id]?.[0]?.source}
+              />
             </div>
-
-            <div className="grid grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-3">
-              {recent.neighborhoods.map((n) => (
-                <Link
-                  key={n.id}
-                  href={`/neighborhoods/${n.id}`}
-                  className="surface-1 group block p-[var(--space-5)] transition-colors hover:bg-[--bg-surface-2]"
-                >
-                  <div className="flex items-start justify-between gap-[var(--space-2)]">
-                    <div className="min-w-0">
-                      <p className="text-caption text-[--text-primary] truncate group-hover:text-[--text-primary]">
-                        {n.name}
-                      </p>
-                      <p className="text-micro text-[--text-tertiary] mt-[2px]">
-                        {n.city}, {n.state}
-                      </p>
-                    </div>
-                    {n.nomadScore > 0 && (
-                      <span className="shrink-0 bg-vapor text-white px-[var(--space-2)] py-[1px] text-[8px] tracking-[0.1em] tabular-nums">
-                        {n.nomadScore}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-[var(--space-3)] flex items-center gap-[var(--space-4)]">
-                    <span className="text-micro text-[--text-ghost] tabular-nums">
-                      {n._count.reviews} {n._count.reviews === 1 ? 'review' : 'reviews'}
-                    </span>
-                    {n.avgRating > 0 && (
-                      <span className="text-micro text-[--text-ghost] tabular-nums">
-                        {n.avgRating.toFixed(1)} avg
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-[var(--space-16)] flex items-center justify-between border-t border-[--border-subtle] pt-[var(--space-6)]">
-          <p className="font-brand text-xs text-[--text-ghost]">Nomadhood</p>
-          <p className="text-micro text-[--text-ghost]">v0.1.0</p>
+          ))}
         </div>
       </div>
-    </main>
+    </section>
+  );
+}
+
+function StatsSection() {
+  const { data: stats } = trpc.dashboard.getStats.useQuery();
+  const { ref, isVisible } = useReveal();
+
+  if (!stats) return null;
+
+  const items = [
+    { value: stats.neighborhoodCount, label: 'Neighborhoods' },
+    { value: stats.reviewCount, label: 'Reviews' },
+    { value: stats.userCount, label: 'Members' },
+  ];
+
+  return (
+    <section ref={ref} className="bg-[--bg-secondary] py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="flex justify-center gap-24">
+          {items.map((item, i) => (
+            <div
+              key={item.label}
+              className={`text-center ${isVisible ? 'animate-reveal' : 'opacity-0'}`}
+              style={{ animationDelay: `${i * 100}ms` }}
+            >
+              <p className="text-display tabular-nums text-[--text-primary]">{item.value}</p>
+              <p className="text-label text-[--text-ghost] mt-2">{item.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const IndexPage: NextPageWithLayout = () => {
+  return (
+    <div>
+      <HeroSection />
+      <ServicesSection />
+      <FeaturedSection />
+      <StatsSection />
+    </div>
   );
 };
 
