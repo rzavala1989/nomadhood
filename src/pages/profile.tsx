@@ -54,13 +54,13 @@ export default function ProfilePage() {
         ) : (
           <>
             {/* User Info */}
-            <div className="surface-1 p-[var(--space-5)] animate-fade-up">
+            <div className="surface-flat rounded-lg p-[var(--space-5)] animate-reveal">
               <p className="text-label text-[--text-ghost] mb-[var(--space-4)]">PROFILE</p>
 
               <div className="flex items-center gap-[var(--space-4)] mb-[var(--space-6)]">
                 <Avatar className="h-14 w-14 rounded-full">
                   <AvatarImage src={image} alt={name} />
-                  <AvatarFallback className="rounded-full bg-[--bg-surface-2] text-[11px] tracking-[0.15em] text-[--text-tertiary]">
+                  <AvatarFallback className="rounded-full bg-[--bg-secondary] text-[11px] tracking-[0.15em] text-[--text-tertiary]">
                     {(name || 'U')
                       .split(' ')
                       .map((n) => n[0])
@@ -115,7 +115,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Favorites */}
-            <div className="animate-fade-up" style={{ animationDelay: '100ms' }}>
+            <div className="animate-reveal" style={{ animationDelay: '100ms' }}>
               <div className="flex items-center justify-between mb-[var(--space-4)]">
                 <p className="text-label text-[--text-ghost]">
                   MY FAVORITES ({favorites?.length ?? 0})
@@ -142,7 +142,7 @@ export default function ProfilePage() {
                     <Link
                       key={fav.id}
                       href={`/neighborhoods/${fav.neighborhood.id}`}
-                      className="flex items-center justify-between py-[10px] border-t border-[rgba(120,80,200,0.08)] transition-colors hover:bg-[--bg-surface-1]"
+                      className="flex items-center justify-between py-[10px] border-t border-[rgba(38,38,38,0.08)] transition-colors hover:bg-[--bg-root]"
                     >
                       <div className="flex items-center gap-[var(--space-3)]">
                         <MapPinIcon className="h-3.5 w-3.5 text-[--text-ghost]" />
@@ -155,7 +155,7 @@ export default function ProfilePage() {
                           </p>
                         </div>
                       </div>
-                      <HeartIcon className="h-3.5 w-3.5 fill-[--vapor-pink] text-[--vapor-pink]" />
+                      <HeartIcon className="h-3.5 w-3.5 fill-[--accent-rose] text-[--accent-rose]" />
                     </Link>
                   ))}
                 </div>

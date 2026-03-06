@@ -55,8 +55,8 @@ function SortableFavoriteCard({ favorite }: { favorite: FavoriteItem }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="animate-fade-up">
-      <div className={`surface-1 flex items-center gap-[var(--space-3)] p-[var(--space-4)] transition-all ${isDragging ? 'bg-[--bg-surface-2]' : ''}`}>
+    <div ref={setNodeRef} style={style} className="animate-reveal">
+      <div className={`surface-flat rounded-lg flex items-center gap-[var(--space-3)] p-[var(--space-4)] transition-all ${isDragging ? 'bg-[--bg-secondary]' : ''}`}>
         <button
           {...attributes}
           {...listeners}
@@ -139,7 +139,7 @@ export default function FavoritesPage() {
             </div>
           ) : !favorites || favorites.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-[var(--space-16)] text-center">
-              <HeartIcon className="mb-[var(--space-4)] h-8 w-8 text-[rgba(120,80,200,0.15)] stroke-[1]" />
+              <HeartIcon className="mb-[var(--space-4)] h-8 w-8 text-[rgba(38,38,38,0.15)] stroke-[1]" />
               <p className="text-heading font-light text-[--text-secondary]">
                 No favorites yet.
               </p>
@@ -148,7 +148,7 @@ export default function FavoritesPage() {
               </p>
               <Link
                 href="/neighborhoods"
-                className="mt-[var(--space-6)] bg-[--bg-inverse] text-[--text-inverse] px-[var(--space-4)] py-[var(--space-2)] text-[10px] uppercase tracking-[0.18em] transition-all hover:bg-[#1A1028]/90"
+                className="btn-pill mt-[var(--space-6)]"
               >
                 Browse Neighborhoods
               </Link>

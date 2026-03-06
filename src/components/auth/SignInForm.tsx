@@ -72,7 +72,7 @@ export function SignInForm() {
             type="email"
             placeholder="Email"
             autoComplete="email"
-            className="w-full bg-[--bg-surface-2] px-[var(--space-4)] py-[var(--space-3)] text-body text-[--text-primary] placeholder:text-[--text-ghost] outline-none"
+            className="w-full bg-[--bg-secondary] rounded-lg px-[var(--space-4)] py-[var(--space-3)] text-body text-[--text-primary] placeholder:text-[--text-ghost] outline-none"
             style={{ boxShadow: 'inset 0 0 0 1px var(--border-default)' }}
             {...register('email', { required: 'Email is required' })}
           />
@@ -86,7 +86,7 @@ export function SignInForm() {
             type="password"
             placeholder="Password"
             autoComplete="current-password"
-            className="w-full bg-[--bg-surface-2] px-[var(--space-4)] py-[var(--space-3)] text-body text-[--text-primary] placeholder:text-[--text-ghost] outline-none"
+            className="w-full bg-[--bg-secondary] rounded-lg px-[var(--space-4)] py-[var(--space-3)] text-body text-[--text-primary] placeholder:text-[--text-ghost] outline-none"
             style={{ boxShadow: 'inset 0 0 0 1px var(--border-default)' }}
             {...register('password', { required: 'Password is required' })}
           />

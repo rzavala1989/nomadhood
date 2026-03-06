@@ -2,14 +2,11 @@ import Link from 'next/link';
 
 export default function Custom404() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen text-center gap-[var(--space-4)]">
-      <h1 className="text-title">404</h1>
-      <p className="text-caption text-[--text-tertiary]">Page not found.</p>
-      <Link
-        href="/"
-        className="text-micro text-[--text-ghost] hover:text-[--text-secondary] transition-colors"
-      >
-        HOME
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] text-center gap-6">
+      <h1 className="text-hero">404</h1>
+      <p className="text-body text-[--text-secondary]">Page not found.</p>
+      <Link href="/" className="btn-pill">
+        Go Home
       </Link>
     </div>
   );
