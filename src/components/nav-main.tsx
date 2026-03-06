@@ -38,8 +38,8 @@ export function NavMain({
                     href={item.url}
                     className={
                       isActive
-                        ? 'bg-[--bg-inverse] text-[--text-inverse] !text-[--text-inverse]'
-                        : 'text-[--text-tertiary] hover:text-[--text-secondary] hover:bg-[--bg-surface-2]'
+                        ? 'bg-[--accent-charcoal] text-[--text-inverse] !text-[--text-inverse] rounded-lg'
+                        : 'text-[--text-tertiary] hover:text-[--text-secondary] hover:bg-[--bg-secondary] rounded-lg'
                     }
                   >
                     {item.icon && <item.icon className="h-3.5 w-3.5" />}

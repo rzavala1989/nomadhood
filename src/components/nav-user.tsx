@@ -46,11 +46,11 @@ export function NavUser({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-[--bg-surface-2]"
+              className="data-[state=open]:bg-[--bg-secondary]"
             >
               <Avatar className="h-7 w-7 rounded-full">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-full bg-[--bg-surface-2] text-[8px] tracking-[0.15em] text-[--text-tertiary]">
+                <AvatarFallback className="rounded-full bg-[--bg-secondary] text-[8px] tracking-[0.15em] text-[--text-tertiary]">
                   {getInitials(user.name)}
                 </AvatarFallback>
               </Avatar>
@@ -75,7 +75,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-2 py-2 text-left">
                 <Avatar className="h-7 w-7 rounded-full">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-full bg-[--bg-surface-2] text-[8px] tracking-[0.15em] text-[--text-tertiary]">
+                  <AvatarFallback className="rounded-full bg-[--bg-secondary] text-[8px] tracking-[0.15em] text-[--text-tertiary]">
                     {getInitials(user.name)}
                   </AvatarFallback>
                 </Avatar>
@@ -89,7 +89,7 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-[rgba(120,80,200,0.08)]" />
+            <DropdownMenuSeparator className="bg-[rgba(38,38,38,0.08)]" />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild className="text-[10px] uppercase tracking-[0.15em] text-[--text-tertiary] hover:text-[--text-secondary]">
                 <Link href="/profile">
@@ -98,7 +98,7 @@ export function NavUser({
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator className="bg-[rgba(120,80,200,0.08)]" />
+            <DropdownMenuSeparator className="bg-[rgba(38,38,38,0.08)]" />
             <DropdownMenuItem
               onClick={() => signOut({ callbackUrl: '/' })}
               className="text-[10px] uppercase tracking-[0.15em] text-[--text-tertiary] hover:text-[--text-secondary]"

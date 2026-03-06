@@ -77,7 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="/dashboard" className="flex items-center gap-[var(--space-2)]">
-                <MapPinIcon className="h-4 w-4 text-[--text-secondary]" />
+                <MapPinIcon className="h-4 w-4 text-[--text-tertiary]" />
                 <span className="font-brand text-sm normal-case tracking-normal text-[--text-primary]">
                   Nomadhood
                 </span>

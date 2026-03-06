@@ -236,15 +236,15 @@ export default function NeighborhoodMap({
               id="boundary-fill"
               type="fill"
               paint={{
-                'fill-color': '#B36BFF',
-                'fill-opacity': 0.06,
+                'fill-color': '#e4a4bd',
+                'fill-opacity': 0.12,
               }}
             />
             <Layer
               id="boundary-line"
               type="line"
               paint={{
-                'line-color': '#B36BFF',
+                'line-color': '#e4a4bd',
                 'line-opacity': 0.3,
                 'line-width': 1.5,
               }}
@@ -267,7 +267,7 @@ export default function NeighborhoodMap({
             type="circle"
             filter={['has', 'point_count']}
             paint={{
-              'circle-color': '#B36BFF',
+              'circle-color': '#e4a4bd',
               'circle-radius': [
                 'step',
                 ['get', 'point_count'],
@@ -276,7 +276,7 @@ export default function NeighborhoodMap({
                 10, 22,
               ],
               'circle-stroke-width': 1.5,
-              'circle-stroke-color': '#7B61FF',
+              'circle-stroke-color': '#e4a4bd',
             }}
           />
 
@@ -313,12 +313,7 @@ export default function NeighborhoodMap({
                 10, 0.85,
                 20, 1.0,
               ],
-              'circle-color': [
-                'interpolate', ['linear'], ['get', 'nomadScore'],
-                0, '#FF6B9D',
-                50, '#B36BFF',
-                100, '#01CDFE',
-              ],
+              'circle-color': '#e4a4bd',
               'circle-stroke-width': [
                 'case',
                 ['==', ['get', 'id'], currentSelectedId],
@@ -328,7 +323,7 @@ export default function NeighborhoodMap({
               'circle-stroke-color': [
                 'case',
                 ['==', ['get', 'id'], currentSelectedId],
-                '#7B61FF',
+                '#e4a4bd',
                 'rgba(255, 255, 255, 0.9)',
               ],
               'circle-stroke-opacity': [
