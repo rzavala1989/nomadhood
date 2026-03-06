@@ -94,7 +94,7 @@ export default function NeighborhoodsPage() {
     <DashboardLayout title="Neighborhoods">
       <div className="flex h-[calc(100vh-3rem)] flex-col overflow-hidden">
         {/* Filter Bar */}
-        <div className="flex flex-col gap-[var(--space-2)] px-[var(--space-6)] py-[var(--space-4)] animate-fade-up">
+        <div className="flex flex-col gap-[var(--space-2)] px-[var(--space-6)] py-[var(--space-4)] animate-reveal">
           <div className="flex flex-col gap-[var(--space-2)] sm:flex-row">
             <div className="relative flex-1">
               <SearchIcon className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[--text-ghost]" />
@@ -174,7 +174,7 @@ export default function NeighborhoodsPage() {
               </span>
             </div>
 
-            <div className="hidden sm:flex gap-px">
+            <div className="hidden sm:flex gap-1">
               {([
                 { key: 'list', icon: ListIcon, label: 'List' },
                 { key: 'split', icon: MapIcon, label: 'Split' },
@@ -183,10 +183,10 @@ export default function NeighborhoodsPage() {
                 <button
                   key={key}
                   onClick={() => setView(key)}
-                  className={`flex items-center gap-1 px-[var(--space-3)] py-[var(--space-2)] text-[9px] uppercase tracking-[0.18em] transition-colors ${
+                  className={`flex items-center gap-1 px-[var(--space-3)] py-[var(--space-2)] text-[9px] uppercase tracking-[0.18em] transition-colors rounded-md ${
                     view === key
-                      ? 'bg-vapor text-white'
-                      : 'surface-1 text-[--text-tertiary] hover:text-[--text-secondary]'
+                      ? 'bg-[--accent-rose] text-[--accent-charcoal]'
+                      : 'surface-flat text-[--text-tertiary] hover:bg-[--bg-secondary] hover:text-[--text-secondary]'
                   }`}
                 >
                   <Icon className="h-3 w-3" />
@@ -196,10 +196,10 @@ export default function NeighborhoodsPage() {
             </div>
 
             {/* Mobile toggle */}
-            <div className="flex sm:hidden gap-px">
+            <div className="flex sm:hidden gap-1">
               <button
                 onClick={() => setView(view === 'map' ? 'list' : 'map')}
-                className="surface-1 flex items-center gap-1 px-[var(--space-3)] py-[var(--space-2)] text-[9px] uppercase tracking-[0.18em] text-[--text-tertiary]"
+                className="surface-flat rounded-md flex items-center gap-1 px-[var(--space-3)] py-[var(--space-2)] text-[9px] uppercase tracking-[0.18em] text-[--text-tertiary] hover:bg-[--bg-secondary]"
               >
                 {view === 'map' ? (
                   <><ListIcon className="h-3 w-3" /> List</>
@@ -221,9 +221,9 @@ export default function NeighborhoodsPage() {
               }`}
             >
               {isLoading ? (
-                <div className={'grid grid-cols-2 gap-px'}>
+                <div className={'grid grid-cols-2 gap-x-8 gap-y-0'}>
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <Skeleton key={i} className="aspect-square w-full" />
+                    <Skeleton key={i} className={`aspect-square w-full rounded-lg mb-12 ${i % 2 === 1 ? 'md:mt-[100px]' : ''}`} />
                   ))}
                 </div>
               ) : !filteredNeighborhoods || filteredNeighborhoods.length === 0 ? (
@@ -242,12 +242,14 @@ export default function NeighborhoodsPage() {
                       Showing {filteredNeighborhoods?.length ?? 0} of {data.neighborhoods.length}
                     </p>
                   )}
-                  <div className={'grid grid-cols-2 gap-px'}>
+                  <div className={'grid grid-cols-2 gap-x-8 gap-y-0'}>
                     {filteredNeighborhoods?.map((n, i) => (
                       <div
                         key={n.id}
-                        className={`animate-fade-up ${
-                          selectedMapId === n.id ? 'ring-2 ring-[--bg-inverse]' : ''
+                        className={`animate-reveal mb-12 rounded-lg ${
+                          i % 2 === 1 ? 'md:mt-[100px]' : ''
+                        } ${
+                          selectedMapId === n.id ? 'ring-2 ring-[--accent-rose]' : ''
                         }`}
                         style={{ animationDelay: `${i * 60}ms` }}
                         onMouseEnter={() => setSelectedMapId(n.id)}
