@@ -9,18 +9,17 @@ const config: Config = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
-
   theme: {
     extend: {
       fontFamily: {
-        mono: ['var(--font-mono)'],
-        serif: ['var(--font-serif)'],
+        sans: ['var(--font-sans)'],
         brand: ['var(--font-brand)'],
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'var(--radius)',
-        sm: 'var(--radius)',
+        lg: '24px',
+        md: '16px',
+        sm: '12px',
+        pill: '9999px',
       },
       colors: {
         background: 'var(--background)',
@@ -56,6 +55,7 @@ const config: Config = {
         border: 'var(--border)',
         input: 'var(--input)',
         ring: 'var(--ring)',
+        rose: 'var(--accent-rose)',
         sidebar: {
           DEFAULT: 'var(--sidebar-background)',
           foreground: 'var(--sidebar-foreground)',
@@ -66,6 +66,9 @@ const config: Config = {
           border: 'var(--sidebar-border)',
           ring: 'var(--sidebar-ring)',
         },
+      },
+      transitionTimingFunction: {
+        luxury: 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
     },
   },
