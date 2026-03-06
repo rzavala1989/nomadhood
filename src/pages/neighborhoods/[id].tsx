@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { PencilIcon, Trash2Icon, ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from 'lucide-react';
 
-import { DashboardLayout } from '@/components/dashboard-layout';
+import { PageLayout } from '@/components/page-layout';
 import { FavoriteButton } from '@/components/favorite-button';
 import { StarRating } from '@/components/star-rating';
 import { ReviewForm } from '@/components/review-form';
@@ -137,7 +137,7 @@ export default function NeighborhoodDetailPage() {
   // ── Loading skeleton ──
   if (isLoading || !id) {
     return (
-      <DashboardLayout title="Neighborhood">
+      <PageLayout title="Neighborhood">
         <div className="p-[var(--space-6)] space-y-[var(--space-4)]">
           {/* Hero skeleton: two columns */}
           <div className="flex flex-col lg:flex-row gap-px h-[320px]">
@@ -151,13 +151,13 @@ export default function NeighborhoodDetailPage() {
             <Skeleton className="h-[160px]" />
           </div>
         </div>
-      </DashboardLayout>
+      </PageLayout>
     );
   }
 
   if (!neighborhood) {
     return (
-      <DashboardLayout title="Not Found">
+      <PageLayout title="Not Found">
         <div className="flex flex-col items-center justify-center py-[var(--space-16)]">
           <p className="text-heading font-light text-[--text-secondary]">
             Neighborhood not found.
@@ -169,7 +169,7 @@ export default function NeighborhoodDetailPage() {
             BACK TO NEIGHBORHOODS
           </button>
         </div>
-      </DashboardLayout>
+      </PageLayout>
     );
   }
 
@@ -187,7 +187,7 @@ export default function NeighborhoodDetailPage() {
   const hasImages = !!activeImage;
 
   return (
-    <DashboardLayout title={neighborhood.name}>
+    <PageLayout title={neighborhood.name}>
       <div className="flex flex-col gap-[var(--space-6)] p-[var(--space-6)]">
 
         {/* ═══ 1. HERO: Image carousel + Data summary ═══ */}
@@ -753,6 +753,6 @@ export default function NeighborhoodDetailPage() {
         {/* ═══ 7. SIMILAR NEIGHBORHOODS ═══ */}
         <SimilarNeighborhoods neighborhoodId={neighborhood.id} state={neighborhood.state} />
       </div>
-    </DashboardLayout>
+    </PageLayout>
   );
 }

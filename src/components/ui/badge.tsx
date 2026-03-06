@@ -13,7 +13,7 @@ const badgeVariants = cva(
         secondary:
           'bg-[--bg-surface-1] text-[--text-tertiary] [box-shadow:inset_0_0_0_1px_var(--border-subtle)]',
         destructive:
-          'bg-[--vapor-magenta] text-white',
+          'bg-[--accent-rose] text-[--accent-charcoal]',
         outline: 'text-[--text-tertiary] [box-shadow:inset_0_0_0_1px_var(--border-default)]',
       },
     },

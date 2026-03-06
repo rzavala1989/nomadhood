@@ -10,7 +10,7 @@ const menuItems = [
   { label: 'Favorites', href: '/favorites' },
 ];
 
-export function SiteHeader({ title }: { title?: string }) {
+export function SiteHeader({ title: _title }: { title?: string }) {
   const { data: session } = useSession();
   const router = useRouter();
   const { data: unreadData } = trpc.news.getUnreadCount.useQuery(undefined, {

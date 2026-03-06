@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { MapPinIcon } from 'lucide-react';
 
-import { DashboardLayout } from '@/components/dashboard-layout';
+import { PageLayout } from '@/components/page-layout';
 import { StarRating } from '@/components/star-rating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -21,31 +21,31 @@ export default function PublicUserProfilePage() {
 
   if (isLoading || !id) {
     return (
-      <DashboardLayout title="Profile">
+      <PageLayout title="Profile">
         <div className="p-[var(--space-6)] space-y-px">
           <Skeleton className="h-[120px] w-full" />
           <Skeleton className="h-[200px] w-full" />
         </div>
-      </DashboardLayout>
+      </PageLayout>
     );
   }
 
   if (!user) {
     return (
-      <DashboardLayout title="Not Found">
+      <PageLayout title="Not Found">
         <div className="flex flex-col items-center justify-center py-[var(--space-16)]">
           <p className="text-heading font-light text-[--text-secondary]">
             User not found.
           </p>
         </div>
-      </DashboardLayout>
+      </PageLayout>
     );
   }
 
   const initials = getInitials(user.name);
 
   return (
-    <DashboardLayout title={user.name ?? 'User'}>
+    <PageLayout title={user.name ?? 'User'}>
       <div className="flex flex-col gap-[var(--space-8)] p-[var(--space-6)]">
         {/* Header */}
         <div className="surface-flat rounded-lg p-[var(--space-5)] animate-reveal">
@@ -148,6 +148,6 @@ export default function PublicUserProfilePage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </PageLayout>
   );
 }

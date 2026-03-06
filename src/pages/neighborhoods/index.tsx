@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { SearchIcon, MapIcon, ListIcon } from 'lucide-react';
 
-import { DashboardLayout } from '@/components/dashboard-layout';
+import { PageLayout } from '@/components/page-layout';
 import { NeighborhoodCard } from '@/components/neighborhood-card';
 import { NeighborhoodMap } from '@/components/neighborhood-map-wrapper';
 import { Pagination } from '@/components/pagination';
@@ -91,7 +91,7 @@ export default function NeighborhoodsPage() {
   const resetPage = () => pushPage(1);
 
   return (
-    <DashboardLayout title="Neighborhoods">
+    <PageLayout title="Neighborhoods">
       <div className="flex h-[calc(100vh-3rem)] flex-col overflow-hidden">
         {/* Filter Bar */}
         <div className="flex flex-col gap-[var(--space-2)] px-[var(--space-6)] py-[var(--space-4)] animate-reveal">
@@ -304,6 +304,6 @@ export default function NeighborhoodsPage() {
           )}
         </div>
       </div>
-    </DashboardLayout>
+    </PageLayout>
   );
 }

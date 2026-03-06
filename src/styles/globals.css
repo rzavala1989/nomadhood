@@ -163,8 +163,8 @@
   }
 
   .text-hero {
-    font-size: 15vw;
-    line-height: 0.8;
+    font-size: clamp(3rem, 7vw, 7.5rem);
+    line-height: 0.85;
     font-weight: 900;
     letter-spacing: -0.04em;
   }

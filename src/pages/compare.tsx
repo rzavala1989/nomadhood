@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ArrowLeftIcon } from 'lucide-react';
 
-import { DashboardLayout } from '@/components/dashboard-layout';
+import { PageLayout } from '@/components/page-layout';
 import { StarRating } from '@/components/star-rating';
 import { RatingDistributionChart } from '@/components/rating-distribution-chart';
 import { FavoriteButton } from '@/components/favorite-button';
@@ -153,7 +153,7 @@ export default function ComparePage() {
 
   if (ids.length < 2) {
     return (
-      <DashboardLayout title="Compare">
+      <PageLayout title="Compare">
         <div className="flex flex-col items-center justify-center py-[var(--space-16)]">
           <p className="text-heading font-light text-[--text-secondary]">
             Select 2–3 neighborhoods to compare
@@ -165,12 +165,12 @@ export default function ComparePage() {
             BROWSE NEIGHBORHOODS
           </Link>
         </div>
-      </DashboardLayout>
+      </PageLayout>
     );
   }
 
   return (
-    <DashboardLayout title="Compare">
+    <PageLayout title="Compare">
       <div className="p-[var(--space-6)]">
         <button
           onClick={() => router.back()}
@@ -186,6 +186,6 @@ export default function ComparePage() {
           ))}
         </div>
       </div>
-    </DashboardLayout>
+    </PageLayout>
   );
 }
