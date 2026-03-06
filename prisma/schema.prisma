@@ -23,6 +23,7 @@ model User {
   reviews         Review[]
   favorites       Favorite[]
   recommendations RecommendationCache[]
+  newsAlerts      NewsAlert[]
 
   @@index([email])
   @@index([isAdmin])
@@ -46,6 +47,8 @@ model Neighborhood {
   imageCache     NeighborhoodImageCache[]
   recommendations RecommendationCache[]
   snapshots      NeighborhoodSnapshot[]
+  news           NeighborhoodNews[]
+  newsAlerts     NewsAlert[]
 
   @@index([city, state])
   @@index([zip])
@@ -273,4 +276,43 @@ model NeighborhoodSnapshot {
   @@unique([neighborhoodId, snapshotDate])
   @@index([neighborhoodId, snapshotDate])
   @@index([snapshotDate])
+}
+
+model NeighborhoodNews {
+  id               String       @id @default(cuid())
+  neighborhoodId   String
+  neighborhood     Neighborhood @relation(fields: [neighborhoodId], references: [id], onDelete: Cascade)
+  articleId        String       @unique
+  title            String
+  description      String?      @db.Text
+  url              String
+  sourceId         String?
+  sentiment        String?      @db.VarChar(20)
+  category         String[]
+  aiTag            String[]
+  pubDate          DateTime
+  fetchedAt        DateTime     @default(now())
+
+  @@index([neighborhoodId, pubDate(sort: Desc)])
+}
+
+model NewsAlert {
+  id                String       @id @default(cuid())
+  userId            String
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  neighborhoodId    String
+  neighborhood      Neighborhood @relation(fields: [neighborhoodId], references: [id], onDelete: Cascade)
+  triggerArticleIds String[]
+  alertType         String       @db.VarChar(30)
+  title             String
+  summary           String?      @db.Text
+  severity          String       @db.VarChar(10)
+  isRead            Boolean      @default(false)
+  triggerDate       DateTime     @db.Date
+  createdAt         DateTime     @default(now())
+
+  @@unique([userId, neighborhoodId, alertType, triggerDate])
+  @@index([userId, isRead])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([neighborhoodId])
 }

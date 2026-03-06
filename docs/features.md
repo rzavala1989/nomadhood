@@ -1,142 +1,123 @@
 # Features
 
-Everything that is built and working.
+Everything built and working.
 
-## Interactive Map
+## Neighborhood Browse and Map
 
-Split-view on the neighborhoods browse page (`/neighborhoods`). MapLibre GL with react-map-gl, tiles from MapTiler (free tier) or CartoDB Positron fallback. Markers at neighborhood lat/lon coordinates, popup cards on click. Mobile toggle between map and list views. Detail pages show a focused single-neighborhood map.
+Split-view on `/neighborhoods`. MapLibre GL with react-map-gl, tiles from MapTiler (CartoDB Positron fallback). Markers at lat/lon, popup cards on click. Sort by name, newest, most reviews, most favorites. Filter by state. Search by name. Paginated.
 
-Components: `neighborhood-map.tsx`, `neighborhood-map-wrapper.tsx` (dynamic import, SSR disabled)
+Key files: `pages/neighborhoods/index.tsx`, `neighborhood-map.tsx`, `neighborhood-map-wrapper.tsx`, `neighborhood-card.tsx`, `pagination.tsx`
 
-## Neighborhood Browse and Filter
-
-Browse all neighborhoods at `/neighborhoods`. Sort by: newest, oldest, name A-Z, name Z-A, most reviews, most favorites. Filter by US state via dropdown. Search by name. Pagination.
-
-tRPC: `neighborhoods.list` (accepts `sortBy`, `state`, `search`, and `page` inputs)
+tRPC: `neighborhoods.list`, `data.getImages`
 
 ## Neighborhood Detail
 
-`/neighborhoods/[id]`: full neighborhood info, interactive map, rating stats (average and distribution chart), review list, review form, similar neighborhoods section, and Nomad Score badge.
+`/neighborhoods/[id]`: hero panel with image carousel, stat pills (walk score, safety, rent, wage), collapsible map, score cards (walkability, safety, cost of living), neighborhood pulse (news intelligence), local events, reviews with dimension ratings, about section, similar neighborhoods with images.
 
-## Reviews
+Key files: `pages/neighborhoods/[id].tsx`, `neighborhood-data-panel.tsx`, `neighborhood-pulse.tsx`, `similar-neighborhoods.tsx`, `rating-distribution-chart.tsx`
 
-Authenticated users can create one review per neighborhood (1-5 star rating and optional comment). Edit and delete own reviews. Rating distribution displayed as a horizontal bar chart (recharts). Review stats: total count, average rating, and distribution breakdown.
+tRPC: `neighborhoods.getById`, `data.getAll`, `news.getPulse`, `reviews.getUserReview`
 
-Components: `review-form.tsx`, `star-rating.tsx`, `rating-distribution-chart.tsx`
+## Reviews and Dimensions
+
+One review per user per neighborhood. 1-5 star overall rating, optional comment, and 6 dimension sub-ratings (wifi, safety, food, nightlife, walkability, cost/value). Edit and delete own reviews. Rating distribution chart.
+
+Key files: `review-form.tsx`, `star-rating.tsx`, `rating-distribution-chart.tsx`
+
+tRPC: `reviews.create`, `reviews.update`, `reviews.delete`, `reviews.getByNeighborhood`
 
 ## Favorites
 
-Toggle favorite on any neighborhood card or detail page. Favorites page (`/favorites`) with drag-and-drop reordering via @dnd-kit. Position persists to database. Toast notifications on add/remove.
+Toggle favorite on any card or detail page. `/favorites` with drag-and-drop reordering via @dnd-kit. Position persists to DB. Toast on add/remove.
 
-tRPC: `favorites.toggle`, `favorites.getMine`, `favorites.isFavorite`, `favorites.reorder`
+tRPC: `favorites.toggle`, `favorites.getMine`, `favorites.reorder`
 
 ## Nomad Score
 
-Composite score (0-100) per neighborhood. Weighted: average rating (50%), review count (30%), and favorite count (20%), normalized against all neighborhoods. Displayed as a badge on neighborhood cards and detail pages. Sortable on browse page.
+Composite 0-100 score. Community-only formula (list pages): avg rating 50%, review count 30%, favorites 20%. Enhanced formula (detail page, when external data available): community 40%, walkability 15%, transit/bike 10%, safety 15%, affordability 20%.
+
+Key files: `server/constants/scores.ts`, `server/utils/`
 
 tRPC: `neighborhoods.getWithScores`
 
-## Neighborhood Comparison
+## Comparison Tool
 
-Select up to 3 neighborhoods for side-by-side comparison. Floating bottom bar appears when 2 or more are selected. Compare page (`/compare`) shows ratings, review counts, favorites, and rating distribution charts side by side.
+Select up to 3 neighborhoods via compare button on cards. Floating bottom bar when 2+ selected. `/compare` shows side-by-side stats, ratings, external data, and rating distributions.
 
-Components: `comparison-bar.tsx`, `comparison-context.tsx`
+Key files: `comparison-bar.tsx`, `contexts/comparison-context.tsx`, `pages/compare.tsx`
 
 ## Dashboard
 
-Authenticated landing page (`/dashboard`). Four stat cards (total neighborhoods, reviews, favorites, average rating). Review trend area chart (last 6 months). Top neighborhoods bar chart (by average rating, minimum 2 reviews). Activity feed (20 most recent reviews across all neighborhoods). Recent neighborhoods grid.
+`/dashboard`: risk alerts (if logged in), stat cards (neighborhoods, reviews, favorites, avg rating), review trend chart, top neighborhoods chart, recent activity feed, news pulse (trending neighborhoods).
 
-Components: `section-cards.tsx`, `activity-feed.tsx`, `review-trend-chart.tsx`, `top-neighborhoods-chart.tsx`
+Key files: `pages/dashboard.tsx`, `section-cards.tsx`, `dashboard/activity-feed.tsx`, `dashboard/review-trend-chart.tsx`, `dashboard/top-neighborhoods-chart.tsx`, `dashboard/news-trending.tsx`, `dashboard/risk-alerts.tsx`
+
+## News Intelligence
+
+Three features powered by newsdata.io article caching and classification.
+
+### Neighborhood Pulse
+
+On detail pages. Classifies articles into 6 nomad signal categories (Infrastructure, Safety, Cost of Living, Food and Culture, Tech and Coworking, Community). Shows sentiment score, trend direction (improving/declining/stable via 7d vs 8-30d velocity), and categorized article list.
+
+Key files: `neighborhood-pulse.tsx`, `server/constants/newsCategories.ts`, `server/services/newsdata.ts` (`getNeighborhoodPulse`)
+
+tRPC: `news.getPulse`
+
+### Trending Neighborhoods
+
+On dashboard. Two-column grid showing "heating up" and "cooling down" neighborhoods based on news velocity (7d vs 30d article frequency) weighted by sentiment ratio. Minimum 2 articles to qualify.
+
+Key files: `dashboard/news-trending.tsx`, `server/services/newsdata.ts` (`getNewsTrending`)
+
+tRPC: `news.getTrending`
+
+### Move-In Risk Alerts
+
+For logged-in users. Generates alerts when favorited neighborhoods have 3+ negative articles in 7 days. Severity: "high" (5+) or "medium" (3-4). Idempotent daily via unique constraint. 90-day auto-cleanup. Unread badge in site header. Dismiss (mark read) per alert.
+
+Key files: `dashboard/risk-alerts.tsx`, `site-header.tsx`, `server/services/newsAlerts.ts`
+
+tRPC: `news.getAlerts`, `news.markRead`, `news.getUnreadCount`
+
+## Personalized Recommendations
+
+Computed on-demand when user visits recommendations. Builds a preference profile from highly-rated reviews (4+ stars), scores unreviewed neighborhoods by dimension similarity, walkability, rent, safety, and geography. Cached 24 hours.
+
+tRPC: `recommendations.getForUser`
+
+## Trend Snapshots
+
+Weekly point-in-time snapshots of each neighborhood's scores, counts, and dimension averages. Created by cron on Sundays. Powers trend analysis.
+
+Key files: `server/services/snapshots.ts`
+
+tRPC: `trends.getSnapshots`, `trends.createSnapshot` (admin)
+
+## External Data Pipeline
+
+Six external APIs provide objective metrics. Fetched to DB cache via admin triggers or daily cron, never during user requests. See [data-pipeline.md](data-pipeline.md).
 
 ## Admin Panel
 
-Accessible to users with `isAdmin: true`. Three management pages:
-
+`/admin/*` pages for users with `isAdmin: true`:
 - `/admin/users`: view all users, promote/demote admin, delete accounts
-- `/admin/neighborhoods`: create, edit, and delete neighborhoods with inline forms
+- `/admin/neighborhoods`: create, edit, delete neighborhoods
 - `/admin/reviews`: view all reviews, admin delete
+- `/admin/data`: fetch buttons per data source, Rentcast usage counter
 
-Protected by `AdminLayout` component that checks `isAdmin` and redirects non-admins. Admin link appears conditionally in the sidebar.
+Key files: `admin-layout.tsx`, `pages/admin/*.tsx`
 
 ## Public User Profiles
 
-`/users/[id]`: public profile showing avatar, name, member since, review count, and favorite count. Tabbed view of user's reviews and favorites with linked neighborhoods. Author names are clickable throughout the app.
+`/users/[id]`: avatar, name, member since, review count, favorites count. Tabbed view of reviews and favorites. Author names are clickable throughout the app.
 
 tRPC: `user.getPublicProfile`
 
 ## Authentication
 
-GitHub OAuth via Auth.js v5. Single sign-in button at `/auth/signin`. Session stored in database. See [authentication.md](authentication.md) for details.
+GitHub OAuth via Auth.js v5. See [authentication.md](authentication.md).
 
 ## Toast Notifications
 
-sonner toasts on all mutations: favorite toggle, review create/update/delete, and profile update. Styled to match the monochrome design system.
-
-## Similar Neighborhoods
-
-On each neighborhood detail page, a "Similar Neighborhoods" section shows other neighborhoods in the same city or state. Uses the `neighborhoods.getSimilar` procedure.
-
-## External Data Pipeline
-
-Five external APIs provide objective neighborhood metrics. Data is fetched into DB cache tables via admin triggers or a daily cron job, never during user requests. The frontend reads pre-fetched data from the DB. If data hasn't been fetched for a neighborhood, that section simply doesn't render.
-
-### Data Sources
-
-| Source | What it provides | Cache TTL | Key |
-|--------|-----------------|-----------|-----|
-| Walk Score | Walk, transit, and bike scores (0-100) | 60 days | `WALKSCORE_API_KEY` |
-| Rentcast | Median rent, sale prices, per-sqft rates | 30 days | `RENTCAST_API_KEY` |
-| FBI Crime Data (CDE) | State-level violent and property crime rates per 100K | 90 days | `FBI_CRIME_DATA_API_KEY` |
-| BLS | CPI index, median hourly wage | 30-180 days | `BLS_API_KEY` |
-| Eventbrite | Upcoming event count and listings | 24 hours | `EVENTBRITE_API_KEY` |
-
-### Architecture
-
-```
-Admin triggers fetch (button on /admin/data) or cron (/api/cron/fetch-data)
-  -> Service iterates neighborhoods, calls external API, writes to DB cache
-  -> Each row stores fetchedAt and expiresAt timestamps
-
-Client visits detail or compare page
-  -> trpc.data.getAll({ neighborhoodId })
-       -> DB reads only, zero API calls
-       -> Returns data + fetchedAt per source, or null
-       -> UI renders cards with "LAST UPDATED" timestamps
-```
-
-### Optimizations
-
-- **Rentcast**: Fetches one representative zip per city, propagates to sibling zips (16 API calls cover ~70 zips, stays under the 45/month hard cap)
-- **FBI Crime Data**: Fetches once per state, propagates to all cities in that state
-- **BLS**: Batches up to 50 series per POST request
-- **All services**: Skip neighborhoods with valid (non-expired) cache entries
-
-### Enhanced Nomad Score
-
-When external data is available, the Nomad Score blends community and external data:
-
-| Component | Weight | Source |
-|-----------|--------|--------|
-| Average Rating | 20% | Community reviews |
-| Review Volume | 12% | Community reviews |
-| Favorites | 8% | Community favorites |
-| Walkability | 15% | Walk Score |
-| Transit and Bike | 10% | Walk Score |
-| Safety | 15% | FBI Crime Data (inverse crime rate) |
-| Affordability | 20% | Rentcast median rent |
-
-Falls back to the community-only formula (50/30/20) when no external data is present. List pages always use community-only scoring.
-
-### Admin Data Management
-
-`/admin/data`: fetch buttons per service, bulk "Fetch All" button, and Rentcast usage counter. Each button triggers the corresponding admin mutation and shows a toast with results.
-
-### Cron Job
-
-Vercel Cron hits `/api/cron/fetch-data` daily at 6 AM UTC. Secured via `CRON_SECRET` (Authorization bearer token). Runs all five services in parallel. Configure the schedule in `vercel.json`.
-
-Components: `neighborhood-data-panel.tsx` (WalkScoreCard, RentDataCard, CrimeDataCard, CostOfLivingCard, EventsCard)
-
-Services: `src/server/services/` (walkScore.ts, rentcast.ts, crimeData.ts, blsData.ts, eventbrite.ts)
-
-tRPC: `data.getAll`, `data.fetchWalkScores`, `data.fetchRentData`, `data.fetchCrimeData`, `data.fetchCostOfLiving`, `data.fetchEvents`, `data.getRentcastUsage`
+sonner toasts on all mutations. Styled to match design system.

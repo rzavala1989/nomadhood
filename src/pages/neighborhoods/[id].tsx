@@ -13,6 +13,7 @@ import { ReviewForm } from '@/components/review-form';
 import { RatingDistributionChart } from '@/components/rating-distribution-chart';
 import { NeighborhoodMap } from '@/components/neighborhood-map-wrapper';
 import { SimilarNeighborhoods } from '@/components/similar-neighborhoods';
+import { NeighborhoodPulse } from '@/components/neighborhood-pulse';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -569,6 +570,9 @@ export default function NeighborhoodDetailPage() {
             })()}
           </div>
         )}
+
+        {/* ═══ 3.5. NEIGHBORHOOD PULSE ═══ */}
+        <NeighborhoodPulse neighborhoodId={id} />
 
         {/* ═══ 4. EVENTS: Horizontal scroll strip ═══ */}
         {externalData?.events && externalData.events.events.length > 0 && (

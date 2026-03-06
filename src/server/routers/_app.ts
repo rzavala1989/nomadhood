@@ -10,6 +10,7 @@ import { dashboardRouter } from '@/server/routers/dashboardRouter';
 import { dataRouter } from '@/server/routers/dataRouter';
 import { recommendationsRouter } from '@/server/routers/recommendationsRouter';
 import { trendsRouter } from '@/server/routers/trendsRouter';
+import { newsRouter } from '@/server/routers/newsRouter';
 
 export const appRouter = router({
   healthcheck: publicProcedure.query(() => 'yay!'),
@@ -22,6 +23,7 @@ export const appRouter = router({
   favorites: favoritesRouter,
   recommendations: recommendationsRouter,
   trends: trendsRouter,
+  news: newsRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);

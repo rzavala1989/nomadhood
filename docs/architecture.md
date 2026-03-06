@@ -8,90 +8,129 @@
 | UI | React | 19 |
 | API | tRPC | 11 |
 | ORM | Prisma | 6 |
-| Auth | Auth.js (next-auth) | 5.0.0-beta |
-| Database | PostgreSQL | n/a |
-| Styling | Tailwind CSS, shadcn/ui, and Radix | 3.4 |
+| Auth | Auth.js (next-auth) | 5 beta |
+| Database | PostgreSQL (Neon) | -- |
+| Styling | Tailwind CSS, shadcn/ui, Radix | 3.4 |
 | Charts | recharts | 2.15 |
-| Maps | MapLibre GL and react-map-gl | 5.19 / 8.1 |
+| Maps | MapLibre GL, react-map-gl | 5.19, 8.1 |
 | Drag and Drop | @dnd-kit | 6.3 |
 | Toasts | sonner | 2.0 |
-| Forms | react-hook-form and zod | 7.55 / 3.24 |
-| Package Manager | Bun | n/a |
+| Forms | react-hook-form, zod | 7.55, 3.24 |
+| Package Manager | Bun | -- |
 
 ## Directory Structure
 
 ```
 src/
-  pages/                       Next.js pages (Pages Router)
-    index.tsx                   Landing page
-    dashboard.tsx               Analytics dashboard
-    profile.tsx                 User profile editor
-    favorites.tsx               Drag-and-drop favorites list
-    compare.tsx                 Side-by-side neighborhood comparison
-    404.tsx                     Not found
-    _app.tsx                    App wrapper (providers, layout)
-    _document.tsx               Document head
+  pages/
+    index.tsx                    Landing page
+    dashboard.tsx                Analytics dashboard (stat cards, charts, news pulse, risk alerts)
+    profile.tsx                  User profile editor
+    favorites.tsx                Drag-and-drop favorites list
+    compare.tsx                  Side-by-side neighborhood comparison
+    404.tsx                      Not found
+    _app.tsx                     App wrapper (providers, layout)
+    _document.tsx                Document head
     auth/
-      signin.tsx                GitHub OAuth sign-in
+      signin.tsx                 GitHub OAuth sign-in
     neighborhoods/
-      index.tsx                 Browse and map split-view
-      [id].tsx                  Neighborhood detail and reviews
+      index.tsx                  Browse with map split-view
+      [id].tsx                   Detail: reviews, scores, pulse, events, similar
     users/
-      [id].tsx                  Public user profile
+      [id].tsx                   Public user profile
     admin/
-      users.tsx                 User management (admin)
-      neighborhoods.tsx         Neighborhood CRUD (admin)
-      reviews.tsx               Review moderation (admin)
-      data.tsx                  External data pipeline management (admin)
+      users.tsx                  User management
+      neighborhoods.tsx          Neighborhood CRUD
+      reviews.tsx                Review moderation
+      data.tsx                   External data pipeline controls
     api/
-      auth/[...nextauth]/       Auth.js API handler (App Router)
-      cron/fetch-data.ts        Scheduled data pipeline (Vercel Cron)
-      trpc/[trpc].ts            tRPC API handler
+      auth/[...nextauth]/        Auth.js handler (App Router)
+      cron/fetch-data.ts         Scheduled data and alert pipeline
+      trpc/[trpc].ts             tRPC API handler
+      signup.ts                  Registration endpoint
 
   components/
-    ui/                         shadcn/ui primitives (button, input, card, etc.)
+    ui/                          shadcn/ui primitives
     auth/
-      SignInForm.tsx             GitHub OAuth button
+      SignInForm.tsx              GitHub OAuth button
     dashboard/
-      activity-feed.tsx         Recent reviews timeline
-      review-trend-chart.tsx    Area chart: reviews over time
-      top-neighborhoods-chart.tsx  Bar chart: top-rated neighborhoods
+      activity-feed.tsx          Recent reviews timeline
+      review-trend-chart.tsx     Area chart: reviews over time
+      top-neighborhoods-chart.tsx Bar chart: top-rated neighborhoods
+      news-trending.tsx          Heating up / cooling down neighborhoods
+      risk-alerts.tsx            Negative news spike alerts
     landing/
-      Hero.tsx                  Landing page hero section
-    admin-layout.tsx            Admin guard and sub-navigation
-    app-sidebar.tsx             Main sidebar navigation
-    comparison-bar.tsx          Floating comparison bottom bar
-    dashboard-layout.tsx        Authenticated layout with sidebar
-    favorite-button.tsx         Toggle favorite with toast
-    neighborhood-card.tsx       Card with compare and Nomad Score
-    neighborhood-data-panel.tsx External API data cards (walk score, rent, crime, BLS, events)
-    neighborhood-map.tsx        MapLibre GL map with markers
-    neighborhood-map-wrapper.tsx  Dynamic import wrapper (SSR disabled)
-    rating-distribution-chart.tsx  Horizontal bar chart (1-5 stars)
-    review-form.tsx             Create/edit review form
-    section-cards.tsx           Dashboard stat cards
-    star-rating.tsx             Star display component
+      Hero.tsx                   Landing hero section
+    admin-layout.tsx             Admin guard and sub-navigation
+    app-sidebar.tsx              Main sidebar navigation
+    comparison-bar.tsx           Floating comparison bottom bar
+    dashboard-layout.tsx         Authenticated layout with sidebar
+    favorite-button.tsx          Toggle favorite with toast
+    neighborhood-card.tsx        Card with image, compare, score
+    neighborhood-data-panel.tsx  External data cards (walkability, rent, crime, cost, events)
+    neighborhood-data-utils.ts   National averages, formatting helpers
+    neighborhood-map.tsx         MapLibre GL map with markers
+    neighborhood-map-wrapper.tsx Dynamic import wrapper (SSR disabled)
+    neighborhood-pulse.tsx       Categorized news with sentiment scoring
+    pagination.tsx               Paginated list controls
+    rating-distribution-chart.tsx Horizontal bar chart (1-5 stars)
+    recent-neighborhoods.tsx     Grid of recently active neighborhoods
+    review-form.tsx              Create/edit review with dimension ratings
+    section-cards.tsx            Dashboard stat cards
+    similar-neighborhoods.tsx    Related neighborhoods with images
+    site-header.tsx              Header with title and alert badge
+    star-rating.tsx              Star display component
 
   server/
-    routers/                    tRPC routers (see below)
-    services/                   External API integrations (see below)
-    utils/                      Score calculations
-    context.ts                  tRPC context, reads session from cookie
-    env.ts                      Zod environment validation
-    prisma.ts                   Prisma client singleton
-    trpc.ts                     Procedure definitions (public/protected/admin)
+    routers/
+      _app.ts                    Root router (mounts all sub-routers)
+      dashboardRouter.ts         Dashboard stats, trends, activity
+      dataRouter.ts              External data reads and admin fetch triggers
+      favoritesRouter.ts         Favorite toggle, list, reorder
+      neighborhoodsRouter.ts     CRUD, list, scores, similar
+      newsRouter.ts              News pulse, trending, alerts
+      recommendationsRouter.ts   Personalized neighborhood recommendations
+      reviewsRouter.ts           Review CRUD with dimensions
+      trendsRouter.ts            Neighborhood snapshots and trend data
+      user.ts                    User profile, admin management
+    services/
+      blsData.ts                 BLS economic data (CPI, wages)
+      crimeData.ts               FBI crime rates
+      eventbrite.ts              Local events
+      neighborhoodImages.ts      Unsplash and Wikimedia images
+      newsAlerts.ts              Risk alert generation from news spikes
+      newsdata.ts                News fetching, pulse analysis, trending
+      rentcast.ts                Housing cost data
+      snapshots.ts               Weekly neighborhood snapshots
+      types.ts                   Shared service return types
+      walkScore.ts               Walkability scores
+    constants/
+      dimensions.ts              Review dimension definitions
+      newsCategories.ts          News-to-nomad-signal classifier
+      queries.ts                 Shared Prisma query fragments
+      scores.ts                  Nomad Score calculation weights
+    utils/                       Score computation helpers
+    context.ts                   tRPC context (session from cookie via Prisma)
+    env.ts                       Zod environment validation
+    prisma.ts                    Prisma client singleton
+    trpc.ts                      Procedure definitions (public/protected/admin)
 
   contexts/
-    comparison-context.tsx      React context for neighborhood comparison (up to 3)
+    comparison-context.tsx       Neighborhood comparison state (up to 3)
+
+  hooks/
+    use-mobile.tsx               Responsive breakpoint hook
 
   styles/
-    globals.css                 Design tokens, base styles, MapLibre overrides
+    globals.css                  Design tokens, animations, MapLibre overrides
 
   types/
-    next-auth.d.ts              Session/User type extensions (isAdmin)
+    next-auth.d.ts               Session/User type extensions (isAdmin)
 
   utils/
-    trpc.ts                     tRPC React client setup
+    trpc.ts                      tRPC React client setup
+    format.ts                    Display formatting helpers
+    transformer.ts               superjson transformer
 ```
 
 ## Data Flow
@@ -108,32 +147,32 @@ Browser -> Next.js Pages Router -> tRPC React Query hooks
                                 Prisma ORM -> PostgreSQL
 ```
 
-Auth runs separately through Auth.js:
+Auth runs through Auth.js separately:
 ```
 Browser -> /api/auth/* (App Router) -> Auth.js -> GitHub OAuth -> Prisma Adapter -> PostgreSQL
 ```
 
-The tRPC context reads the session token cookie directly from the request and looks it up in the database via Prisma; it does not call the Auth.js `auth()` function.
-
 External data pipeline (fetch and display are decoupled):
 ```
-Admin or Cron -> /api/cron/fetch-data or admin mutation
-                       |
-                 Service layer (src/server/services/)
-                       |
-                 External API -> DB cache tables (WalkScoreCache, RentcastCache, etc.)
+Admin or Cron -> service layer -> External API -> DB cache tables
+Client -> trpc.data.getAll -> DB reads only -> UI
+```
 
-Client -> trpc.data.getAll -> DB reads only -> UI cards with "LAST UPDATED" timestamps
+News intelligence pipeline:
+```
+Cron or on-demand -> newsdata.io API -> NeighborhoodNews table
+                  -> classifyArticle() -> signal categories
+                  -> sentiment analysis -> pulse scores, trending
+                  -> generateNewsAlerts() -> NewsAlert table (for favorited neighborhoods)
 ```
 
 ## tRPC Router Map
 
-### Root (`_app.ts`)
+### `dashboard`
 
 | Procedure | Type | Access |
 |-----------|------|--------|
-| `healthcheck` | query | public |
-| `getDashboardStats` | query | public |
+| `getStats` | query | public |
 | `getRecentActivity` | query | public |
 | `getTopNeighborhoods` | query | public |
 | `getReviewTrend` | query | public |
@@ -191,26 +230,42 @@ Client -> trpc.data.getAll -> DB reads only -> UI cards with "LAST UPDATED" time
 | Procedure | Type | Access |
 |-----------|------|--------|
 | `getAll` | query | public |
+| `getImages` | query | public |
 | `getWalkScore` | query | public |
+| `trackUnsplashDownload` | mutation | public |
 | `fetchWalkScores` | mutation | admin |
 | `fetchRentData` | mutation | admin |
 | `fetchCrimeData` | mutation | admin |
 | `fetchCostOfLiving` | mutation | admin |
 | `fetchEvents` | mutation | admin |
+| `fetchImages` | mutation | admin |
 | `getRentcastUsage` | query | admin |
 
-### Service Layer (`src/server/services/`)
+### `news`
 
-| File | External API | Cache Model |
-|------|-------------|-------------|
-| `walkScore.ts` | Walk Score API | `WalkScoreCache` |
-| `rentcast.ts` | Rentcast API (rate-limited to 45/month) | `RentcastCache` |
-| `crimeData.ts` | FBI CDE API (state-level) | `CrimeDataCache` |
-| `blsData.ts` | BLS v2 API (CPI and wages) | `BlsDataCache` |
-| `eventbrite.ts` | Eventbrite v3 API | `EventbriteCache` |
-| `types.ts` | Shared return types | n/a |
+| Procedure | Type | Access |
+|-----------|------|--------|
+| `getByNeighborhood` | query | public |
+| `getPulse` | query | public |
+| `getTrending` | query | public |
+| `getAlerts` | query | protected |
+| `markRead` | mutation | protected |
+| `getUnreadCount` | query | protected |
+
+### `recommendations`
+
+| Procedure | Type | Access |
+|-----------|------|--------|
+| `getForUser` | query | protected |
+
+### `trends`
+
+| Procedure | Type | Access |
+|-----------|------|--------|
+| `getSnapshots` | query | public |
+| `createSnapshot` | mutation | admin |
 
 Access levels:
 - **public**: no authentication required
-- **protected**: requires authenticated session
-- **admin**: requires authenticated session with `isAdmin: true`
+- **protected**: requires authenticated session (`ctx.user`)
+- **admin**: requires `ctx.user.isAdmin === true`

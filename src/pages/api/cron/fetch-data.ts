@@ -7,6 +7,7 @@ import { fetchAllBlsData } from '@/server/services/blsData';
 import { fetchAllEvents } from '@/server/services/eventbrite';
 import { fetchAllNeighborhoodImages } from '@/server/services/neighborhoodImages';
 import { createSnapshotAll } from '@/server/services/snapshots';
+import { generateNewsAlerts } from '@/server/services/newsAlerts';
 
 /**
  * Cron endpoint that runs the full external data pipeline.
@@ -62,6 +63,13 @@ export default async function handler(
     }));
   }
 
+  // News alerts for favorited neighborhoods
+  const newsAlerts = await generateNewsAlerts().catch(() => ({
+    alertsGenerated: 0,
+    neighborhoodsScanned: 0,
+    newsRefreshed: 0,
+  }));
+
   const duration = Date.now() - start;
 
   const result = {
@@ -74,6 +82,7 @@ export default async function handler(
     events,
     images,
     snapshots,
+    newsAlerts,
   };
 
   console.log('[cron/fetch-data]', JSON.stringify(result));

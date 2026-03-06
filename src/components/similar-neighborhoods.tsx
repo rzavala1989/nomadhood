@@ -7,6 +7,12 @@ export function SimilarNeighborhoods({ neighborhoodId, state }: { neighborhoodId
     { enabled: !!neighborhoodId },
   );
 
+  const neighborhoodIds = similar?.map((n) => n.id) ?? [];
+  const { data: imageMap } = trpc.data.getImages.useQuery(
+    { neighborhoodIds },
+    { enabled: neighborhoodIds.length > 0 },
+  );
+
   if (!similar || similar.length === 0) return null;
 
   return (
@@ -17,7 +23,12 @@ export function SimilarNeighborhoods({ neighborhoodId, state }: { neighborhoodId
       <div className="grid grid-cols-1 gap-px md:grid-cols-2">
         {similar.map((n, i) => (
           <div key={n.id} className="animate-fade-up" style={{ animationDelay: `${400 + i * 60}ms` }}>
-            <NeighborhoodCard neighborhood={n} />
+            <NeighborhoodCard
+              neighborhood={n}
+              imageUrl={imageMap?.[n.id]?.[0]?.thumbUrl ?? imageMap?.[n.id]?.[0]?.imageUrl}
+              imageAlt={imageMap?.[n.id]?.[0]?.altText ?? undefined}
+              imageSource={imageMap?.[n.id]?.[0]?.source}
+            />
           </div>
         ))}
       </div>

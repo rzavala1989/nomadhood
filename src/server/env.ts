@@ -33,6 +33,7 @@ const envSchema = z.object({
   BLS_API_KEY: z.string().min(1).optional(),
   EVENTBRITE_API_KEY: z.string().min(1).optional(),
   UNSPLASH_ACCESS_KEY: z.string().min(1).optional(),
+  NEWSDATA_IO_API_KEY: z.string().min(1).optional(),
 
   // Cron secret for securing scheduled data pipeline endpoint
   CRON_SECRET: z.string().min(1).optional(),

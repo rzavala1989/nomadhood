@@ -3,11 +3,18 @@ import { SectionCards } from '@/components/section-cards';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { TopNeighborhoodsChart } from '@/components/dashboard/top-neighborhoods-chart';
 import { ReviewTrendChart } from '@/components/dashboard/review-trend-chart';
+import { RiskAlerts } from '@/components/dashboard/risk-alerts';
+import { NewsTrending } from '@/components/dashboard/news-trending';
 
 export default function Dashboard() {
   return (
     <DashboardLayout title="Dashboard">
       <div className="flex flex-col gap-[var(--space-6)] py-[var(--space-6)]">
+        {/* Row 0: Risk Alerts (logged-in users only, hidden if empty) */}
+        <div className="px-[var(--space-6)] animate-fade-up">
+          <RiskAlerts />
+        </div>
+
         {/* Row 1: Stat strip */}
         <SectionCards />
 
@@ -37,6 +44,11 @@ export default function Dashboard() {
             </div>
             <ActivityFeed />
           </div>
+        </div>
+
+        {/* Row 4: News Pulse (trending neighborhoods) */}
+        <div className="px-[var(--space-6)] animate-fade-up" style={{ animationDelay: '280ms' }}>
+          <NewsTrending />
         </div>
       </div>
     </DashboardLayout>
