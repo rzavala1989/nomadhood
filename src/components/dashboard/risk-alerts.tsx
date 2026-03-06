@@ -29,15 +29,15 @@ export function RiskAlerts() {
         {alerts.map((alert, i) => (
           <div
             key={alert.id}
-            className={`flex items-start gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] min-h-[48px] border-t border-[rgba(120,80,200,0.06)] animate-fade-up ${
-              alert.isRead ? 'surface-1' : 'bg-[--bg-surface-2]'
+            className={`flex items-start gap-[var(--space-3)] px-[var(--space-4)] py-[var(--space-3)] min-h-[48px] border-t border-[rgba(38,38,38,0.06)] animate-reveal ${
+              alert.isRead ? 'surface-flat rounded-lg' : 'bg-[--bg-secondary]'
             }`}
             style={{ animationDelay: `${i * 40}ms` }}
           >
             {/* Severity dot */}
             <span
               className={`mt-[6px] h-[8px] w-[8px] shrink-0 ${
-                alert.severity === 'high' ? 'bg-[--vapor-pink]' : 'bg-[rgba(120,80,200,0.22)]'
+                alert.severity === 'high' ? 'bg-[--accent-rose]' : 'bg-[rgba(38,38,38,0.22)]'
               }`}
             />
 
@@ -51,7 +51,7 @@ export function RiskAlerts() {
               )}
               <Link
                 href={`/neighborhoods/${alert.neighborhoodId}`}
-                className="text-micro text-[--vapor-purple] hover:text-[--vapor-pink] transition-colors"
+                className="text-micro text-[--accent-rose] hover:text-[--accent-rose] transition-colors"
               >
                 {alert.neighborhood.name}, {alert.neighborhood.city}
               </Link>

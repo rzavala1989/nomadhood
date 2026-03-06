@@ -31,8 +31,8 @@ export function TopNeighborhoodsChart() {
         <Link
           key={n.id}
           href={`/neighborhoods/${n.id}`}
-          className="flex items-center gap-[var(--space-3)] py-[6px] px-[var(--space-2)] hover:bg-[--bg-surface-2] transition-colors group"
-          style={i === 0 ? { boxShadow: 'inset 3px 0 0 #FF6B9D' } : undefined}
+          className="flex items-center gap-[var(--space-3)] py-[6px] px-[var(--space-2)] hover:bg-[--bg-secondary] transition-colors group"
+          style={i === 0 ? { boxShadow: 'inset 3px 0 0 var(--accent-rose)' } : undefined}
         >
           <span className="text-micro text-[--text-ghost] tabular-nums w-[16px] shrink-0 text-right">
             {i + 1}
@@ -46,7 +46,7 @@ export function TopNeighborhoodsChart() {
             {n.city}
           </span>
           <span className="text-caption text-[--text-secondary] tabular-nums shrink-0">
-            ★ {n.avgRating.toFixed(1)}
+            {n.avgRating.toFixed(1)}
           </span>
           <span className="text-micro text-[--text-ghost] tabular-nums shrink-0">
             ({n.reviewCount})

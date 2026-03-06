@@ -17,7 +17,7 @@ function TrendRow({
   return (
     <Link
       href={`/neighborhoods/${item.neighborhoodId}`}
-      className="flex items-center gap-[var(--space-3)] h-[40px] px-[var(--space-3)] border-t border-[rgba(120,80,200,0.06)] hover:bg-[--bg-surface-1] transition-colors animate-fade-up"
+      className="flex items-center gap-[var(--space-3)] h-[40px] px-[var(--space-3)] border-t border-[rgba(38,38,38,0.06)] hover:bg-[--bg-root] transition-colors animate-reveal"
       style={{ animationDelay: `${index * 40}ms` }}
     >
       <div className="flex-1 min-w-0">
@@ -27,10 +27,10 @@ function TrendRow({
         </p>
       </div>
       <div className="w-[80px] shrink-0">
-        <div className="h-[3px] w-full bg-[rgba(120,80,200,0.06)]">
+        <div className="h-[3px] w-full bg-[rgba(38,38,38,0.06)]">
           <div
             className={`h-full transition-all duration-500 ${
-              variant === 'hot' ? 'bg-[--vapor-pink]' : 'bg-[rgba(120,80,200,0.22)]'
+              variant === 'hot' ? 'bg-[--accent-rose]' : 'bg-[rgba(38,38,38,0.22)]'
             }`}
             style={{ width: `${barWidth}%` }}
           />
@@ -61,7 +61,7 @@ export function NewsTrending() {
       <p className="text-label text-[--text-ghost] mb-[var(--space-2)]">NEWS PULSE</p>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-px">
         {/* Heating Up */}
-        <div className="surface-1 p-[var(--space-4)]">
+        <div className="surface-flat rounded-lg p-[var(--space-4)]">
           <p className="text-label text-[--text-ghost] mb-[var(--space-2)]">HEATING UP</p>
           {hasHeating ? (
             trending.heatingUp.map((item, i) => (
@@ -73,7 +73,7 @@ export function NewsTrending() {
         </div>
 
         {/* Cooling Down */}
-        <div className="surface-1 p-[var(--space-4)]">
+        <div className="surface-flat rounded-lg p-[var(--space-4)]">
           <p className="text-label text-[--text-ghost] mb-[var(--space-2)]">COOLING DOWN</p>
           {hasCooling ? (
             trending.coolingDown.map((item, i) => (

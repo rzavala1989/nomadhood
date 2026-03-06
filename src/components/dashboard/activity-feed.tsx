@@ -36,7 +36,7 @@ export function ActivityFeed() {
         <Link
           key={review.id}
           href={`/neighborhoods/${review.neighborhood.id}`}
-          className="flex items-center gap-[var(--space-3)] h-[48px] px-[var(--space-2)] border-t border-[rgba(120,80,200,0.06)] hover:bg-[--bg-surface-1] transition-colors animate-fade-up"
+          className="flex items-center gap-[var(--space-3)] h-[48px] px-[var(--space-2)] border-t border-[rgba(38,38,38,0.06)] hover:bg-[--bg-secondary] transition-colors animate-reveal"
           style={{ animationDelay: `${i * 30}ms` }}
         >
           <Avatar className="h-8 w-8 rounded-full shrink-0">
@@ -44,7 +44,7 @@ export function ActivityFeed() {
               src={review.user.image ?? undefined}
               alt={review.user.name ?? 'User'}
             />
-            <AvatarFallback className="rounded-full bg-[--bg-surface-2] text-[7px] tracking-[0.15em] text-[--text-tertiary]">
+            <AvatarFallback className="rounded-full bg-[--bg-secondary] text-[7px] tracking-[0.15em] text-[--text-tertiary]">
               {getInitials(review.user.name)}
             </AvatarFallback>
           </Avatar>

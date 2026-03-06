@@ -7,7 +7,7 @@ import { trpc } from '@/utils/trpc';
 const chartConfig = {
   count: {
     label: 'Reviews',
-    color: '#FF6B9D',
+    color: '#e4a4bd',
   },
 };
 
@@ -40,8 +40,8 @@ export function ReviewTrendChart() {
         <AreaChart data={trend} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
           <defs>
             <linearGradient id="reviewFillPink" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#FF6B9D" stopOpacity={0.12} />
-              <stop offset="95%" stopColor="#FF6B9D" stopOpacity={0.01} />
+              <stop offset="5%" stopColor="#e4a4bd" stopOpacity={0.12} />
+              <stop offset="95%" stopColor="#e4a4bd" stopOpacity={0.01} />
             </linearGradient>
           </defs>
           <XAxis
@@ -50,43 +50,43 @@ export function ReviewTrendChart() {
             tickLine={false}
             tick={{
               fontSize: 9,
-              fill: 'rgba(26, 16, 40, 0.35)',
+              fill: 'rgba(38, 38, 38, 0.35)',
               fontFamily: 'var(--font-mono)',
             }}
           />
           <YAxis hide domain={[0, maxCount + 2]} />
           <ReferenceLine
             y={avgCount}
-            stroke="rgba(26, 16, 40, 0.08)"
+            stroke="rgba(38, 38, 38, 0.08)"
             strokeDasharray="3 3"
             label={{
               value: `AVG ${avgCount}`,
               position: 'right',
               fontSize: 8,
-              fill: 'rgba(26, 16, 40, 0.22)',
+              fill: 'rgba(38, 38, 38, 0.22)',
               fontFamily: 'var(--font-mono)',
             }}
           />
           <Tooltip
             contentStyle={{
-              background: '#1A1028',
+              background: '#1a1a1a',
               border: 'none',
-              borderRadius: 0,
+              borderRadius: 8,
               fontSize: 10,
-              color: '#F8F6FC',
+              color: '#fafafa',
               padding: '4px 8px',
             }}
-            itemStyle={{ color: '#FF6B9D', fontSize: 10 }}
-            labelStyle={{ color: 'rgba(248, 246, 252, 0.6)', fontSize: 9 }}
+            itemStyle={{ color: '#e4a4bd', fontSize: 10 }}
+            labelStyle={{ color: 'rgba(250, 250, 250, 0.6)', fontSize: 9 }}
           />
           <Area
             type="monotone"
             dataKey="count"
-            stroke="#FF6B9D"
+            stroke="#e4a4bd"
             strokeWidth={1.5}
             fill="url(#reviewFillPink)"
             dot={false}
-            activeDot={{ r: 3, fill: '#FF6B9D', strokeWidth: 0 }}
+            activeDot={{ r: 3, fill: '#e4a4bd', strokeWidth: 0 }}
           />
         </AreaChart>
       </ChartContainer>
