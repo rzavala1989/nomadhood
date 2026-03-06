@@ -5,7 +5,6 @@ import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
 
 import { DefaultLayout } from '@/components/DefaultLayout';
-import { AmbientOverlay } from '@/components/ambient-overlay';
 import { ComparisonProvider } from '@/contexts/comparison-context';
 import { ComparisonBar } from '@/components/comparison-bar';
 import { Toaster } from '@/components/ui/sonner';
@@ -34,12 +33,11 @@ const MyApp = (({ Component, pageProps }: AppPropsWithLayout) => {
 
   return (
     <SessionProvider session={pageProps.session}>
-      <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
+      <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" disableTransitionOnChange>
         <ComparisonProvider>
           {getLayout(<Component {...pageProps} />)}
           <ComparisonBar />
         </ComparisonProvider>
-        <AmbientOverlay />
         <Toaster position="bottom-right" />
       </ThemeProvider>
     </SessionProvider>
