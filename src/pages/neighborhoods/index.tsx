@@ -242,13 +242,11 @@ export default function NeighborhoodsPage() {
                       Showing {filteredNeighborhoods?.length ?? 0} of {data.neighborhoods.length}
                     </p>
                   )}
-                  <div className={'grid grid-cols-2 gap-x-8 gap-y-0'}>
+                  <div className={'grid grid-cols-1 sm:grid-cols-2 gap-6'}>
                     {filteredNeighborhoods?.map((n, i) => (
                       <div
                         key={n.id}
-                        className={`animate-reveal mb-12 rounded-lg ${
-                          i % 2 === 1 ? 'md:mt-[100px]' : ''
-                        } ${
+                        className={`animate-reveal rounded-lg ${
                           selectedMapId === n.id ? 'ring-2 ring-[--accent-rose]' : ''
                         }`}
                         style={{ animationDelay: `${i * 60}ms` }}
