@@ -2,17 +2,17 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { trpc } from '@/utils/trpc';
 
 const SIGNAL_COLORS: Record<string, string> = {
-  Safety: 'bg-[--vapor-pink]',
-  Infrastructure: 'bg-[--vapor-purple]',
-  'Cost of Living': 'bg-[--vapor-pink]',
-  'Food and Culture': 'bg-[rgba(120,80,200,0.22)]',
-  'Tech and Coworking': 'bg-[rgba(120,80,200,0.22)]',
-  Community: 'bg-[rgba(120,80,200,0.22)]',
+  Safety: 'bg-[--accent-rose]',
+  Infrastructure: 'bg-[--accent-rose]',
+  'Cost of Living': 'bg-[--accent-rose]',
+  'Food and Culture': 'bg-[rgba(38,38,38,0.22)]',
+  'Tech and Coworking': 'bg-[rgba(38,38,38,0.22)]',
+  Community: 'bg-[rgba(38,38,38,0.22)]',
 };
 
 function TrendArrow({ direction }: { direction: 'improving' | 'declining' | 'stable' }) {
   if (direction === 'improving') return <span className="text-[--text-secondary]">&#x25B2;</span>;
-  if (direction === 'declining') return <span className="text-[--vapor-pink]">&#x25BC;</span>;
+  if (direction === 'declining') return <span className="text-[--accent-rose]">&#x25BC;</span>;
   return <span className="text-[--text-ghost]">&#x25CF;</span>;
 }
 
@@ -26,7 +26,7 @@ export function NeighborhoodPulse({ neighborhoodId }: { neighborhoodId: string }
 
   if (!pulse || pulse.articleCount === 0) {
     return (
-      <div className="animate-fade-up [animation-delay:105ms]">
+      <div className="animate-reveal [animation-delay:105ms]">
         <p className="text-label text-[--text-ghost] mb-[var(--space-2)]">NEIGHBORHOOD PULSE</p>
         <p className="text-micro text-[--text-tertiary]">
           No recent news coverage for this neighborhood
@@ -40,14 +40,14 @@ export function NeighborhoodPulse({ neighborhoodId }: { neighborhoodId: string }
   const categories = Object.entries(pulse.articles);
 
   return (
-    <div className="animate-fade-up [animation-delay:105ms]">
+    <div className="animate-reveal [animation-delay:105ms]">
       <p className="text-label text-[--text-ghost] mb-[var(--space-2)]">NEIGHBORHOOD PULSE</p>
 
       {/* Top bar: sentiment + trend */}
       <div className="flex items-center gap-[var(--space-3)] mb-[var(--space-3)]">
         <div
-          className={`px-[var(--space-3)] py-[4px] text-[10px] tracking-[0.12em] tabular-nums ${
-            isPositive ? 'bg-vapor text-white' : 'surface-1 text-[--text-secondary]'
+          className={`px-[var(--space-3)] py-[4px] text-[10px] tracking-[0.12em] tabular-nums rounded-full ${
+            isPositive ? 'bg-[--accent-rose] text-[--accent-charcoal]' : 'surface-flat text-[--text-secondary]'
           }`}
         >
           SENTIMENT {sentimentPct > 0 ? '+' : ''}{sentimentPct}%
@@ -75,12 +75,12 @@ export function NeighborhoodPulse({ neighborhoodId }: { neighborhoodId: string }
                   href={article.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-[var(--space-2)] py-[var(--space-2)] border-t border-[rgba(120,80,200,0.06)] hover:bg-[--bg-surface-1] transition-colors animate-fade-up"
+                  className="flex items-start gap-[var(--space-2)] py-[var(--space-2)] border-t border-[rgba(38,38,38,0.06)] hover:bg-[--bg-secondary] transition-colors animate-reveal"
                   style={{ animationDelay: `${(i + 1) * 30}ms` }}
                 >
                   {/* Signal dot */}
                   <span
-                    className={`mt-[5px] h-[6px] w-[6px] shrink-0 ${SIGNAL_COLORS[category] ?? 'bg-[rgba(120,80,200,0.22)]'}`}
+                    className={`mt-[5px] h-[6px] w-[6px] shrink-0 rounded-full ${SIGNAL_COLORS[category] ?? 'bg-[rgba(38,38,38,0.22)]'}`}
                   />
 
                   {/* Content */}

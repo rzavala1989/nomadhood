@@ -16,13 +16,13 @@ export function SimilarNeighborhoods({ neighborhoodId, state }: { neighborhoodId
   if (!similar || similar.length === 0) return null;
 
   return (
-    <div className="animate-fade-up" style={{ animationDelay: '360ms' }}>
+    <div className="animate-reveal" style={{ animationDelay: '360ms' }}>
       <p className="text-label text-[--text-ghost] mb-[var(--space-4)]">
         SIMILAR IN {state}
       </p>
-      <div className="grid grid-cols-1 gap-px md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-6 gap-y-0 md:grid-cols-2">
         {similar.map((n, i) => (
-          <div key={n.id} className="animate-fade-up" style={{ animationDelay: `${400 + i * 60}ms` }}>
+          <div key={n.id} className={`animate-reveal mb-8 ${i % 2 === 1 ? 'md:mt-[60px]' : ''}`} style={{ animationDelay: `${400 + i * 60}ms` }}>
             <NeighborhoodCard
               neighborhood={n}
               imageUrl={imageMap?.[n.id]?.[0]?.thumbUrl ?? imageMap?.[n.id]?.[0]?.imageUrl}

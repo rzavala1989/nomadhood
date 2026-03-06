@@ -18,14 +18,14 @@ function ComparisonBar({ value, benchmark, max }: { value: number; benchmark: nu
   const valuePct = Math.min((value / max) * 100, 100);
   const benchPct = Math.min((benchmark / max) * 100, 100);
   return (
-    <div className="relative h-[3px] w-full bg-[rgba(120,80,200,0.08)]">
+    <div className="relative h-[3px] w-full bg-[rgba(38,38,38,0.08)] rounded-full">
       <div
-        className="h-full bg-[#B36BFF99] transition-all duration-500"
+        className="h-full bg-[--accent-rose] rounded-full transition-all duration-500"
         style={{ width: `${valuePct}%` }}
       />
       {/* Benchmark tick */}
       <div
-        className="absolute top-[-2px] h-[7px] w-[1px] bg-[#FF6B9D66]"
+        className="absolute top-[-2px] h-[7px] w-[1px] bg-[--accent-rose]/40"
         style={{ left: `${benchPct}%` }}
       />
     </div>
@@ -46,7 +46,7 @@ function WalkScoreCard({
   fetchedAt: Date;
 }) {
   return (
-    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+    <div className="surface-flat rounded-lg p-[var(--space-5)] space-y-[var(--space-3)]">
       <p className="text-label text-[--text-ghost]">WALKABILITY</p>
 
       {walkScore != null && (
@@ -126,7 +126,7 @@ function RentDataCard({
   if (!hasRent && !hasSale) return null;
 
   return (
-    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+    <div className="surface-flat rounded-lg p-[var(--space-5)] space-y-[var(--space-3)]">
       <p className="text-label text-[--text-ghost]">HOUSING COST</p>
 
       {hasRent && (
@@ -194,13 +194,13 @@ function CrimeRateRow({
           {diff > 0 ? '+' : ''}{diff}%
         </span>
       </div>
-      <div className="relative h-[3px] w-full bg-[rgba(120,80,200,0.08)]">
+      <div className="relative h-[3px] w-full bg-[rgba(38,38,38,0.08)] rounded-full">
         <div
-          className="h-full bg-[#B36BFF99] transition-all duration-500"
+          className="h-full bg-[--accent-rose] rounded-full transition-all duration-500"
           style={{ width: `${ratePct}%` }}
         />
         <div
-          className="absolute top-[-2px] h-[7px] w-[1px] bg-[#FF6B9D66]"
+          className="absolute top-[-2px] h-[7px] w-[1px] bg-[--accent-rose]/40"
           style={{ left: `${avgPct}%` }}
         />
       </div>
@@ -229,7 +229,7 @@ function CrimeDataCard({
   const riskLevel = getRiskLevel(violentCrimeRate, propertyCrimeRate);
 
   return (
-    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+    <div className="surface-flat rounded-lg p-[var(--space-5)] space-y-[var(--space-3)]">
       <p className="text-label text-[--text-ghost]">SAFETY (STATE)</p>
 
       {riskLevel && (
@@ -287,7 +287,7 @@ function CostOfLivingCard({
   const nationalAnnual = Math.round(NATIONAL.medianHourlyWage * 2080);
 
   return (
-    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+    <div className="surface-flat rounded-lg p-[var(--space-5)] space-y-[var(--space-3)]">
       <p className="text-label text-[--text-ghost]">COST OF LIVING</p>
 
       {cpiValue != null && (
@@ -351,7 +351,7 @@ function EventsCard({
   fetchedAt: Date;
 }) {
   return (
-    <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+    <div className="surface-flat rounded-lg p-[var(--space-5)] space-y-[var(--space-3)]">
       <p className="text-label text-[--text-ghost]">LOCAL EVENTS</p>
 
       {upcomingEventCount > 0 ? (
@@ -431,7 +431,7 @@ export function NeighborhoodDataPanel({
   if (!hasAnyData) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-px animate-fade-up">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-reveal">
       {data.walkScore && (
         <WalkScoreCard
           walkScore={data.walkScore.walkScore}

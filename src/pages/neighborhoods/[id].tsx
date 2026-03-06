@@ -51,7 +51,7 @@ function StatPill({
   const diffGood = diff != null && deltaInvert ? diff < 0 : (diff ?? 0) > 0;
 
   return (
-    <div className="surface-1 p-[var(--space-3)] min-w-0">
+    <div className="surface-flat rounded-lg p-[var(--space-3)] min-w-0">
       <p className="text-label text-[--text-ghost] mb-[var(--space-1)]">{label}</p>
       <p className="text-[20px] font-light text-[--text-primary] tabular-nums leading-none truncate">
         {value ?? '--'}
@@ -191,7 +191,7 @@ export default function NeighborhoodDetailPage() {
       <div className="flex flex-col gap-[var(--space-6)] p-[var(--space-6)]">
 
         {/* ═══ 1. HERO: Image carousel + Data summary ═══ */}
-        <div className={`flex flex-col lg:flex-row gap-px animate-fade-up ${hasImages ? 'h-auto lg:h-[360px]' : ''}`}>
+        <div className={`flex flex-col lg:flex-row gap-px animate-reveal rounded-lg overflow-hidden ${hasImages ? 'h-auto lg:h-[360px]' : ''}`}>
           {/* Left: Image carousel */}
           {activeImage && (
             <div className="lg:w-[45%] h-[240px] lg:h-full flex flex-col gap-px shrink-0">
@@ -276,7 +276,7 @@ export default function NeighborhoodDetailPage() {
           )}
 
           {/* Right: Data summary panel */}
-          <div className={`${hasImages ? 'lg:w-[55%]' : 'w-full'} surface-1 p-[var(--space-5)] flex flex-col justify-between`}>
+          <div className={`${hasImages ? 'lg:w-[55%]' : 'w-full'} surface-flat rounded-lg p-[var(--space-5)] flex flex-col justify-between`}>
             <div>
               {/* Name and location */}
               <div className="flex items-start justify-between">
@@ -308,7 +308,7 @@ export default function NeighborhoodDetailPage() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="bg-vapor text-white px-[var(--space-3)] py-[4px] text-[10px] tracking-[0.12em] tabular-nums inline-block cursor-help">
+                        <div className="badge-accent px-[var(--space-3)] py-[4px] text-[10px] tracking-[0.12em] tabular-nums inline-block cursor-help">
                           NOMAD SCORE {neighborhood.nomadScore}
                         </div>
                       </TooltipTrigger>
@@ -362,7 +362,7 @@ export default function NeighborhoodDetailPage() {
 
         {/* ═══ 2. MAP: Collapsible ═══ */}
         {neighborhood.latitude != null && neighborhood.longitude != null && (
-          <div className="animate-fade-up [animation-delay:60ms]">
+          <div className="animate-reveal [animation-delay:60ms]">
             <button
               onClick={() => setMapExpanded((prev) => !prev)}
               className="flex items-center gap-[var(--space-2)] text-label text-[--text-ghost] hover:text-[--text-tertiary] transition-colors mb-[var(--space-2)]"
@@ -383,10 +383,10 @@ export default function NeighborhoodDetailPage() {
 
         {/* ═══ 3. SCORES: 3-column grid ═══ */}
         {externalData && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px animate-fade-up [animation-delay:90ms]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-reveal [animation-delay:90ms]">
             {/* Walkability */}
             {externalData.walkScore && (
-              <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+              <div className="surface-flat rounded-lg p-[var(--space-5)] space-y-[var(--space-3)]">
                 <p className="text-label text-[--text-ghost]">WALKABILITY</p>
                 <div className="flex items-baseline gap-[var(--space-3)]">
                   <p className="text-[28px] font-light text-[--text-primary] tabular-nums leading-none">
@@ -400,9 +400,9 @@ export default function NeighborhoodDetailPage() {
                   )}
                 </div>
                 {externalData.walkScore.walkScore != null && (
-                  <div className="h-[3px] w-full bg-[rgba(120,80,200,0.08)]">
+                  <div className="h-[3px] w-full bg-[rgba(38,38,38,0.08)] rounded-full">
                     <div
-                      className="h-full bg-[#B36BFF99] transition-all duration-500"
+                      className="h-full bg-[--accent-rose] rounded-full transition-all duration-500"
                       style={{ width: `${externalData.walkScore.walkScore}%` }}
                     />
                   </div>
@@ -412,16 +412,16 @@ export default function NeighborhoodDetailPage() {
                   {externalData.walkScore.transitScore != null && (
                     <div className="space-y-[2px]">
                       <p className="text-micro text-[--text-tertiary] tabular-nums">TRANSIT {externalData.walkScore.transitScore}</p>
-                      <div className="h-[2px] w-[60px] bg-[rgba(120,80,200,0.08)]">
-                        <div className="h-full bg-[rgba(120,80,200,0.20)]" style={{ width: `${externalData.walkScore.transitScore}%` }} />
+                      <div className="h-[2px] w-[60px] bg-[rgba(38,38,38,0.08)] rounded-full">
+                        <div className="h-full bg-[rgba(38,38,38,0.20)] rounded-full" style={{ width: `${externalData.walkScore.transitScore}%` }} />
                       </div>
                     </div>
                   )}
                   {externalData.walkScore.bikeScore != null && (
                     <div className="space-y-[2px]">
                       <p className="text-micro text-[--text-tertiary] tabular-nums">BIKE {externalData.walkScore.bikeScore}</p>
-                      <div className="h-[2px] w-[60px] bg-[rgba(120,80,200,0.08)]">
-                        <div className="h-full bg-[rgba(120,80,200,0.20)]" style={{ width: `${externalData.walkScore.bikeScore}%` }} />
+                      <div className="h-[2px] w-[60px] bg-[rgba(38,38,38,0.08)] rounded-full">
+                        <div className="h-full bg-[rgba(38,38,38,0.20)] rounded-full" style={{ width: `${externalData.walkScore.bikeScore}%` }} />
                       </div>
                     </div>
                   )}
@@ -449,12 +449,12 @@ export default function NeighborhoodDetailPage() {
 
             {/* Safety */}
             {crimeData && crimeData.dataQuality !== 'unavailable' && (
-              <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+              <div className="surface-flat rounded-lg p-[var(--space-5)] space-y-[var(--space-3)]">
                 <p className="text-label text-[--text-ghost]">SAFETY (STATE)</p>
                 {riskLevel && (
                   <p className={`text-heading font-light ${
                     riskLevel === 'LOW RISK' ? 'text-[--text-secondary]'
-                    : riskLevel === 'HIGH RISK' ? 'text-[--vapor-pink]'
+                    : riskLevel === 'HIGH RISK' ? 'text-[--accent-rose]'
                     : 'text-[--text-primary]'
                   }`}>
                     {riskLevel}
@@ -474,9 +474,9 @@ export default function NeighborhoodDetailPage() {
                           {diff > 0 ? '+' : ''}{diff}%
                         </span>
                       </div>
-                      <div className="relative h-[3px] w-full bg-[rgba(120,80,200,0.08)]">
-                        <div className="h-full bg-[#B36BFF99]" style={{ width: `${Math.min((crimeData.violentCrimeRate / barMax) * 100, 100)}%` }} />
-                        <div className="absolute top-[-2px] h-[7px] w-[1px] bg-[#FF6B9D66]" style={{ left: `${Math.min((NATIONAL.violentCrime / barMax) * 100, 100)}%` }} />
+                      <div className="relative h-[3px] w-full bg-[rgba(38,38,38,0.08)] rounded-full">
+                        <div className="h-full bg-[--accent-rose] rounded-full" style={{ width: `${Math.min((crimeData.violentCrimeRate / barMax) * 100, 100)}%` }} />
+                        <div className="absolute top-[-2px] h-[7px] w-[1px] bg-[--accent-rose]/40" style={{ left: `${Math.min((NATIONAL.violentCrime / barMax) * 100, 100)}%` }} />
                       </div>
                     </div>
                   );
@@ -495,9 +495,9 @@ export default function NeighborhoodDetailPage() {
                           {diff > 0 ? '+' : ''}{diff}%
                         </span>
                       </div>
-                      <div className="relative h-[3px] w-full bg-[rgba(120,80,200,0.08)]">
-                        <div className="h-full bg-[#B36BFF99]" style={{ width: `${Math.min((crimeData.propertyCrimeRate / barMax) * 100, 100)}%` }} />
-                        <div className="absolute top-[-2px] h-[7px] w-[1px] bg-[#FF6B9D66]" style={{ left: `${Math.min((NATIONAL.propertyCrime / barMax) * 100, 100)}%` }} />
+                      <div className="relative h-[3px] w-full bg-[rgba(38,38,38,0.08)] rounded-full">
+                        <div className="h-full bg-[--accent-rose] rounded-full" style={{ width: `${Math.min((crimeData.propertyCrimeRate / barMax) * 100, 100)}%` }} />
+                        <div className="absolute top-[-2px] h-[7px] w-[1px] bg-[--accent-rose]/40" style={{ left: `${Math.min((NATIONAL.propertyCrime / barMax) * 100, 100)}%` }} />
                       </div>
                     </div>
                   );
@@ -526,7 +526,7 @@ export default function NeighborhoodDetailPage() {
                 : null;
 
               return (
-                <div className="surface-1 p-[var(--space-5)] space-y-[var(--space-3)]">
+                <div className="surface-flat rounded-lg p-[var(--space-5)] space-y-[var(--space-3)]">
                   <p className="text-label text-[--text-ghost]">COST OF LIVING</p>
 
                   {medianRent != null && (
@@ -576,16 +576,16 @@ export default function NeighborhoodDetailPage() {
 
         {/* ═══ 4. EVENTS: Horizontal scroll strip ═══ */}
         {externalData?.events && externalData.events.events.length > 0 && (
-          <div className="animate-fade-up [animation-delay:120ms]">
+          <div className="animate-reveal [animation-delay:120ms]">
             <p className="text-label text-[--text-ghost] mb-[var(--space-2)]">LOCAL EVENTS</p>
-            <div className="flex gap-px overflow-x-auto pb-[var(--space-1)]">
+            <div className="flex gap-3 overflow-x-auto pb-[var(--space-1)]">
               {externalData.events.events.map((event) => (
                 <a
                   key={event.url}
                   href={event.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="surface-1 p-[var(--space-3)] min-w-[180px] max-w-[220px] shrink-0 hover:bg-[--bg-surface-2] transition-colors group"
+                  className="surface-flat rounded-lg p-[var(--space-3)] min-w-[180px] max-w-[220px] shrink-0 hover:bg-[--bg-secondary] transition-colors group"
                 >
                   <p className="text-caption text-[--text-secondary] group-hover:text-[--text-primary] transition-colors truncate">
                     {event.name}
@@ -595,7 +595,7 @@ export default function NeighborhoodDetailPage() {
                       {format(new Date(event.date), 'MMM d').toUpperCase()}
                     </span>
                     {event.isFree && (
-                      <span className="text-micro text-[--vapor-pink] tracking-[0.12em]">FREE</span>
+                      <span className="text-micro text-[--accent-rose] tracking-[0.12em]">FREE</span>
                     )}
                   </div>
                 </a>
@@ -604,13 +604,13 @@ export default function NeighborhoodDetailPage() {
           </div>
         )}
         {externalData?.events && externalData.events.events.length === 0 && externalData.events.upcomingEventCount === 0 && (
-          <p className="text-micro text-[--text-tertiary] animate-fade-up [animation-delay:120ms]">
+          <p className="text-micro text-[--text-tertiary] animate-reveal [animation-delay:120ms]">
             No upcoming events tracked for this area
           </p>
         )}
 
         {/* ═══ 5. REVIEWS ═══ */}
-        <div ref={reviewsSectionRef} className="animate-fade-up [animation-delay:150ms]">
+        <div ref={reviewsSectionRef} className="animate-reveal [animation-delay:150ms]">
           <p className="text-label text-[--text-ghost] mb-[var(--space-4)]">REVIEWS</p>
 
           {/* Two-column header: distribution + write/user review */}
@@ -623,7 +623,7 @@ export default function NeighborhoodDetailPage() {
             {/* Right: Write review or user's existing review */}
             <div className="md:w-1/2">
               {session && userReview && !editingReview ? (
-                <div className="surface-1 p-[var(--space-4)] space-y-[var(--space-3)]">
+                <div className="surface-flat rounded-lg p-[var(--space-4)] space-y-[var(--space-3)]">
                   <p className="text-label text-[--text-ghost]">YOUR REVIEW</p>
                   <StarRating value={userReview.rating} readonly />
                   {userReview.comment && (
@@ -648,7 +648,7 @@ export default function NeighborhoodDetailPage() {
                   </div>
                 </div>
               ) : session && !showReviewForm && !editingReview ? (
-                <div className="surface-1 p-[var(--space-4)] flex items-center justify-center h-full">
+                <div className="surface-flat rounded-lg p-[var(--space-4)] flex items-center justify-center h-full">
                   <Button onClick={() => setShowReviewForm(true)}>
                     WRITE A REVIEW
                   </Button>
@@ -659,7 +659,7 @@ export default function NeighborhoodDetailPage() {
 
           {/* Expanded review form */}
           {session && (showReviewForm || editingReview) && (
-            <div className="surface-1 p-[var(--space-5)] mt-[var(--space-4)]">
+            <div className="surface-flat rounded-lg p-[var(--space-5)] mt-[var(--space-4)]">
               <p className="text-label text-[--text-ghost] mb-[var(--space-4)]">
                 {editingReview ? 'EDIT YOUR REVIEW' : 'WRITE A REVIEW'}
               </p>
@@ -693,7 +693,7 @@ export default function NeighborhoodDetailPage() {
                   return (
                     <div
                       key={review.id}
-                      className="py-[var(--space-3)] border-t border-[--border-default]"
+                      className="py-[var(--space-3)] border-t border-[rgba(38,38,38,0.08)]"
                     >
                       {/* Single-line header */}
                       <div className="flex items-center gap-[var(--space-2)]">
@@ -702,7 +702,7 @@ export default function NeighborhoodDetailPage() {
                             src={review.user.image ?? undefined}
                             alt={review.user.name ?? 'User'}
                           />
-                          <AvatarFallback className="rounded-full bg-[--bg-surface-2] text-[6px] tracking-[0.15em] text-[--text-tertiary]">
+                          <AvatarFallback className="rounded-full bg-[--bg-secondary] text-[6px] tracking-[0.15em] text-[--text-tertiary]">
                             {getInitials(review.user.name)}
                           </AvatarFallback>
                         </Avatar>
@@ -744,7 +744,7 @@ export default function NeighborhoodDetailPage() {
 
         {/* ═══ 6. ABOUT ═══ */}
         {neighborhood.description && (
-          <div className="surface-1 p-[var(--space-5)] animate-fade-up [animation-delay:180ms]">
+          <div className="surface-flat rounded-lg p-[var(--space-5)] animate-reveal [animation-delay:180ms]">
             <p className="text-label text-[--text-ghost] mb-[var(--space-3)]">ABOUT</p>
             <p className="text-body text-[--text-secondary]">{neighborhood.description}</p>
           </div>
