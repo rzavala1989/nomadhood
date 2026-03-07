@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.1 — 2026-03-06
+
+style: theme migration and restore main layout for index
+
 ## v0.2.0 — 2026-03-05
 
 feat: multi-dimension reviews, personalized recommendations, trend snapshots
