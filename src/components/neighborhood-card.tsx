@@ -37,7 +37,7 @@ export function NeighborhoodCard({
       <div className="relative">
         {/* Image */}
         {imageUrl && (
-          <div className="relative aspect-[3/4] overflow-hidden rounded-lg mb-4">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-lg mb-4">
             <img
               src={imageUrl}
               alt={imageAlt ?? `${neighborhood.name} neighborhood`}
