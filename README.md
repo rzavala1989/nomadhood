@@ -49,6 +49,10 @@ prisma/
 docs/              Project documentation
 ```
 
+## TODOs
+
+- [ ] Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to Vercel environment variables to enable Google OAuth in production
+
 ## License
 
 Private.
