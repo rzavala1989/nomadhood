@@ -15,7 +15,7 @@ function HeroSection() {
   const { data: me, isLoading: meLoading } = trpc.user.me.useQuery();
 
   return (
-    <section className="min-h-screen flex items-center relative overflow-hidden">
+    <section className="min-h-[calc(100vh-80px)] flex items-center relative overflow-hidden">
       <div className="mx-auto max-w-7xl px-6 grid grid-cols-12 gap-8 items-center w-full">
         {/* Left: Headline */}
         <div className="col-span-12 lg:col-span-7">
@@ -136,13 +136,12 @@ function FeaturedSection() {
         </div>
 
         {/* Staggered 2-column grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-0">
+        {/* Mobile: single column in order */}
+        <div className="flex flex-col gap-12 md:hidden">
           {recent.neighborhoods.map((n, i) => (
             <div
               key={n.id}
-              className={`${i % 2 === 1 ? 'md:mt-[100px]' : ''} mb-12 ${
-                isVisible ? 'animate-reveal' : 'opacity-0'
-              }`}
+              className={isVisible ? 'animate-reveal' : 'opacity-0'}
               style={{ animationDelay: `${300 + i * 100}ms` }}
             >
               <NeighborhoodCard
@@ -154,6 +153,43 @@ function FeaturedSection() {
               />
             </div>
           ))}
+        </div>
+        {/* Desktop: two independent flex columns so mt offset doesn't inflate row heights */}
+        <div className="hidden md:flex gap-x-8">
+          <div className="flex-1 flex flex-col gap-12">
+            {recent.neighborhoods.filter((_, i) => i % 2 === 0).map((n, idx) => (
+              <div
+                key={n.id}
+                className={isVisible ? 'animate-reveal' : 'opacity-0'}
+                style={{ animationDelay: `${300 + idx * 200}ms` }}
+              >
+                <NeighborhoodCard
+                  neighborhood={n}
+                  nomadScore={n.nomadScore}
+                  imageUrl={imageMap?.[n.id]?.[0]?.thumbUrl ?? imageMap?.[n.id]?.[0]?.imageUrl}
+                  imageAlt={imageMap?.[n.id]?.[0]?.altText ?? undefined}
+                  imageSource={imageMap?.[n.id]?.[0]?.source}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex-1 flex flex-col gap-12 mt-[100px]">
+            {recent.neighborhoods.filter((_, i) => i % 2 === 1).map((n, idx) => (
+              <div
+                key={n.id}
+                className={isVisible ? 'animate-reveal' : 'opacity-0'}
+                style={{ animationDelay: `${400 + idx * 200}ms` }}
+              >
+                <NeighborhoodCard
+                  neighborhood={n}
+                  nomadScore={n.nomadScore}
+                  imageUrl={imageMap?.[n.id]?.[0]?.thumbUrl ?? imageMap?.[n.id]?.[0]?.imageUrl}
+                  imageAlt={imageMap?.[n.id]?.[0]?.altText ?? undefined}
+                  imageSource={imageMap?.[n.id]?.[0]?.source}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
