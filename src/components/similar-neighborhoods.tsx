@@ -20,9 +20,9 @@ export function SimilarNeighborhoods({ neighborhoodId, state }: { neighborhoodId
       <p className="text-label text-[--text-ghost] mb-[var(--space-4)]">
         SIMILAR IN {state}
       </p>
-      <div className="grid grid-cols-1 gap-x-6 gap-y-0 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {similar.map((n, i) => (
-          <div key={n.id} className={`animate-reveal mb-8 ${i % 2 === 1 ? 'md:mt-[60px]' : ''}`} style={{ animationDelay: `${400 + i * 60}ms` }}>
+          <div key={n.id} className="animate-reveal" style={{ animationDelay: `${400 + i * 60}ms` }}>
             <NeighborhoodCard
               neighborhood={n}
               imageUrl={imageMap?.[n.id]?.[0]?.thumbUrl ?? imageMap?.[n.id]?.[0]?.imageUrl}

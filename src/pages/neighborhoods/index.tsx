@@ -222,9 +222,9 @@ export default function NeighborhoodsPage() {
               }`}
             >
               {isLoading ? (
-                <div className={'grid grid-cols-2 gap-x-8 gap-y-0'}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <Skeleton key={i} className={`aspect-square w-full rounded-lg mb-12 ${i % 2 === 1 ? 'md:mt-[100px]' : ''}`} />
+                    <Skeleton key={i} className="aspect-[4/3] w-full rounded-lg" />
                   ))}
                 </div>
               ) : !filteredNeighborhoods || filteredNeighborhoods.length === 0 ? (

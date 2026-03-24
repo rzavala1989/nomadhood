@@ -154,8 +154,8 @@ function FeaturedSection() {
             </div>
           ))}
         </div>
-        {/* Desktop: two independent flex columns so mt offset doesn't inflate row heights */}
-        <div className="hidden md:flex gap-x-8">
+        {/* Desktop: two independent flex columns with subtle stagger */}
+        <div className="hidden md:flex gap-x-12">
           <div className="flex-1 flex flex-col gap-12">
             {recent.neighborhoods.filter((_, i) => i % 2 === 0).map((n, idx) => (
               <div
@@ -173,7 +173,7 @@ function FeaturedSection() {
               </div>
             ))}
           </div>
-          <div className="flex-1 flex flex-col gap-12 mt-[100px]">
+          <div className="flex-1 flex flex-col gap-12 mt-16">
             {recent.neighborhoods.filter((_, i) => i % 2 === 1).map((n, idx) => (
               <div
                 key={n.id}
