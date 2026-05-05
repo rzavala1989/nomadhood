@@ -37,6 +37,32 @@ jobs:
       - name: Lint
         run: bun run lint
 
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache bun store
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: ${{ runner.os }}-bun-
+
+      - name: Install deps
+        run: bun install
+
+      - name: Generate Prisma client
+        run: bun run generate
+
+      - name: Run unit tests
+        run: bun run test-unit -- --run
+
   e2e:
     name: Build and E2E Tests
     runs-on: ubuntu-latest
